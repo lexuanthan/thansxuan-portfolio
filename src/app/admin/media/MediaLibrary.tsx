@@ -58,6 +58,23 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
     router.refresh();
   }
 
+  async function toggleLogo(item: MediaItem) {
+    setBusy(item.id);
+    const next = !item.is_logo;
+    const { error } = await createClient()
+      .from("media")
+      .update({ is_logo: next })
+      .eq("id", item.id);
+
+    if (error) setErrors([error.message]);
+    else
+      setItems((prev) =>
+        prev.map((m) => (m.id === item.id ? { ...m, is_logo: next } : m))
+      );
+    setBusy(null);
+    router.refresh();
+  }
+
   async function copyUrl(url: string) {
     try {
       await navigator.clipboard.writeText(url);
@@ -143,6 +160,11 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />
+                {m.is_logo && (
+                  <span className="absolute left-2 top-2 rounded-full bg-cyan-500/90 px-2 py-0.5 text-[10px] font-bold text-white">
+                    LOGO
+                  </span>
+                )}
               </div>
               <div className="p-3">
                 <p className="truncate text-xs font-medium text-white" title={m.name}>
@@ -153,7 +175,20 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                   {new Date(m.created_at).toLocaleDateString("vi-VN")}
                 </p>
 
-                <div className="mt-3 flex gap-1.5">
+                <button
+                  onClick={() => toggleLogo(m)}
+                  disabled={busy === m.id}
+                  className={`mt-2 w-full rounded-md border px-2 py-1.5 text-[11px] transition disabled:opacity-50 ${
+                    m.is_logo
+                      ? "border-cyan-500 bg-cyan-500/15 text-cyan-200"
+                      : "border-white/10 text-slate-400 hover:bg-white/5"
+                  }`}
+                  title="Logo được đánh dấu sẽ hiện trong tool ghép ảnh"
+                >
+                  {m.is_logo ? "✓ Là logo" : "Đánh dấu là logo"}
+                </button>
+
+                <div className="mt-2 flex gap-1.5">
                   <button
                     onClick={() => copyUrl(m.url)}
                     className="flex-1 rounded-md border border-white/10 px-2 py-1.5 text-[11px] text-slate-300 transition hover:bg-white/5 hover:text-white"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { inputClass } from "./ui";
+import { inputClass } from "./styles";
 
 export default function TagInput({
   value,

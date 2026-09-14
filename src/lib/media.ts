@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { MEDIA_BUCKET } from "@/lib/supabase/config";
+import { slugify } from "@/lib/slug";
 import type { MediaItem } from "@/lib/types";
 
 /** Bỏ dấu tiếng Việt + ký tự lạ để tên file an toàn trên storage. */
@@ -8,15 +9,7 @@ export function safeFileName(name: string): string {
   const base = dot > 0 ? name.slice(0, dot) : name;
   const ext = dot > 0 ? name.slice(dot + 1).toLowerCase() : "bin";
 
-  const slug = base
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
+  const slug = slugify(base, 60);
 
   const stamp = Date.now().toString(36);
   const rand = Math.random().toString(36).slice(2, 7);

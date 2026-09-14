@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { uploadMedia } from "@/lib/media";
 import type { MediaItem } from "@/lib/types";
-import { inputClass } from "./ui";
+import { inputClass } from "./styles";
 
 export default function ImagePicker({
   value,

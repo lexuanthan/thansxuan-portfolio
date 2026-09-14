@@ -76,6 +76,7 @@ export type MediaItem = {
   url: string;
   size: number;
   mime_type: string;
+  is_logo: boolean;
   created_at: string;
 };
 

@@ -5,21 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { COLOR_PRESETS, type Project } from "@/lib/types";
+import { slugify } from "@/lib/slug";
 import { Card, Field, inputClass } from "@/components/admin/ui";
 import TagInput from "@/components/admin/TagInput";
 import ImagePicker from "@/components/admin/ImagePicker";
-
-function slugify(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "D")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 80);
-}
 
 type FormState = {
   title: string;
