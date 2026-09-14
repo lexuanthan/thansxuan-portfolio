@@ -23,7 +23,18 @@ export function normalizePrompt(raw: unknown): string {
 }
 
 export function normalizeSteps(raw: unknown): number {
-  const n = typeof raw === "number" ? raw : Number(raw);
+  // Number(null), Number(""), Number([]), Number(false) đều ra 0 — nếu để lọt
+  // vào clamp thì 0 bị kẹp thành 1 bước, ảnh sinh ra mờ mà không ai báo lỗi.
+  // Chỉ số thật hoặc chuỗi số mới được coi là giá trị người dùng nhập.
+  let n: number;
+  if (typeof raw === "number") {
+    n = raw;
+  } else if (typeof raw === "string" && raw.trim() !== "") {
+    n = Number(raw);
+  } else {
+    return DEFAULT_STEPS;
+  }
+
   if (!Number.isFinite(n)) return DEFAULT_STEPS;
   return Math.min(MAX_STEPS, Math.max(MIN_STEPS, Math.round(n)));
 }

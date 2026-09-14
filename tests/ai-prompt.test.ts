@@ -67,6 +67,16 @@ describe("normalizeSteps", () => {
     expect(normalizeSteps(Number.NaN)).toBe(DEFAULT_STEPS);
     expect(normalizeSteps(Infinity)).toBe(DEFAULT_STEPS);
   });
+
+  it("giá trị rỗng không được lặng lẽ tụt xuống 1 bước", () => {
+    // Number("") và Number([]) đều ra 0, nếu lọt vào clamp sẽ thành 1 bước
+    // và người dùng nhận ảnh mờ mà không có lỗi nào báo.
+    expect(normalizeSteps("")).toBe(DEFAULT_STEPS);
+    expect(normalizeSteps("   ")).toBe(DEFAULT_STEPS);
+    expect(normalizeSteps([])).toBe(DEFAULT_STEPS);
+    expect(normalizeSteps(false)).toBe(DEFAULT_STEPS);
+    expect(normalizeSteps({})).toBe(DEFAULT_STEPS);
+  });
 });
 
 describe("estimateNeurons", () => {
