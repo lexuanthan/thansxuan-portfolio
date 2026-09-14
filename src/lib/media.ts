@@ -25,10 +25,14 @@ export function formatBytes(bytes: number): string {
 
 export const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8 MB
 
-/** Upload 1 file lên bucket `media` và ghi record vào bảng `media`. */
+/**
+ * Upload 1 file lên bucket `media` và ghi record vào bảng `media`.
+ * `isLogo` dùng cho trang quản lý logo — ảnh upload từ đó được đánh dấu ngay.
+ */
 export async function uploadMedia(
   supabase: SupabaseClient,
-  file: File
+  file: File,
+  options: { isLogo?: boolean } = {}
 ): Promise<MediaItem> {
   if (!file.type.startsWith("image/")) {
     throw new Error(`"${file.name}" không phải file ảnh.`);
@@ -61,6 +65,7 @@ export async function uploadMedia(
       url: publicUrl,
       size: file.size,
       mime_type: file.type,
+      is_logo: options.isLogo ?? false,
     })
     .select()
     .single();

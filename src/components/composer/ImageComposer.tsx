@@ -10,6 +10,13 @@ import {
   MIN_CANVAS_SIDE,
   SIZE_PRESETS,
 } from "@/lib/composer/presets";
+import { createClient as createSupabaseBrowser } from "@/lib/supabase/client";
+import {
+  DEFAULT_STEPS,
+  MAX_STEPS,
+  MIN_STEPS,
+  estimateFreeImagesPerDay,
+} from "@/lib/ai/prompt";
 import {
   FONT_OPTIONS,
   WEIGHT_OPTIONS,
@@ -47,6 +54,13 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState("thiet-ke");
 
+  // AI sinh ảnh nền — chỉ mở cho tài khoản đã đăng nhập
+  const [canUseAi, setCanUseAi] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiSteps, setAiSteps] = useState(DEFAULT_STEPS);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
   const historyRef = useRef<ComposerDoc[]>([]);
   const lastPushRef = useRef(0);
   const objectUrlsRef = useRef<string[]>([]);
@@ -57,6 +71,50 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
     const urls = objectUrlsRef.current;
     return () => urls.forEach((u) => URL.revokeObjectURL(u));
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    createSupabaseBrowser()
+      .auth.getUser()
+      .then(({ data }) => {
+        if (!cancelled) setCanUseAi(Boolean(data.user));
+      })
+      .catch(() => {
+        /* chưa cấu hình Supabase — cứ coi như chưa đăng nhập */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function generateBackground() {
+    const prompt = aiPrompt.trim();
+    if (prompt.length < 3) {
+      setAiError("Hãy mô tả ảnh anh muốn tạo.");
+      return;
+    }
+
+    setAiBusy(true);
+    setAiError(null);
+    try {
+      const res = await fetch("/api/ai/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, steps: aiSteps }),
+      });
+      const data = (await res.json()) as { image?: string; error?: string };
+
+      if (!res.ok || !data.image) {
+        setAiError(data.error ?? "Không sinh được ảnh.");
+        return;
+      }
+      setBackground(data.image);
+    } catch {
+      setAiError("Mất kết nối khi đang sinh ảnh.");
+    } finally {
+      setAiBusy(false);
+    }
+  }
 
   const selected = doc.layers.find((l) => l.id === selectedId) ?? null;
 
@@ -369,6 +427,55 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
           </div>
         </Panel>
 
+        {canUseAi && (
+          <Panel title="✨ Sinh ảnh nền bằng AI">
+            <textarea
+              className={`${input} min-h-[90px] resize-y`}
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="VD: sinh viên tình nguyện áo xanh đang trồng cây, ánh nắng buổi sáng, phong cách ảnh báo chí"
+            />
+
+            <label className="mt-3 block text-xs text-slate-400">
+              <span className="mb-1 flex items-center justify-between">
+                Độ chi tiết
+                <span className="text-slate-500">
+                  {aiSteps} bước · còn ~{estimateFreeImagesPerDay(aiSteps)} ảnh/ngày
+                </span>
+              </span>
+              <input
+                type="range"
+                min={MIN_STEPS}
+                max={MAX_STEPS}
+                step={1}
+                value={aiSteps}
+                onChange={(e) => setAiSteps(Number(e.target.value))}
+                className="w-full accent-fuchsia-500"
+              />
+            </label>
+
+            <button
+              type="button"
+              onClick={generateBackground}
+              disabled={aiBusy}
+              className="mt-3 w-full rounded-lg bg-gradient-to-r from-fuchsia-600 to-purple-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:from-fuchsia-500 hover:to-purple-500 disabled:opacity-60"
+            >
+              {aiBusy ? "Đang vẽ…" : "✨ Sinh ảnh nền"}
+            </button>
+
+            {aiError && (
+              <p className="mt-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-300">
+                {aiError}
+              </p>
+            )}
+
+            <p className="mt-2 text-[11px] leading-relaxed text-slate-500">
+              Ảnh sinh ra thay cho ảnh nền hiện tại. Logo vẫn được ghép từ file gốc
+              nên không bị AI vẽ lại.
+            </p>
+          </Panel>
+        )}
+
         <Panel title="Ảnh nền">
           <input
             ref={bgFileRef}
@@ -488,24 +595,31 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
             ⬆ Tải logo của bạn
           </button>
 
-          {presetLogos.length > 0 && (
-            <>
-              <p className="mt-4 mb-2 text-xs font-semibold text-slate-400">Logo có sẵn</p>
-              <div className="grid grid-cols-3 gap-2">
-                {presetLogos.map((logo) => (
-                  <button
-                    key={logo.id}
-                    type="button"
-                    title={logo.name}
-                    onClick={() => addLogo(logo.url, logo.name)}
-                    className="flex h-16 items-center justify-center rounded-lg border border-white/10 bg-white/95 p-1.5 transition hover:border-cyan-400"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={logo.url} alt={logo.name} className="max-h-full max-w-full object-contain" />
-                  </button>
-                ))}
-              </div>
-            </>
+          <p className="mt-4 mb-2 text-xs font-semibold text-slate-400">
+            Logo có sẵn {presetLogos.length > 0 && `(${presetLogos.length})`}
+          </p>
+
+          {presetLogos.length > 0 ? (
+            <div className="grid grid-cols-3 gap-2">
+              {presetLogos.map((logo) => (
+                <button
+                  key={logo.id}
+                  type="button"
+                  title={`Chèn ${logo.name}`}
+                  onClick={() => addLogo(logo.url, logo.name)}
+                  className="flex h-16 items-center justify-center rounded-lg border border-white/10 bg-white/95 p-1.5 transition hover:border-cyan-400"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={logo.url} alt={logo.name} className="max-h-full max-w-full object-contain" />
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="rounded-lg border border-dashed border-white/15 px-3 py-4 text-center text-[11px] leading-relaxed text-slate-500">
+              Chưa có logo nào được nạp sẵn.
+              <br />
+              Quản trị viên thêm ở mục <span className="text-slate-400">Logo có sẵn</span> trong admin.
+            </p>
           )}
 
           <button type="button" className={`${btn} mt-3 w-full`} onClick={addText}>
