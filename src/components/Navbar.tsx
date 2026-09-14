@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 
-export default function Navbar() {
+export default function Navbar({ brandName }: { brandName?: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const links = [
@@ -18,8 +18,11 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition">
-            Thế giới của Thân LX
+          <Link
+            href="/"
+            className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent hover:opacity-80 transition"
+          >
+            {brandName || "Thế giới của Thân LX"}
           </Link>
 
           {/* Desktop Menu */}
@@ -39,17 +42,26 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
+            aria-label="Mở menu"
             className="md:hidden flex flex-col gap-1.5"
           >
-            <div className={`w-6 h-0.5 bg-gray-800 transition-transform ${isOpen ? "rotate-45 translate-y-2" : ""}`}></div>
+            <div
+              className={`w-6 h-0.5 bg-gray-800 transition-transform ${
+                isOpen ? "rotate-45 translate-y-2" : ""
+              }`}
+            ></div>
             <div className={`w-6 h-0.5 bg-gray-800 ${isOpen ? "opacity-0" : ""}`}></div>
-            <div className={`w-6 h-0.5 bg-gray-800 transition-transform ${isOpen ? "-rotate-45 -translate-y-2" : ""}`}></div>
+            <div
+              className={`w-6 h-0.5 bg-gray-800 transition-transform ${
+                isOpen ? "-rotate-45 -translate-y-2" : ""
+              }`}
+            ></div>
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden pb-4 space-y-2 animate-in">
+          <div className="md:hidden pb-4 space-y-2">
             {links.map((link) => (
               <Link
                 key={link.href}
