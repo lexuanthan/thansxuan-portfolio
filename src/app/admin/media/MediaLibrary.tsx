@@ -104,15 +104,15 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
         onClick={() => !uploading && fileRef.current?.click()}
         className={`mb-6 cursor-pointer rounded-xl border-2 border-dashed px-6 py-12 text-center transition ${
           dragging
-            ? "border-blue-500 bg-blue-500/10"
-            : "border-white/15 bg-slate-800/30 hover:border-white/30"
+            ? "border-brand-400 bg-brand-50"
+            : "border-line-strong bg-surface-soft hover:border-brand-300"
         }`}
       >
         <div className="mb-2 text-4xl">{uploading ? "⏳" : "⬆️"}</div>
-        <p className="font-medium text-white">
+        <p className="font-medium text-ink-900">
           {uploading ? progress : "Kéo thả ảnh vào đây hoặc bấm để chọn file"}
         </p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-ink-500">
           PNG, JPG, WEBP, GIF, SVG · tối đa {formatBytes(MAX_UPLOAD_BYTES)} mỗi file
         </p>
         <input
@@ -126,22 +126,22 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
       </div>
 
       {errors.length > 0 && (
-        <div className="mb-6 space-y-1 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="mb-6 space-y-1 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {errors.map((e, i) => (
             <p key={i}>{e}</p>
           ))}
         </div>
       )}
 
-      <p className="mb-4 text-sm text-slate-400">
+      <p className="mb-4 text-sm text-ink-500">
         {items.length} ảnh · tổng {formatBytes(totalSize)}
       </p>
 
       {items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-white/15 bg-slate-800/30 px-6 py-16 text-center">
+        <div className="rounded-xl border border-dashed border-line-strong bg-surface-soft px-6 py-16 text-center">
           <div className="mb-3 text-4xl">🖼️</div>
-          <h3 className="text-lg font-semibold text-white">Thư viện trống</h3>
-          <p className="mt-1.5 text-sm text-slate-400">
+          <h3 className="text-lg font-semibold text-ink-900">Thư viện trống</h3>
+          <p className="mt-1.5 text-sm text-ink-500">
             Upload ảnh đầu tiên để dùng cho project và trang About.
           </p>
         </div>
@@ -150,9 +150,9 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
           {items.map((m) => (
             <div
               key={m.id}
-              className="group overflow-hidden rounded-xl border border-white/10 bg-slate-800/40"
+              className="group overflow-hidden rounded-xl border border-line bg-surface"
             >
-              <div className="relative aspect-[4/3] bg-slate-900">
+              <div className="relative aspect-[4/3] bg-surface">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={m.url}
@@ -161,16 +161,16 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                   loading="lazy"
                 />
                 {m.is_logo && (
-                  <span className="absolute left-2 top-2 rounded-full bg-cyan-500/90 px-2 py-0.5 text-[10px] font-bold text-white">
+                  <span className="absolute left-2 top-2 rounded-full bg-brand-400 px-2 py-0.5 text-[10px] font-bold text-ink-900">
                     LOGO
                   </span>
                 )}
               </div>
               <div className="p-3">
-                <p className="truncate text-xs font-medium text-white" title={m.name}>
+                <p className="truncate text-xs font-medium text-ink-900" title={m.name}>
                   {m.name}
                 </p>
-                <p className="mt-0.5 text-[11px] text-slate-500">
+                <p className="mt-0.5 text-[11px] text-ink-400">
                   {formatBytes(m.size)} ·{" "}
                   {new Date(m.created_at).toLocaleDateString("vi-VN")}
                 </p>
@@ -180,8 +180,8 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                   disabled={busy === m.id}
                   className={`mt-2 w-full rounded-md border px-2 py-1.5 text-[11px] transition disabled:opacity-50 ${
                     m.is_logo
-                      ? "border-cyan-500 bg-cyan-500/15 text-cyan-200"
-                      : "border-white/10 text-slate-400 hover:bg-white/5"
+                      ? "border-brand-400 bg-brand-100 text-brand-800"
+                      : "border-line text-ink-500 hover:bg-brand-50"
                   }`}
                   title="Logo được đánh dấu sẽ hiện trong tool ghép ảnh"
                 >
@@ -191,7 +191,7 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                 <div className="mt-2 flex gap-1.5">
                   <button
                     onClick={() => copyUrl(m.url)}
-                    className="flex-1 rounded-md border border-white/10 px-2 py-1.5 text-[11px] text-slate-300 transition hover:bg-white/5 hover:text-white"
+                    className="flex-1 rounded-md border border-line px-2 py-1.5 text-[11px] text-ink-700 transition hover:bg-brand-50 hover:text-brand-700"
                   >
                     {copied === m.url ? "✓ Đã copy" : "Copy URL"}
                   </button>
@@ -200,13 +200,13 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                       <button
                         onClick={() => remove(m)}
                         disabled={busy === m.id}
-                        className="rounded-md bg-red-600 px-2 py-1.5 text-[11px] font-medium text-white transition hover:bg-red-500 disabled:opacity-50"
+                        className="rounded-md bg-rose-600 px-2 py-1.5 text-[11px] font-medium text-ink-900 transition hover:bg-rose-500 disabled:opacity-50"
                       >
                         {busy === m.id ? "…" : "Xoá"}
                       </button>
                       <button
                         onClick={() => setConfirmId(null)}
-                        className="rounded-md border border-white/10 px-2 py-1.5 text-[11px] text-slate-300"
+                        className="rounded-md border border-line px-2 py-1.5 text-[11px] text-ink-700"
                       >
                         ✕
                       </button>
@@ -214,7 +214,7 @@ export default function MediaLibrary({ initial }: { initial: MediaItem[] }) {
                   ) : (
                     <button
                       onClick={() => setConfirmId(m.id)}
-                      className="rounded-md border border-red-500/30 px-2 py-1.5 text-[11px] text-red-300 transition hover:bg-red-500/10"
+                      className="rounded-md border border-rose-200 px-2 py-1.5 text-[11px] text-rose-700 transition hover:bg-rose-50"
                     >
                       Xoá
                     </button>

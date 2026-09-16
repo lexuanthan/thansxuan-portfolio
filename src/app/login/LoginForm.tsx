@@ -59,7 +59,7 @@ export default function LoginForm() {
       <div>
         <label
           htmlFor="email"
-          className="mb-2 block text-sm font-medium text-slate-300"
+          className="mb-2 block text-sm font-medium text-ink-700"
         >
           Email
         </label>
@@ -71,14 +71,14 @@ export default function LoginForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="ban@example.com"
-          className="w-full rounded-lg border border-white/10 bg-slate-900/60 px-4 py-3 text-white placeholder-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+          className="w-full rounded-lg border border-line bg-surface-soft px-4 py-3 text-ink-900 placeholder-ink-400 outline-none transition focus:border-brand-400 focus:bg-surface"
         />
       </div>
 
       <div>
         <label
           htmlFor="password"
-          className="mb-2 block text-sm font-medium text-slate-300"
+          className="mb-2 block text-sm font-medium text-ink-700"
         >
           Mật khẩu
         </label>
@@ -91,12 +91,12 @@ export default function LoginForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full rounded-lg border border-white/10 bg-slate-900/60 px-4 py-3 pr-20 text-white placeholder-slate-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
+            className="w-full rounded-lg border border-line bg-surface-soft px-4 py-3 pr-20 text-ink-900 placeholder-ink-400 outline-none transition focus:border-brand-400 focus:bg-surface"
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-slate-400 hover:text-white"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-ink-500 hover:text-brand-700"
           >
             {showPassword ? "Ẩn" : "Hiện"}
           </button>
@@ -106,7 +106,7 @@ export default function LoginForm() {
       {error && (
         <div
           role="alert"
-          className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+          className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700"
         >
           {error}
         </div>
@@ -115,14 +115,14 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 font-semibold text-white transition hover:from-blue-500 hover:to-purple-500 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-lg bg-brand-400 px-4 py-3 font-semibold text-ink-900 shadow-brand transition hover:bg-brand-300 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Đang đăng nhập…" : "Đăng nhập"}
       </button>
 
       <Link
         href="/"
-        className="block text-center text-sm text-slate-400 transition hover:text-white"
+        className="block text-center text-sm text-ink-500 transition hover:text-brand-700"
       >
         ← Về trang chủ
       </Link>

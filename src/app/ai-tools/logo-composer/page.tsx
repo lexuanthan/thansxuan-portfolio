@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import SiteShell from "@/components/SiteShell";
 import ImageComposer, { type PresetLogo } from "@/components/composer/ImageComposer";
+import { Chip } from "@/components/ui";
+import { IconArrow } from "@/components/ui/icons";
 import { createPublicClient } from "@/lib/supabase/public";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Ghép logo & chữ lên ảnh · Lê Xuân Thân",
+  title: "Ghép logo & chữ lên ảnh",
   description:
     "Công cụ ghép logo gốc và chữ lên ảnh ngay trên trình duyệt. Logo giữ nguyên từng pixel, không bị AI vẽ lại sai.",
 };
@@ -36,28 +38,32 @@ export default async function LogoComposerPage() {
 
   return (
     <SiteShell>
-      <div className="min-h-screen bg-slate-900 py-10 text-white">
-        <div className="mx-auto max-w-[1500px] px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <Link
-              href="/ai-tools"
-              className="text-sm text-slate-400 transition hover:text-white"
-            >
-              ← Tất cả AI Tools
-            </Link>
-            <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+      <div className="mx-auto w-full max-w-[1500px] px-4 py-10 sm:px-6 lg:px-8">
+        <header className="mb-8">
+          <Link
+            href="/ai-tools"
+            className="inline-flex items-center gap-2 text-sm font-medium text-ink-500 transition-colors hover:text-brand-700"
+          >
+            <IconArrow className="h-4 w-4 rotate-180" />
+            Tất cả AI Tools
+          </Link>
+
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <h1 className="text-3xl font-extrabold text-ink-900 sm:text-4xl">
               Ghép logo &amp; chữ lên ảnh
             </h1>
-            <p className="mt-2 max-w-3xl text-slate-400">
-              Các công cụ AI luôn <em>vẽ lại</em> logo theo trí nhớ nên chữ méo, tỷ lệ
-              lệch, màu trật. Tool này làm ngược lại: lấy đúng file logo gốc ghép đè
-              lên ảnh bằng canvas, nên logo giữ nguyên từng pixel. Mọi thứ chạy ngay
-              trên máy anh — ảnh không được gửi đi đâu cả.
-            </p>
+            <Chip tone="emerald">Đang chạy</Chip>
           </div>
 
-          <ImageComposer presetLogos={logos} />
-        </div>
+          <p className="mt-3 max-w-3xl leading-relaxed text-ink-500">
+            Các công cụ AI luôn <em>vẽ lại</em> logo theo trí nhớ nên chữ méo, tỷ lệ
+            lệch, màu trật. Tool này làm ngược lại: lấy đúng file logo gốc ghép đè lên
+            ảnh bằng canvas, nên logo giữ nguyên từng pixel. Mọi thứ chạy ngay trên máy
+            anh — ảnh không được gửi đi đâu cả.
+          </p>
+        </header>
+
+        <ImageComposer presetLogos={logos} />
       </div>
     </SiteShell>
   );

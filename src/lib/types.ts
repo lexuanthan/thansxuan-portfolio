@@ -30,6 +30,74 @@ export type AiTool = {
   updated_at: string;
 };
 
+/** Chuyên mục dùng chung cho bài viết và tài nguyên. */
+export type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  sort_order: number;
+  created_at: string;
+};
+
+export type Post = {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string | null;
+  cover_url: string | null;
+  category_id: string | null;
+  /** Tên chuyên mục kèm theo khi join, để khỏi phải truy vấn lần hai. */
+  category_name: string | null;
+  tags: string[];
+  featured: boolean;
+  published: boolean;
+  views: number;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Tài nguyên chia sẻ: liên kết, tệp mẫu, bộ sưu tập… */
+export type Resource = {
+  id: string;
+  title: string;
+  description: string | null;
+  url: string | null;
+  kind: string;
+  icon: string;
+  tags: string[];
+  published: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Một hạng mục tư vấn / hỗ trợ. */
+export type Service = {
+  id: string;
+  title: string;
+  description: string | null;
+  bullets: string[];
+  icon: string;
+  published: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Lời nhắn gửi từ form liên hệ. */
+export type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  subject: string | null;
+  content: string;
+  handled: boolean;
+  created_at: string;
+};
+
 export type SkillGroup = { category: string; items: string[] };
 export type JourneyItem = { year: string; title: string; desc: string };
 export type CoreValue = { icon: string; title: string; desc: string };
@@ -61,6 +129,10 @@ export type Settings = {
   brand_name: string | null;
   hero_title: string | null;
   hero_subtitle: string | null;
+  /** Câu tâm đắc hiện ở thẻ "Về tôi" ngoài trang chủ. */
+  quote: string | null;
+  /** Ảnh bìa lớn ở đầu trang chủ. Bỏ trống thì dùng khối trang trí vẽ sẵn. */
+  hero_image_url: string | null;
   email: string | null;
   phone: string | null;
   location: string | null;

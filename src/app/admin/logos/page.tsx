@@ -23,7 +23,7 @@ export default async function AdminLogosPage() {
       />
 
       {missingColumn ? (
-        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-5 text-sm text-amber-200">
+        <div className="rounded-xl border border-brand-200 bg-brand-50 p-5 text-sm text-brand-800">
           <p className="mb-2 font-semibold">Chưa chạy SQL cài đặt</p>
           <p className="leading-relaxed">
             Mở file <code>supabase/add-logo-flag.sql</code> bằng Notepad, copy toàn
@@ -31,7 +31,7 @@ export default async function AdminLogosPage() {
           </p>
         </div>
       ) : error ? (
-        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
           {error.message}
         </div>
       ) : (

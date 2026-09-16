@@ -1,114 +1,100 @@
 import SiteShell from "@/components/SiteShell";
+import { Container, EmptyState, PageHeading } from "@/components/ui";
+import { IconArrow } from "@/components/ui/icons";
 import { getAiTools } from "@/lib/queries";
-import { statusClassName } from "@/lib/types";
+import { statusClassName, type AiTool } from "@/lib/types";
 
 export const revalidate = 60;
 
 export const metadata = {
-  title: "AI Tools · Lê Xuân Thân",
+  title: "AI Tools",
+  description: "Bộ công cụ AI tự phát triển và các công cụ tôi dùng hằng ngày.",
 };
 
-export default async function AITools() {
+function ToolCard({ tool }: { tool: AiTool }) {
+  const body = (
+    <>
+      <div className="flex items-start justify-between gap-3">
+        <div
+          aria-hidden="true"
+          className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br text-2xl ${
+            tool.color || "from-brand-100 to-brand-200"
+          }`}
+        >
+          {tool.icon || "✨"}
+        </div>
+
+        {tool.status && (
+          <span
+            className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${statusClassName(
+              tool.status_color
+            )}`}
+          >
+            {tool.status}
+          </span>
+        )}
+      </div>
+
+      <h2 className="mt-4 font-bold leading-snug text-ink-900">{tool.title}</h2>
+
+      {tool.description && (
+        <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink-500">
+          {tool.description}
+        </p>
+      )}
+
+      {tool.link_url && (
+        <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700">
+          Dùng thử ngay <IconArrow className="h-4 w-4" />
+        </span>
+      )}
+    </>
+  );
+
+  const cls =
+    "flex flex-col rounded-card border border-line bg-surface p-5 transition-shadow hover:shadow-lift";
+
+  if (!tool.link_url) return <article className={cls}>{body}</article>;
+
+  return (
+    <a
+      href={tool.link_url}
+      className={cls}
+      {...(tool.link_url.startsWith("http")
+        ? { target: "_blank", rel: "noopener noreferrer" }
+        : {})}
+    >
+      {body}
+    </a>
+  );
+}
+
+export default async function AiToolsPage() {
   const tools = await getAiTools();
 
   return (
     <SiteShell>
-      <div className="min-h-screen bg-gradient-to-b from-white via-blue-50 to-purple-50 py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              AI Tools
-            </h1>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Các ứng dụng AI cá nhân hóa giúp bạn tạo content, phát triển chiến
-              lược, và tự động hóa công việc hàng ngày
-            </p>
+      <Container className="py-10">
+        <PageHeading
+          eyebrow="AI Tools"
+          title="Công cụ AI hữu ích"
+          description="Một phần là công cụ tôi tự viết để giải quyết việc của mình, phần còn lại là những nền tảng tôi dùng thật và thấy đáng giới thiệu."
+        />
+
+        {tools.length > 0 ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {tools.map((t) => (
+              <ToolCard key={t.id} tool={t} />
+            ))}
           </div>
-
-          {/* Tools grid */}
-          {tools.length === 0 ? (
-            <p className="text-center text-gray-500 py-20">
-              Chưa có tool nào được đăng.
-            </p>
-          ) : (
-            <div className="grid md:grid-cols-2 gap-6 mb-16">
-              {tools.map((tool) => {
-                const card = (
-                  <div
-                    className={`relative bg-gradient-to-br ${tool.color} border border-gray-300 hover:border-blue-400 rounded-lg p-8 hover:shadow-lg hover:shadow-blue-200 transition-all duration-300 h-full`}
-                  >
-                    <div className="absolute top-4 right-4">
-                      <span
-                        className={`border px-3 py-1 rounded-full text-xs font-semibold ${statusClassName(
-                          tool.status_color
-                        )}`}
-                      >
-                        {tool.status}
-                      </span>
-                    </div>
-
-                    <div className="text-5xl mb-4">{tool.icon}</div>
-                    <h3 className="text-2xl font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors">
-                      {tool.title}
-                    </h3>
-                    <p className="text-gray-700 text-base leading-relaxed whitespace-pre-line">
-                      {tool.description}
-                    </p>
-
-                    {tool.link_url && (
-                      <div className="mt-6 flex items-center text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <span className="text-sm font-semibold">Explore →</span>
-                      </div>
-                    )}
-                  </div>
-                );
-
-                return tool.link_url ? (
-                  <a
-                    key={tool.id}
-                    href={tool.link_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block"
-                  >
-                    {card}
-                  </a>
-                ) : (
-                  <div key={tool.id} className="group">
-                    {card}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* How it works */}
-          <div className="mt-20 p-8 sm:p-12 bg-white border border-gray-200 rounded-lg">
-            <h2 className="text-3xl font-bold mb-8 text-center text-gray-900">
-              Cách hoạt động
-            </h2>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                { step: "01", title: "Nhập Input", desc: "Cung cấp thông tin hoặc prompt cho tool" },
-                { step: "02", title: "AI Processing", desc: "AI xử lý và tạo kết quả tùy chỉnh" },
-                { step: "03", title: "Export & Use", desc: "Tải kết quả, chỉnh sửa, và sử dụng ngay" },
-              ].map((item) => (
-                <div key={item.step} className="text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-4">
-                    {item.step}
-                  </div>
-                  <h4 className="text-xl font-bold text-gray-900 mb-2">
-                    {item.title}
-                  </h4>
-                  <p className="text-gray-600">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+        ) : (
+          <EmptyState
+            icon="✨"
+            title="Chưa có công cụ nào được đăng"
+            hint="Vào Quản trị → Tool AI để thêm mục đầu tiên."
+          />
+        )}
+      </Container>
     </SiteShell>
   );
 }

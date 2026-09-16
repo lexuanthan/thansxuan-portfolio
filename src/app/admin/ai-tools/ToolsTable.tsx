@@ -43,7 +43,7 @@ export default function ToolsTable({ initial }: { initial: AiTool[] }) {
   return (
     <div>
       {error && (
-        <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {error}
         </div>
       )}
@@ -52,7 +52,7 @@ export default function ToolsTable({ initial }: { initial: AiTool[] }) {
         {rows.map((t) => (
           <div
             key={t.id}
-            className="flex flex-col rounded-xl border border-white/10 bg-slate-800/40 p-5 transition hover:border-white/20"
+            className="flex flex-col rounded-xl border border-line bg-surface p-5 transition hover:border-brand-300"
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <div
@@ -69,25 +69,25 @@ export default function ToolsTable({ initial }: { initial: AiTool[] }) {
               </span>
             </div>
 
-            <h3 className="font-semibold text-white">{t.title}</h3>
-            <p className="mt-1 line-clamp-2 flex-1 text-sm text-slate-400">
+            <h3 className="font-semibold text-ink-900">{t.title}</h3>
+            <p className="mt-1 line-clamp-2 flex-1 text-sm text-ink-500">
               {t.description || "—"}
             </p>
 
-            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-white/5 pt-4">
-              <span className="mr-auto text-xs text-slate-500">
+            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
+              <span className="mr-auto text-xs text-ink-400">
                 #{t.sort_order} · {t.published ? "Hiển thị" : "Nháp"}
               </span>
               <button
                 onClick={() => togglePublished(t)}
                 disabled={busy === t.id}
-                className="rounded-md border border-white/10 px-2.5 py-1.5 text-xs text-slate-300 transition hover:bg-white/5 hover:text-white disabled:opacity-50"
+                className="rounded-md border border-line px-2.5 py-1.5 text-xs text-ink-700 transition hover:bg-brand-50 hover:text-brand-700 disabled:opacity-50"
               >
                 {t.published ? "Ẩn" : "Hiện"}
               </button>
               <Link
                 href={`/admin/ai-tools/${t.id}`}
-                className="rounded-md bg-blue-600/80 px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600"
+                className="rounded-md bg-brand-400 px-2.5 py-1.5 text-xs font-medium text-ink-900 transition hover:bg-brand-300"
               >
                 Sửa
               </Link>
@@ -96,13 +96,13 @@ export default function ToolsTable({ initial }: { initial: AiTool[] }) {
                   <button
                     onClick={() => remove(t)}
                     disabled={busy === t.id}
-                    className="rounded-md bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-red-500 disabled:opacity-50"
+                    className="rounded-md bg-rose-600 px-2.5 py-1.5 text-xs font-medium text-ink-900 transition hover:bg-rose-500 disabled:opacity-50"
                   >
                     {busy === t.id ? "…" : "Xoá thật"}
                   </button>
                   <button
                     onClick={() => setConfirmId(null)}
-                    className="rounded-md border border-white/10 px-2.5 py-1.5 text-xs text-slate-300"
+                    className="rounded-md border border-line px-2.5 py-1.5 text-xs text-ink-700"
                   >
                     Huỷ
                   </button>
@@ -110,7 +110,7 @@ export default function ToolsTable({ initial }: { initial: AiTool[] }) {
               ) : (
                 <button
                   onClick={() => setConfirmId(t.id)}
-                  className="rounded-md border border-red-500/30 px-2.5 py-1.5 text-xs text-red-300 transition hover:bg-red-500/10"
+                  className="rounded-md border border-rose-200 px-2.5 py-1.5 text-xs text-rose-700 transition hover:bg-rose-50"
                 >
                   Xoá
                 </button>

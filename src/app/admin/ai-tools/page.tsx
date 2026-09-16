@@ -18,13 +18,13 @@ export default async function AdminAiToolsPage() {
   return (
     <>
       <PageHeader
-        title="AI Tools"
+        title="Tool AI"
         description={`${tools.length} tool trong danh mục`}
-        action={<LinkButton href="/admin/ai-tools/new">+ Thêm tool</LinkButton>}
+        action={<LinkButton href="/admin/ai-tools/new">+ Thêm công cụ</LinkButton>}
       />
 
       {error && (
-        <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+        <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
           {error.message}
         </div>
       )}
@@ -32,9 +32,9 @@ export default async function AdminAiToolsPage() {
       {tools.length === 0 ? (
         <EmptyState
           icon="🤖"
-          title="Chưa có AI tool nào"
-          description="Thêm tool đầu tiên để hiển thị ngoài trang AI Tools."
-          action={<LinkButton href="/admin/ai-tools/new">+ Thêm tool</LinkButton>}
+          title="Chưa có công cụ nào"
+          description="Thêm công cụ đầu tiên để hiển thị ngoài trang AI Tools."
+          action={<LinkButton href="/admin/ai-tools/new">+ Thêm công cụ</LinkButton>}
         />
       ) : (
         <ToolsTable initial={tools} />

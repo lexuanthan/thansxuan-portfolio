@@ -138,8 +138,8 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
                   onClick={() => set("icon", ic)}
                   className={`rounded-md border px-2 py-1 text-lg transition ${
                     form.icon === ic
-                      ? "border-blue-500 bg-blue-500/10"
-                      : "border-white/10 hover:border-white/30"
+                      ? "border-brand-400 bg-brand-50"
+                      : "border-line hover:border-brand-300"
                   }`}
                 >
                   {ic}
@@ -151,9 +151,9 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
 
         {/* Preview */}
         <Card>
-          <h3 className="mb-4 text-sm font-semibold text-white">Xem trước card</h3>
+          <h3 className="mb-4 text-sm font-semibold text-ink-900">Xem trước card</h3>
           <div
-            className={`relative rounded-lg border border-gray-300 bg-gradient-to-br ${form.color} p-8`}
+            className={`relative rounded-lg border border-line bg-gradient-to-br ${form.color} p-8`}
           >
             <div className="absolute right-4 top-4">
               <span
@@ -165,10 +165,10 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
               </span>
             </div>
             <div className="mb-4 text-5xl">{form.icon}</div>
-            <h3 className="mb-3 text-2xl font-bold text-gray-900">
+            <h3 className="mb-3 text-2xl font-bold text-ink-900">
               {form.title || "Tên tool"}
             </h3>
-            <p className="text-base leading-relaxed text-gray-700">
+            <p className="text-base leading-relaxed text-ink-700">
               {form.description || "Mô tả tool sẽ hiển thị ở đây."}
             </p>
           </div>
@@ -177,7 +177,7 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
 
       <div className="space-y-6">
         <Card className="space-y-5">
-          <h3 className="text-sm font-semibold text-white">Trạng thái</h3>
+          <h3 className="text-sm font-semibold text-ink-900">Trạng thái</h3>
 
           <Field label="Nhãn trạng thái">
             <input
@@ -191,7 +191,7 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
                   key={s}
                   type="button"
                   onClick={() => set("status", s)}
-                  className="rounded-md border border-white/10 px-2 py-1 text-[11px] text-slate-300 transition hover:border-white/30 hover:text-white"
+                  className="rounded-md border border-line px-2 py-1 text-[11px] text-ink-700 transition hover:border-brand-300 hover:text-brand-700"
                 >
                   {s}
                 </button>
@@ -210,7 +210,7 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
                     s.className
                   } ${
                     form.status_color === s.value
-                      ? "ring-2 ring-white/60"
+                      ? "ring-2 ring-brand-300"
                       : "opacity-70 hover:opacity-100"
                   }`}
                 >
@@ -222,14 +222,14 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
         </Card>
 
         <Card className="space-y-5">
-          <h3 className="text-sm font-semibold text-white">Hiển thị</h3>
+          <h3 className="text-sm font-semibold text-ink-900">Hiển thị</h3>
           <label className="flex cursor-pointer items-center justify-between gap-3">
-            <span className="text-sm text-slate-300">Công khai trên website</span>
+            <span className="text-sm text-ink-700">Công khai trên website</span>
             <input
               type="checkbox"
               checked={form.published}
               onChange={(e) => set("published", e.target.checked)}
-              className="h-5 w-5 accent-blue-600"
+              className="h-5 w-5 accent-brand-500"
             />
           </label>
           <Field label="Thứ tự sắp xếp" hint="Số nhỏ hiện trước.">
@@ -243,7 +243,7 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
         </Card>
 
         <Card>
-          <h3 className="mb-4 text-sm font-semibold text-white">Màu card</h3>
+          <h3 className="mb-4 text-sm font-semibold text-ink-900">Màu card</h3>
           <div className="grid grid-cols-2 gap-2">
             {COLOR_PRESETS.map((c) => (
               <button
@@ -252,21 +252,21 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
                 onClick={() => set("color", c.value)}
                 className={`rounded-lg border p-2 text-left text-[11px] transition ${
                   form.color === c.value
-                    ? "border-blue-500 ring-2 ring-blue-500/40"
-                    : "border-white/10 hover:border-white/25"
+                    ? "border-brand-400 ring-2 ring-brand-300"
+                    : "border-line hover:border-brand-300"
                 }`}
               >
                 <span
                   className={`mb-1.5 block h-6 w-full rounded bg-gradient-to-br ${c.value}`}
                 />
-                <span className="text-slate-300">{c.label}</span>
+                <span className="text-ink-700">{c.label}</span>
               </button>
             ))}
           </div>
         </Card>
 
         {error && (
-          <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
             {error}
           </div>
         )}
@@ -275,13 +275,13 @@ export default function ToolForm({ tool }: { tool?: AiTool }) {
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-sm font-semibold text-white transition hover:from-blue-500 hover:to-purple-500 disabled:opacity-60"
+            className="flex-1 rounded-lg bg-gradient-to-r from-brand-400 to-brand-300 px-4 py-3 text-sm font-semibold text-ink-900 transition hover:from-brand-300 hover:to-brand-200 disabled:opacity-60"
           >
-            {saving ? "Đang lưu…" : isEdit ? "Lưu thay đổi" : "Tạo tool"}
+            {saving ? "Đang lưu…" : isEdit ? "Lưu thay đổi" : "Tạo công cụ"}
           </button>
           <Link
             href="/admin/ai-tools"
-            className="rounded-lg border border-white/10 px-4 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/5"
+            className="rounded-lg border border-line px-4 py-3 text-sm font-semibold text-ink-700 transition hover:bg-brand-50"
           >
             Huỷ
           </Link>

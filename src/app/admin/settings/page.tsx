@@ -26,7 +26,7 @@ export default async function AdminSettingsPage() {
   return (
     <>
       <PageHeader
-        title="Settings"
+        title="Cài đặt chung"
         description="Thông tin liên hệ, social links và metadata của website"
       />
       <SettingsForm settings={settings} exists={Boolean(data)} />

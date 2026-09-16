@@ -34,21 +34,21 @@ export default function TagInput({
         {value.map((tag) => (
           <span
             key={tag}
-            className="inline-flex items-center gap-1.5 rounded-full bg-blue-600/20 px-3 py-1 text-xs font-medium text-blue-200"
+            className="inline-flex items-center gap-1.5 rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-sky-700"
           >
             {tag}
             <button
               type="button"
               aria-label={`Xoá tag ${tag}`}
               onClick={() => onChange(value.filter((t) => t !== tag))}
-              className="text-blue-300 transition hover:text-white"
+              className="text-sky-700 transition hover:text-brand-700"
             >
               ✕
             </button>
           </span>
         ))}
         {value.length === 0 && (
-          <span className="text-xs text-slate-500">Chưa có tag nào</span>
+          <span className="text-xs text-ink-400">Chưa có tag nào</span>
         )}
       </div>
 

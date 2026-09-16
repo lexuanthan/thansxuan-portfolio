@@ -5,7 +5,7 @@ export default function NewProjectPage() {
   return (
     <>
       <PageHeader
-        title="Thêm project"
+        title="Thêm ứng dụng / dự án"
         description="Tạo một dự án mới cho trang Portfolio"
       />
       <ProjectForm />

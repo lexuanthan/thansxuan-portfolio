@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import type { Settings, SocialLinks } from "@/lib/types";
 import { Card, Field, inputClass } from "@/components/admin/ui";
+import ImagePicker from "@/components/admin/ImagePicker";
 
 const SOCIALS: { key: keyof SocialLinks; label: string; placeholder: string }[] = [
   { key: "facebook", label: "Facebook", placeholder: "https://facebook.com/…" },
@@ -30,6 +31,8 @@ export default function SettingsForm({
     brand_name: settings.brand_name ?? "",
     hero_title: settings.hero_title ?? "",
     hero_subtitle: settings.hero_subtitle ?? "",
+    quote: settings.quote ?? "",
+    hero_image_url: settings.hero_image_url ?? "",
     email: settings.email ?? "",
     phone: settings.phone ?? "",
     location: settings.location ?? "",
@@ -68,20 +71,32 @@ export default function SettingsForm({
 
     setSaving(false);
     if (error) {
-      setMessage({ ok: false, text: error.message });
+      /**
+       * Thiếu cột trong database là lỗi hay gặp nhất ở đây: mã nguồn đã có ô
+       * nhập mới nhưng file SQL chưa chạy. Postgres chỉ báo cụt lủn kiểu
+       * 'column settings.hero_image_url does not exist', đọc xong không biết
+       * phải làm gì — nên dịch ra thành việc cụ thể.
+       */
+      const missingColumn = /column .*does not exist/i.test(error.message);
+      setMessage({
+        ok: false,
+        text: missingColumn
+          ? `${error.message} — Database chưa có cột này. Vào Supabase → SQL Editor và chạy hai file supabase/v2-giao-dien-moi.sql rồi supabase/v3-anh-bia.sql, sau đó lưu lại.`
+          : error.message,
+      });
       return;
     }
-    setMessage({ ok: true, text: "Đã lưu settings." });
+    setMessage({ ok: true, text: "Đã lưu cài đặt." });
     router.refresh();
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 pb-24">
       <Card className="space-y-5">
-        <h2 className="text-lg font-semibold text-white">Liên hệ</h2>
+        <h2 className="text-lg font-semibold text-ink-900">Liên hệ</h2>
 
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="Email" hint="Dùng cho nút “Get in Touch” trên website.">
+          <Field label="Email" hint="Hiện ở footer và trang Liên hệ.">
             <input
               type="email"
               className={inputClass}
@@ -113,7 +128,7 @@ export default function SettingsForm({
       </Card>
 
       <Card className="space-y-5">
-        <h2 className="text-lg font-semibold text-white">Social links</h2>
+        <h2 className="text-lg font-semibold text-ink-900">Social links</h2>
         <div className="grid gap-5 sm:grid-cols-2">
           {SOCIALS.map((s) => (
             <Field key={s.key} label={s.label}>
@@ -129,13 +144,13 @@ export default function SettingsForm({
             </Field>
           ))}
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-ink-400">
           Để trống ô nào thì link đó sẽ không hiện ở footer.
         </p>
       </Card>
 
       <Card className="space-y-5">
-        <h2 className="text-lg font-semibold text-white">Thương hiệu & Hero</h2>
+        <h2 className="text-lg font-semibold text-ink-900">Thương hiệu & Hero</h2>
 
         <Field label="Tên hiển thị ở navbar">
           <input
@@ -163,6 +178,32 @@ export default function SettingsForm({
           </Field>
         </div>
 
+        <div>
+          <span className="mb-1.5 block text-sm font-semibold text-ink-700">
+            Ảnh bìa trang chủ
+          </span>
+          <ImagePicker
+            value={form.hero_image_url || null}
+            onChange={(url) => set("hero_image_url", url ?? "")}
+          />
+          <span className="mt-1.5 block text-xs leading-relaxed text-ink-400">
+            Ảnh nằm bên phải phần giới thiệu đầu trang chủ. Nên dùng ảnh ngang,
+            khoảng 1200×900 trở lên. Bỏ trống thì web dùng khối trang trí vẽ sẵn.
+          </span>
+        </div>
+
+        <Field
+          label="Câu tâm đắc"
+          hint='Hiện trong ô "Về tôi" ngoài trang chủ. Bỏ trống thì ô đó không hiện.'
+        >
+          <input
+            className={inputClass}
+            value={form.quote}
+            onChange={(e) => set("quote", e.target.value)}
+            placeholder="Học hỏi mỗi ngày, tạo ra giá trị mỗi ngày!"
+          />
+        </Field>
+
         <Field label="Mô tả ngắn ở footer">
           <textarea
             className={`${inputClass} min-h-[80px] resize-y`}
@@ -173,7 +214,7 @@ export default function SettingsForm({
       </Card>
 
       <Card className="space-y-5">
-        <h2 className="text-lg font-semibold text-white">SEO / Metadata</h2>
+        <h2 className="text-lg font-semibold text-ink-900">SEO / Metadata</h2>
 
         <Field label="Site title" hint="Hiện trên tab trình duyệt và kết quả Google.">
           <input
@@ -189,18 +230,18 @@ export default function SettingsForm({
             value={form.site_description}
             onChange={(e) => set("site_description", e.target.value)}
           />
-          <span className="mt-1 block text-right text-xs text-slate-500">
+          <span className="mt-1 block text-right text-xs text-ink-400">
             {form.site_description.length} ký tự
           </span>
         </Field>
       </Card>
 
-      <div className="sticky bottom-0 -mx-4 border-t border-white/10 bg-slate-900/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+      <div className="sticky bottom-0 -mx-4 border-t border-line bg-surface px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           {message && (
             <p
               className={`text-sm ${
-                message.ok ? "text-emerald-400" : "text-red-400"
+                message.ok ? "text-emerald-600" : "text-rose-600"
               }`}
             >
               {message.text}
@@ -209,7 +250,7 @@ export default function SettingsForm({
           <button
             type="submit"
             disabled={saving}
-            className="ml-auto rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:from-blue-500 hover:to-purple-500 disabled:opacity-60"
+            className="ml-auto rounded-lg bg-gradient-to-r from-brand-400 to-brand-300 px-6 py-3 text-sm font-semibold text-ink-900 transition hover:from-brand-300 hover:to-brand-200 disabled:opacity-60"
           >
             {saving ? "Đang lưu…" : "Lưu settings"}
           </button>

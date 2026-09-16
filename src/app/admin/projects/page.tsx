@@ -18,13 +18,13 @@ export default async function AdminProjectsPage() {
   return (
     <>
       <PageHeader
-        title="Projects"
+        title="Ứng dụng & Dự án"
         description={`${projects.length} dự án trong portfolio`}
-        action={<LinkButton href="/admin/projects/new">+ Thêm project</LinkButton>}
+        action={<LinkButton href="/admin/projects/new">+ Thêm mục mới</LinkButton>}
       />
 
       {error && (
-        <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+        <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
           {error.message}
         </div>
       )}
@@ -32,9 +32,9 @@ export default async function AdminProjectsPage() {
       {projects.length === 0 ? (
         <EmptyState
           icon="📂"
-          title="Chưa có project nào"
+          title="Chưa có ứng dụng nào"
           description="Thêm dự án đầu tiên để hiển thị ngoài trang Portfolio."
-          action={<LinkButton href="/admin/projects/new">+ Thêm project</LinkButton>}
+          action={<LinkButton href="/admin/projects/new">+ Thêm mục mới</LinkButton>}
         />
       ) : (
         <ProjectsTable initial={projects} />

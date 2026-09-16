@@ -222,7 +222,7 @@ export default function Stage({
     >
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 h-full w-full rounded-lg shadow-2xl"
+        className="absolute inset-0 h-full w-full rounded-lg border border-line shadow-lift"
         style={{ backgroundColor: doc.backgroundColor }}
       />
 

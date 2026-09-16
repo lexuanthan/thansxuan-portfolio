@@ -73,7 +73,7 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
     router.refresh();
   }
 
-  /** Bỏ khỏi danh sách logo nhưng giữ file trong Media library. */
+  /** Bỏ khỏi danh sách logo nhưng giữ file trong thư viện ảnh. */
   async function unmark(item: MediaItem) {
     setBusy(item.id);
     const { error } = await createClient()
@@ -117,15 +117,15 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
         onClick={() => !uploading && fileRef.current?.click()}
         className={`mb-6 cursor-pointer rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
           dragging
-            ? "border-cyan-500 bg-cyan-500/10"
-            : "border-white/15 bg-slate-800/30 hover:border-white/30"
+            ? "border-brand-400 bg-brand-50"
+            : "border-line-strong bg-surface-soft hover:border-brand-300"
         }`}
       >
         <div className="mb-2 text-4xl">{uploading ? "⏳" : "🏛️"}</div>
-        <p className="font-medium text-white">
+        <p className="font-medium text-ink-900">
           {uploading ? progress : "Kéo thả logo vào đây hoặc bấm để chọn file"}
         </p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-ink-500">
           Nên dùng PNG nền trong suốt hoặc SVG · tối đa {formatBytes(MAX_UPLOAD_BYTES)}
         </p>
         <input
@@ -139,26 +139,26 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
       </div>
 
       {errors.length > 0 && (
-        <div className="mb-6 space-y-1 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="mb-6 space-y-1 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {errors.map((e, i) => (
             <p key={i}>{e}</p>
           ))}
         </div>
       )}
 
-      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-slate-400">
+      <div className="mb-4 flex flex-wrap items-center gap-2 text-sm text-ink-500">
         <span>{items.length} logo</span>
-        <span className="text-slate-600">·</span>
+        <span className="text-ink-400">·</span>
         <span>Sắp xếp theo tên — thêm số vào đầu tên để đổi thứ tự</span>
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-white/15 bg-slate-800/30 px-6 py-16 text-center">
+        <div className="rounded-xl border border-dashed border-line-strong bg-surface-soft px-6 py-16 text-center">
           <div className="mb-3 text-4xl">🏛️</div>
-          <h3 className="text-lg font-semibold text-white">Chưa có logo nào</h3>
-          <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-slate-400">
+          <h3 className="text-lg font-semibold text-ink-900">Chưa có logo nào</h3>
+          <p className="mx-auto mt-1.5 max-w-md text-sm leading-relaxed text-ink-500">
             Tải logo trường lên đây, nó sẽ hiện ngay trong ô{" "}
-            <span className="text-slate-300">Logo có sẵn</span> của tool ghép ảnh —
+            <span className="text-ink-700">Logo có sẵn</span> của tool ghép ảnh —
             người dùng bấm một phát là chèn được, không phải tự tải lên nữa.
           </p>
         </div>
@@ -167,7 +167,7 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
           {items.map((m) => (
             <div
               key={m.id}
-              className="overflow-hidden rounded-xl border border-white/10 bg-slate-800/40"
+              className="overflow-hidden rounded-xl border border-line bg-surface"
             >
               {/* Nền ca-rô để thấy rõ phần trong suốt của logo */}
               <div
@@ -200,7 +200,7 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
                       if (e.key === "Enter") rename(m);
                       if (e.key === "Escape") setEditingId(null);
                     }}
-                    className="w-full rounded border border-cyan-500 bg-slate-900 px-2 py-1 text-xs text-white outline-none"
+                    className="w-full rounded border border-brand-400 bg-surface px-2 py-1 text-xs text-ink-900 outline-none"
                   />
                 ) : (
                   <button
@@ -209,13 +209,13 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
                       setDraftName(m.name);
                     }}
                     title="Bấm để đổi tên"
-                    className="block w-full truncate text-left text-xs font-medium text-white hover:text-cyan-300"
+                    className="block w-full truncate text-left text-xs font-medium text-ink-900 hover:text-brand-700"
                   >
                     {m.name}
                   </button>
                 )}
 
-                <p className="mt-0.5 text-[11px] text-slate-500">
+                <p className="mt-0.5 text-[11px] text-ink-400">
                   {formatBytes(m.size)}
                 </p>
 
@@ -223,8 +223,8 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
                   <button
                     onClick={() => unmark(m)}
                     disabled={busy === m.id}
-                    title="Giữ file trong Media library, chỉ bỏ khỏi tool ghép ảnh"
-                    className="flex-1 rounded-md border border-white/10 px-2 py-1.5 text-[11px] text-slate-300 transition hover:bg-white/5 hover:text-white disabled:opacity-50"
+                    title="Giữ file trong thư viện ảnh, chỉ bỏ khỏi tool ghép ảnh"
+                    className="flex-1 rounded-md border border-line px-2 py-1.5 text-[11px] text-ink-700 transition hover:bg-brand-50 hover:text-brand-700 disabled:opacity-50"
                   >
                     Bỏ khỏi tool
                   </button>
@@ -234,13 +234,13 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
                       <button
                         onClick={() => removeForever(m)}
                         disabled={busy === m.id}
-                        className="rounded-md bg-red-600 px-2 py-1.5 text-[11px] font-medium text-white transition hover:bg-red-500 disabled:opacity-50"
+                        className="rounded-md bg-rose-600 px-2 py-1.5 text-[11px] font-medium text-ink-900 transition hover:bg-rose-500 disabled:opacity-50"
                       >
                         {busy === m.id ? "…" : "Xoá hẳn"}
                       </button>
                       <button
                         onClick={() => setConfirmId(null)}
-                        className="rounded-md border border-white/10 px-2 py-1.5 text-[11px] text-slate-300"
+                        className="rounded-md border border-line px-2 py-1.5 text-[11px] text-ink-700"
                       >
                         ✕
                       </button>
@@ -249,7 +249,7 @@ export default function LogoManager({ initial }: { initial: MediaItem[] }) {
                     <button
                       onClick={() => setConfirmId(m.id)}
                       title="Xoá vĩnh viễn khỏi kho lưu trữ"
-                      className="rounded-md border border-red-500/30 px-2 py-1.5 text-[11px] text-red-300 transition hover:bg-red-500/10"
+                      className="rounded-md border border-rose-200 px-2 py-1.5 text-[11px] text-rose-700 transition hover:bg-rose-50"
                     >
                       Xoá
                     </button>

@@ -218,18 +218,19 @@ export const FALLBACK_ABOUT: AboutPage = {
 
 export const FALLBACK_SETTINGS: Settings = {
   id: 1,
-  site_title: "Lê Xuân Thân - Brand & Communications",
+  site_title: "Lê Xuân Thân — Content Creator & Tech Builder",
   site_description:
-    "Personal portfolio & AI tools by Lê Xuân Thân. Designer, strategist, and AI enthusiast.",
-  brand_name: "Thế giới của Thân LX",
+    "Tôi chia sẻ những nội dung hữu ích về công nghệ, AI, sáng tạo và truyền thông. Đồng thời tôi cũng phát triển các công cụ, ứng dụng web giúp tối ưu công việc và học tập.",
+  brand_name: "Lê Xuân Thân",
   hero_title: "Lê Xuân Thân",
-  hero_subtitle:
-    "Brand strategist · Designer · Content creator · AI enthusiast",
+  hero_subtitle: "Người sáng tạo nội dung & xây dựng ứng dụng công nghệ",
+  quote: "Học hỏi mỗi ngày, tạo ra giá trị mỗi ngày!",
+  hero_image_url: null,
   email: "",
   phone: "",
   location: "",
   footer_text:
-    "Brand strategist, designer, content creator, and AI enthusiast.",
+    "Chia sẻ nội dung về công nghệ, AI và sáng tạo. Đồng thời tự phát triển các công cụ web phục vụ công việc và học tập.",
   social: {},
   updated_at: NOW,
 };

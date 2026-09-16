@@ -34,7 +34,7 @@ function renderBold(text: string): ReactNode[] {
   return parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
       return (
-        <strong key={i} className="font-semibold text-blue-600">
+        <strong key={i} className="font-semibold text-brand-700">
           {part.slice(2, -2)}
         </strong>
       );

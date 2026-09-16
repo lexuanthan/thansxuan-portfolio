@@ -29,7 +29,7 @@ export default async function AdminAboutPage() {
   return (
     <>
       <PageHeader
-        title="About page"
+        title="Trang giới thiệu"
         description="Chỉnh sửa bio, kỹ năng, hành trình và giá trị cốt lõi"
       />
       <AboutForm about={about} exists={Boolean(data)} />

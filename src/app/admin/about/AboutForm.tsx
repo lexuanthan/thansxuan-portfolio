@@ -63,7 +63,7 @@ export default function AboutForm({
     <form onSubmit={handleSubmit} className="space-y-6 pb-24">
       {/* BIO */}
       <Card className="space-y-5">
-        <h2 className="text-lg font-semibold text-white">Giới thiệu</h2>
+        <h2 className="text-lg font-semibold text-ink-900">Giới thiệu</h2>
 
         <Field label="Tiêu đề khối bio">
           <input
@@ -89,13 +89,13 @@ export default function AboutForm({
       {/* SKILLS */}
       <Card>
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Skills & Expertise</h2>
+          <h2 className="text-lg font-semibold text-ink-900">Skills & Expertise</h2>
           <button
             type="button"
             onClick={() =>
               setSkills((s) => [...s, { category: "", items: [] }])
             }
-            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/5 hover:text-white"
+            className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-brand-50 hover:text-brand-700"
           >
             + Thêm nhóm
           </button>
@@ -105,7 +105,7 @@ export default function AboutForm({
           {skills.map((group, i) => (
             <div
               key={i}
-              className="rounded-lg border border-white/10 bg-slate-900/40 p-4"
+              className="rounded-lg border border-line bg-surface-soft p-4"
             >
               <div className="mb-3 flex items-center gap-2">
                 <input
@@ -152,7 +152,7 @@ export default function AboutForm({
             </div>
           ))}
           {skills.length === 0 && (
-            <p className="py-6 text-center text-sm text-slate-500">
+            <p className="py-6 text-center text-sm text-ink-400">
               Chưa có nhóm kỹ năng nào.
             </p>
           )}
@@ -162,13 +162,13 @@ export default function AboutForm({
       {/* JOURNEY */}
       <Card>
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">My Journey</h2>
+          <h2 className="text-lg font-semibold text-ink-900">My Journey</h2>
           <button
             type="button"
             onClick={() =>
               setJourney((j) => [...j, { year: "", title: "", desc: "" }])
             }
-            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/5 hover:text-white"
+            className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-brand-50 hover:text-brand-700"
           >
             + Thêm mốc
           </button>
@@ -178,7 +178,7 @@ export default function AboutForm({
           {journey.map((item, i) => (
             <div
               key={i}
-              className="rounded-lg border border-white/10 bg-slate-900/40 p-4"
+              className="rounded-lg border border-line bg-surface-soft p-4"
             >
               <div className="mb-3 flex items-center gap-2">
                 <input
@@ -229,7 +229,7 @@ export default function AboutForm({
             </div>
           ))}
           {journey.length === 0 && (
-            <p className="py-6 text-center text-sm text-slate-500">
+            <p className="py-6 text-center text-sm text-ink-400">
               Chưa có mốc hành trình nào.
             </p>
           )}
@@ -239,13 +239,13 @@ export default function AboutForm({
       {/* CORE VALUES */}
       <Card>
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Core Values</h2>
+          <h2 className="text-lg font-semibold text-ink-900">Core Values</h2>
           <button
             type="button"
             onClick={() =>
               setCoreValues((v) => [...v, { icon: "✨", title: "", desc: "" }])
             }
-            className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/5 hover:text-white"
+            className="rounded-lg border border-line px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-brand-50 hover:text-brand-700"
           >
             + Thêm giá trị
           </button>
@@ -255,7 +255,7 @@ export default function AboutForm({
           {coreValues.map((v, i) => (
             <div
               key={i}
-              className="rounded-lg border border-white/10 bg-slate-900/40 p-4"
+              className="rounded-lg border border-line bg-surface-soft p-4"
             >
               <div className="mb-3 flex items-center gap-2">
                 <input
@@ -275,7 +275,7 @@ export default function AboutForm({
                   onClick={() =>
                     setCoreValues((cv) => cv.filter((_, xi) => xi !== i))
                   }
-                  className="ml-auto rounded-md border border-red-500/30 px-2 py-1.5 text-xs text-red-300 transition hover:bg-red-500/10"
+                  className="ml-auto rounded-md border border-rose-200 px-2 py-1.5 text-xs text-rose-700 transition hover:bg-rose-50"
                 >
                   Xoá
                 </button>
@@ -310,12 +310,12 @@ export default function AboutForm({
       </Card>
 
       {/* Save bar */}
-      <div className="sticky bottom-0 -mx-4 border-t border-white/10 bg-slate-900/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+      <div className="sticky bottom-0 -mx-4 border-t border-line bg-surface px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           {message && (
             <p
               className={`text-sm ${
-                message.ok ? "text-emerald-400" : "text-red-400"
+                message.ok ? "text-emerald-600" : "text-rose-600"
               }`}
             >
               {message.text}
@@ -324,7 +324,7 @@ export default function AboutForm({
           <button
             type="submit"
             disabled={saving}
-            className="ml-auto rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 text-sm font-semibold text-white transition hover:from-blue-500 hover:to-purple-500 disabled:opacity-60"
+            className="ml-auto rounded-lg bg-gradient-to-r from-brand-400 to-brand-300 px-6 py-3 text-sm font-semibold text-ink-900 transition hover:from-brand-300 hover:to-brand-200 disabled:opacity-60"
           >
             {saving ? "Đang lưu…" : "Lưu thay đổi"}
           </button>
@@ -360,7 +360,7 @@ function RowButtons({
         aria-label="Lên"
         disabled={index === 0}
         onClick={() => onMove(-1)}
-        className="rounded-md border border-white/10 px-2 py-1.5 text-xs text-slate-300 transition hover:bg-white/5 disabled:opacity-30"
+        className="rounded-md border border-line px-2 py-1.5 text-xs text-ink-700 transition hover:bg-brand-50 disabled:opacity-30"
       >
         ↑
       </button>
@@ -369,14 +369,14 @@ function RowButtons({
         aria-label="Xuống"
         disabled={index === length - 1}
         onClick={() => onMove(1)}
-        className="rounded-md border border-white/10 px-2 py-1.5 text-xs text-slate-300 transition hover:bg-white/5 disabled:opacity-30"
+        className="rounded-md border border-line px-2 py-1.5 text-xs text-ink-700 transition hover:bg-brand-50 disabled:opacity-30"
       >
         ↓
       </button>
       <button
         type="button"
         onClick={onRemove}
-        className="rounded-md border border-red-500/30 px-2 py-1.5 text-xs text-red-300 transition hover:bg-red-500/10"
+        className="rounded-md border border-rose-200 px-2 py-1.5 text-xs text-rose-700 transition hover:bg-rose-50"
       >
         ✕
       </button>

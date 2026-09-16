@@ -15,12 +15,12 @@ export default async function AdminMediaPage() {
   return (
     <>
       <PageHeader
-        title="Media library"
+        title="Hình ảnh & Media"
         description="Upload, xem và xoá ảnh dùng cho website"
       />
 
       {error && (
-        <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+        <div className="mb-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
           {error.message}
         </div>
       )}

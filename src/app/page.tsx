@@ -1,196 +1,385 @@
 import Link from "next/link";
 import SiteShell from "@/components/SiteShell";
-import { getAiTools, getProjects, getSettings } from "@/lib/queries";
+import Hero from "@/components/home/Hero";
+import { PostCard } from "@/components/content/PostCard";
+import {
+  ButtonLink,
+  Card,
+  CardHeader,
+  Chip,
+  Container,
+  EmptyState,
+  IconTile,
+  toneForLabel,
+} from "@/components/ui";
+import {
+  IconArrow,
+  IconBook,
+  IconChat,
+  IconCheck,
+  IconFile,
+  IconGrid,
+  IconRocket,
+  IconSparkle,
+  IconUser,
+} from "@/components/ui/icons";
+import {
+  getAbout,
+  getAiTools,
+  getFeaturedPosts,
+  getProjects,
+  getServices,
+  getSettings,
+} from "@/lib/queries";
+import { plainText, truncate } from "@/lib/format";
+import type { SocialLinks } from "@/lib/types";
 
 export const revalidate = 60;
 
+const QUICK_LINKS = [
+  { href: "/bai-viet", label: "Bài viết", Icon: IconFile },
+  { href: "/ai-tools", label: "AI Tools", Icon: IconSparkle },
+  { href: "/du-an", label: "Dự án", Icon: IconRocket },
+  { href: "/tai-nguyen", label: "Tài nguyên", Icon: IconBook },
+  { href: "/tu-van", label: "Tư vấn", Icon: IconChat },
+  { href: "/gioi-thieu", label: "Giới thiệu", Icon: IconUser },
+];
+
+const SOCIAL_SHORT: { key: keyof SocialLinks; short: string; label: string }[] = [
+  { key: "facebook", short: "Fb", label: "Facebook" },
+  { key: "youtube", short: "Yt", label: "YouTube" },
+  { key: "linkedin", short: "In", label: "LinkedIn" },
+  { key: "tiktok", short: "Tt", label: "TikTok" },
+  { key: "github", short: "Gh", label: "GitHub" },
+];
+
 export default async function Home() {
-  const [settings, projects, tools] = await Promise.all([
+  const [settings, about, posts, projects, tools, services] = await Promise.all([
     getSettings(),
+    getAbout(),
+    getFeaturedPosts(3),
     getProjects(),
     getAiTools(),
+    getServices(),
   ]);
 
-  const featured = projects.filter((p) => p.featured).slice(0, 3);
-  const showcase = featured.length > 0 ? featured : projects.slice(0, 3);
-  const contactHref = settings.email ? `mailto:${settings.email}` : "/about";
+  const showcase = (() => {
+    const featured = projects.filter((p) => p.featured);
+    return (featured.length > 0 ? featured : projects).slice(0, 4);
+  })();
+
+  const social = settings.social ?? {};
+  const socialLinks = SOCIAL_SHORT.filter((s) => social[s.key]);
 
   return (
     <SiteShell>
-      <div className="bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 min-h-screen text-white">
-        {/* Hero */}
-        <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="mb-6 inline-block">
-              <span className="bg-purple-500/20 border border-purple-500/50 text-purple-300 px-4 py-2 rounded-full text-sm font-medium">
-                👋 Welcome to my creative space
-              </span>
-            </div>
+      <Container className="py-6 sm:py-8">
+        <Hero settings={settings} />
 
-            <h1 className="text-6xl sm:text-7xl font-bold mb-6 bg-gradient-to-r from-purple-200 via-pink-200 to-purple-200 bg-clip-text text-transparent">
-              {settings.hero_title || "Lê Xuân Thân"}
-            </h1>
+        <div className="mt-6 grid items-start gap-5 lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_19rem] 2xl:grid-cols-[17rem_minmax(0,1fr)_20rem] 2xl:gap-6">
+          {/* ============ CỘT TRÁI ============ */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader icon={<IconUser className="h-4 w-4" />} title="Về tôi" />
 
-            <p className="text-xl sm:text-2xl text-purple-200 mb-8 font-light">
-              {settings.hero_subtitle ||
-                "Brand Strategist • Designer • AI Innovator"}
-            </p>
-
-            <p className="text-lg text-gray-300 mb-12 max-w-2xl mx-auto leading-relaxed">
-              Tạo nên những content sáng tạo, chiến lược branding mạnh mẽ, và các
-              ứng dụng AI cá nhân hóa để giải quyết thử thách trong quản trị
-              thương hiệu
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Link
-                href="/projects"
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105 shadow-lg"
-              >
-                Xem Portfolio
-              </Link>
-              <Link
-                href="/ai-tools"
-                className="border border-purple-400 hover:bg-purple-900/30 text-purple-300 hover:text-purple-200 px-8 py-4 rounded-lg font-semibold transition-all"
-              >
-                Thử AI Tools
-              </Link>
-            </div>
-
-            {/* Stats — số thật từ database */}
-            <div className="grid grid-cols-3 gap-6 max-w-2xl mx-auto py-12 border-t border-purple-500/20">
-              <div>
-                <div className="text-3xl font-bold text-purple-300">
-                  {projects.length}
-                </div>
-                <p className="text-sm text-gray-400 mt-2">Projects</p>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-purple-300">
-                  {tools.length}
-                </div>
-                <p className="text-sm text-gray-400 mt-2">AI Tools</p>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-purple-300">100%</div>
-                <p className="text-sm text-gray-400 mt-2">Creative Focus</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Featured projects */}
-        {showcase.length > 0 && (
-          <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black/30">
-            <div className="max-w-6xl mx-auto">
-              <h2 className="text-4xl font-bold text-center mb-4">
-                Dự án nổi bật
-              </h2>
-              <p className="text-gray-400 text-center mb-16 max-w-2xl mx-auto">
-                Một vài dự án tiêu biểu trong portfolio
+              <p className="text-sm leading-relaxed text-ink-500">
+                {truncate(plainText(about.bio), 260) ||
+                  "Mình là người yêu công nghệ, thích sáng tạo nội dung và luôn tìm kiếm những giải pháp mới để làm việc hiệu quả hơn."}
               </p>
 
-              <div className="grid md:grid-cols-3 gap-8">
-                {showcase.map((p) => (
-                  <div
-                    key={p.id}
-                    className="group overflow-hidden rounded-lg border border-purple-500/20 bg-purple-900/10 backdrop-blur transition-all duration-300 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20"
+              {about.core_values.length > 0 && (
+                <ul className="mt-4 space-y-2.5">
+                  {about.core_values.slice(0, 4).map((v, i) => (
+                    <li key={i} className="flex items-center gap-2.5 text-sm text-ink-700">
+                      <IconTile tone="brand" size="sm">
+                        <span className="text-xs">{v.icon || "✦"}</span>
+                      </IconTile>
+                      <span className="font-medium">{v.title}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <ButtonLink href="/gioi-thieu" tone="primary" className="mt-5 w-full">
+                Tìm hiểu thêm
+                <IconArrow className="h-4 w-4" />
+              </ButtonLink>
+
+              {settings.quote && (
+                <blockquote className="mt-5 rounded-xl bg-brand-50 p-4">
+                  <p className="text-sm font-semibold italic leading-relaxed text-ink-700">
+                    “{settings.quote}”
+                  </p>
+                  <footer className="mt-2 text-right text-xs text-ink-400">
+                    — {settings.hero_title || "Lê Xuân Thân"}
+                  </footer>
+                </blockquote>
+              )}
+            </Card>
+
+            <Card>
+              <CardHeader icon={<IconGrid className="h-4 w-4" />} title="Danh mục nhanh" />
+              <div className="grid grid-cols-2 gap-2">
+                {QUICK_LINKS.map(({ href, label, Icon }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    className="flex items-center gap-2 rounded-xl border border-line bg-surface-soft px-3 py-2.5 text-[13px] font-medium text-ink-700 transition-colors hover:border-brand-300 hover:text-brand-700"
                   >
-                    {p.image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={p.image_url}
-                        alt={p.title}
-                        className="h-40 w-full object-cover"
-                      />
-                    ) : (
-                      <div
-                        className={`h-40 w-full bg-gradient-to-br ${p.color}`}
-                      />
-                    )}
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold mb-3 text-purple-300">
-                        {p.title}
-                      </h3>
-                      <p className="text-gray-400 leading-relaxed line-clamp-3">
-                        {p.description}
-                      </p>
-                    </div>
-                  </div>
+                    <Icon className="h-4 w-4 text-brand-600" />
+                    {label}
+                  </Link>
                 ))}
               </div>
+            </Card>
+          </div>
 
-              <div className="mt-12 text-center">
-                <Link
-                  href="/projects"
-                  className="inline-block border border-purple-400 px-6 py-3 rounded-lg font-semibold text-purple-300 transition-all hover:bg-purple-900/30"
-                >
-                  Xem tất cả dự án →
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
+          {/* ============ CỘT GIỮA ============ */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader
+                icon={<IconFile className="h-4 w-4" />}
+                title="Bài viết nổi bật"
+                actionHref="/bai-viet"
+              />
 
-        {/* Expertise */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8 bg-black/40">
-          <div className="max-w-6xl mx-auto">
-            <h2 className="text-4xl font-bold text-center mb-4">Expertise</h2>
-            <p className="text-gray-400 text-center mb-16 max-w-2xl mx-auto">
-              Kỹ năng và kinh nghiệm sẽ giúp bạn đạt mục tiêu
-            </p>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {[
-                {
-                  icon: "🎨",
-                  title: "Brand & Design",
-                  desc: "Chiến lược thiết kế, visual identity, UI/UX design cho doanh nghiệp",
-                },
-                {
-                  icon: "✍️",
-                  title: "Content Creation",
-                  desc: "Viết content marketing, video storyboarding, copywriting chuyên nghiệp",
-                },
-                {
-                  icon: "🤖",
-                  title: "AI Tools & Automation",
-                  desc: "Phát triển AI tools cá nhân hóa, xử lý dữ liệu, tự động hóa workflow",
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="group bg-gradient-to-br from-purple-900/20 to-pink-900/20 border border-purple-500/20 hover:border-purple-500/50 p-8 rounded-lg backdrop-blur transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
-                >
-                  <div className="text-5xl mb-4 transition-transform group-hover:scale-110">
-                    {item.icon}
-                  </div>
-                  <h3 className="text-xl font-bold mb-3 text-purple-300">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-400 leading-relaxed">{item.desc}</p>
+              {posts.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+                  {posts.map((p) => (
+                    <PostCard key={p.id} post={p} />
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
+              ) : (
+                <EmptyState
+                  icon="✍️"
+                  title="Chưa có bài viết nào"
+                  hint="Vào Quản trị → Bài viết để đăng bài đầu tiên. Bài đánh dấu nổi bật sẽ hiện ngay tại đây."
+                />
+              )}
+            </Card>
 
-        {/* CTA */}
-        <section className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">Sẵn sàng hợp tác?</h2>
-            <p className="text-gray-400 mb-8">
-              Liên hệ với tôi để thảo luận về dự án của bạn
-            </p>
-            <Link
-              href={contactHref}
-              className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105"
-            >
-              📧 Contact Me
-            </Link>
+            <Card>
+              <CardHeader
+                icon={<IconRocket className="h-4 w-4" />}
+                tone="violet"
+                title="Ứng dụng & Dự án của tôi"
+                actionHref="/du-an"
+              />
+
+              {showcase.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-2 2xl:grid-cols-4">
+                  {showcase.map((p) => {
+                    const inner = (
+                      <>
+                        <div
+                          aria-hidden="true"
+                          className={`mb-3 flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br text-lg font-extrabold text-ink-700 ${
+                            p.color || "from-brand-100 to-brand-200"
+                          }`}
+                        >
+                          {p.title.trim().charAt(0).toUpperCase()}
+                        </div>
+                        <h3 className="font-bold leading-snug text-ink-900">{p.title}</h3>
+                        {p.description && (
+                          <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink-500">
+                            {truncate(plainText(p.description), 90)}
+                          </p>
+                        )}
+                        <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700">
+                          Truy cập ngay <IconArrow className="h-3.5 w-3.5" />
+                        </span>
+                      </>
+                    );
+
+                    const cls =
+                      "block rounded-card border border-line bg-surface p-4 transition-shadow hover:shadow-lift";
+
+                    return p.link_url ? (
+                      <a
+                        key={p.id}
+                        href={p.link_url}
+                        className={cls}
+                        {...(p.link_url.startsWith("http")
+                          ? { target: "_blank", rel: "noopener noreferrer" }
+                          : {})}
+                      >
+                        {inner}
+                      </a>
+                    ) : (
+                      <div key={p.id} className={cls}>
+                        {inner}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <EmptyState
+                  icon="🚀"
+                  title="Chưa có ứng dụng nào được đăng"
+                  hint="Thêm trong Quản trị → Ứng dụng & Dự án."
+                />
+              )}
+            </Card>
+
+            {/* Dải mời theo dõi */}
+            <section className="overflow-hidden rounded-card bg-gradient-to-r from-brand-300 to-brand-200 px-6 py-7 sm:px-8">
+              <div className="flex flex-wrap items-center justify-between gap-5">
+                <div>
+                  <h2 className="text-xl font-extrabold text-ink-900">
+                    Cùng nhau khám phá những điều thú vị!
+                  </h2>
+                  <p className="mt-1.5 text-sm font-medium text-ink-700">
+                    Công nghệ · Sáng tạo · Kết nối · Phát triển
+                  </p>
+                </div>
+                <ButtonLink href="/gioi-thieu" tone="outline">
+                  Theo dõi hành trình của tôi
+                  <IconArrow className="h-4 w-4" />
+                </ButtonLink>
+              </div>
+            </section>
           </div>
-        </section>
-      </div>
+
+          {/* ============ CỘT PHẢI ============ */}
+          <div className="space-y-6 lg:col-span-2 xl:col-span-1">
+            <Card>
+              <CardHeader
+                icon={<IconSparkle className="h-4 w-4" />}
+                tone="orange"
+                title="Công cụ AI hữu ích"
+                actionHref="/ai-tools"
+              />
+
+              {tools.length > 0 ? (
+                <ul className="space-y-1">
+                  {tools.slice(0, 5).map((t) => {
+                    const body = (
+                      <>
+                        <div
+                          aria-hidden="true"
+                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-lg ${
+                            t.color || "from-brand-100 to-brand-200"
+                          }`}
+                        >
+                          {t.icon || "✨"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-ink-900">
+                            {t.title}
+                          </p>
+                          {t.description && (
+                            <p className="truncate text-xs text-ink-500">
+                              {t.description.split("\n")[0]}
+                            </p>
+                          )}
+                        </div>
+                        <IconArrow className="h-4 w-4 shrink-0 text-ink-400" />
+                      </>
+                    );
+
+                    const cls =
+                      "flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-brand-50";
+
+                    return (
+                      <li key={t.id}>
+                        {t.link_url ? (
+                          <a
+                            href={t.link_url}
+                            className={cls}
+                            {...(t.link_url.startsWith("http")
+                              ? { target: "_blank", rel: "noopener noreferrer" }
+                              : {})}
+                          >
+                            {body}
+                          </a>
+                        ) : (
+                          <div className={cls}>{body}</div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <EmptyState icon="✨" title="Chưa có công cụ nào" />
+              )}
+
+              <ButtonLink href="/ai-tools" tone="primary" className="mt-4 w-full">
+                Khám phá tất cả công cụ
+                <IconArrow className="h-4 w-4" />
+              </ButtonLink>
+            </Card>
+
+            {services.length > 0 && (
+              <Card>
+                <CardHeader
+                  icon={<IconChat className="h-4 w-4" />}
+                  tone="emerald"
+                  title="Tư vấn & Hỗ trợ"
+                  actionHref="/tu-van"
+                  actionLabel="Chi tiết"
+                />
+                <ul className="space-y-2.5">
+                  {services.slice(0, 4).map((s) => (
+                    <li key={s.id} className="flex items-start gap-2.5 text-sm text-ink-700">
+                      <IconCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                      <span>{s.title}</span>
+                    </li>
+                  ))}
+                </ul>
+                <ButtonLink href="/lien-he" tone="primary" className="mt-4 w-full">
+                  Liên hệ với tôi
+                  <IconArrow className="h-4 w-4" />
+                </ButtonLink>
+              </Card>
+            )}
+
+            {(socialLinks.length > 0 || settings.email) && (
+              <Card>
+                <CardHeader
+                  icon={<IconUser className="h-4 w-4" />}
+                  tone="sky"
+                  title="Kết nối với tôi"
+                />
+
+                {socialLinks.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {socialLinks.map((s) => (
+                      <a
+                        key={s.key}
+                        href={social[s.key]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={s.label}
+                        className="inline-flex h-10 min-w-10 items-center justify-center rounded-full bg-brand-50 px-3 text-sm font-bold text-brand-700 transition-colors hover:bg-brand-100"
+                      >
+                        <span aria-hidden="true">{s.short}</span>
+                        <span className="sr-only">{s.label}</span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+
+                <p className="mt-4 text-xs leading-relaxed text-ink-500">
+                  Đừng ngần ngại kết nối, mình luôn sẵn sàng trao đổi và chia sẻ!
+                </p>
+
+                {about.skills.length > 0 && (
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {about.skills
+                      .flatMap((g) => g.items)
+                      .slice(0, 8)
+                      .map((item) => (
+                        <Chip key={item} tone={toneForLabel(item)}>
+                          {item}
+                        </Chip>
+                      ))}
+                  </div>
+                )}
+              </Card>
+            )}
+          </div>
+        </div>
+      </Container>
     </SiteShell>
   );
 }

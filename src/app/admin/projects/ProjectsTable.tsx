@@ -58,21 +58,21 @@ export default function ProjectsTable({ initial }: { initial: Project[] }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Tìm theo tiêu đề, mô tả hoặc tag…"
-        className="mb-4 w-full rounded-lg border border-white/10 bg-slate-900/70 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none focus:border-blue-500 sm:max-w-sm"
+        className="mb-4 w-full rounded-lg border border-line bg-surface-soft px-4 py-2.5 text-sm text-ink-900 placeholder:text-ink-400 outline-none focus:border-brand-400 sm:max-w-sm"
       />
 
       {error && (
-        <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+        <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
           {error}
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-white/10">
-        <div className="divide-y divide-white/5">
+      <div className="overflow-hidden rounded-xl border border-line">
+        <div className="divide-y divide-line">
           {filtered.map((p) => (
             <div
               key={p.id}
-              className="flex flex-col gap-3 bg-slate-800/40 p-4 transition hover:bg-slate-800/70 sm:flex-row sm:items-center"
+              className="flex flex-col gap-3 bg-surface p-4 transition hover:bg-brand-50 sm:flex-row sm:items-center"
             >
               {/* Thumb */}
               <div className="shrink-0">
@@ -93,23 +93,23 @@ export default function ProjectsTable({ initial }: { initial: Project[] }) {
               {/* Info */}
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="truncate font-semibold text-white">{p.title}</h3>
+                  <h3 className="truncate font-semibold text-ink-900">{p.title}</h3>
                   {p.featured && (
-                    <span className="rounded-full bg-purple-500/15 px-2 py-0.5 text-[10px] font-medium text-purple-300">
-                      ★ Featured
+                    <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-medium text-violet-700">
+                      ★ Nổi bật
                     </span>
                   )}
                   <span
                     className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
                       p.published
-                        ? "bg-emerald-500/15 text-emerald-300"
-                        : "bg-slate-600/40 text-slate-400"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-stone-100 text-ink-500"
                     }`}
                   >
                     {p.published ? "Hiển thị" : "Nháp"}
                   </span>
                 </div>
-                <p className="mt-1 line-clamp-1 text-sm text-slate-400">
+                <p className="mt-1 line-clamp-1 text-sm text-ink-500">
                   {p.description || "—"}
                 </p>
                 {p.tags.length > 0 && (
@@ -117,7 +117,7 @@ export default function ProjectsTable({ initial }: { initial: Project[] }) {
                     {p.tags.map((t) => (
                       <span
                         key={t}
-                        className="rounded bg-blue-500/10 px-1.5 py-0.5 text-[10px] text-blue-300"
+                        className="rounded bg-sky-100 px-1.5 py-0.5 text-[10px] text-sky-800"
                       >
                         {t}
                       </span>
@@ -128,17 +128,17 @@ export default function ProjectsTable({ initial }: { initial: Project[] }) {
 
               {/* Actions */}
               <div className="flex shrink-0 flex-wrap items-center gap-2">
-                <span className="mr-1 text-xs text-slate-500">#{p.sort_order}</span>
+                <span className="mr-1 text-xs text-ink-400">#{p.sort_order}</span>
                 <button
                   onClick={() => togglePublished(p)}
                   disabled={busy === p.id}
-                  className="rounded-md border border-white/10 px-2.5 py-1.5 text-xs text-slate-300 transition hover:bg-white/5 hover:text-white disabled:opacity-50"
+                  className="rounded-md border border-line px-2.5 py-1.5 text-xs text-ink-700 transition hover:bg-brand-50 hover:text-brand-700 disabled:opacity-50"
                 >
                   {p.published ? "Ẩn" : "Hiện"}
                 </button>
                 <Link
                   href={`/admin/projects/${p.id}`}
-                  className="rounded-md bg-blue-600/80 px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-blue-600"
+                  className="rounded-md bg-brand-400 px-2.5 py-1.5 text-xs font-medium text-ink-900 transition hover:bg-brand-300"
                 >
                   Sửa
                 </Link>
@@ -147,13 +147,13 @@ export default function ProjectsTable({ initial }: { initial: Project[] }) {
                     <button
                       onClick={() => remove(p)}
                       disabled={busy === p.id}
-                      className="rounded-md bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-red-500 disabled:opacity-50"
+                      className="rounded-md bg-rose-600 px-2.5 py-1.5 text-xs font-medium text-ink-900 transition hover:bg-rose-500 disabled:opacity-50"
                     >
                       {busy === p.id ? "…" : "Xoá thật"}
                     </button>
                     <button
                       onClick={() => setConfirmId(null)}
-                      className="rounded-md border border-white/10 px-2.5 py-1.5 text-xs text-slate-300"
+                      className="rounded-md border border-line px-2.5 py-1.5 text-xs text-ink-700"
                     >
                       Huỷ
                     </button>
@@ -161,7 +161,7 @@ export default function ProjectsTable({ initial }: { initial: Project[] }) {
                 ) : (
                   <button
                     onClick={() => setConfirmId(p.id)}
-                    className="rounded-md border border-red-500/30 px-2.5 py-1.5 text-xs text-red-300 transition hover:bg-red-500/10"
+                    className="rounded-md border border-rose-200 px-2.5 py-1.5 text-xs text-rose-700 transition hover:bg-rose-50"
                   >
                     Xoá
                   </button>
@@ -171,8 +171,8 @@ export default function ProjectsTable({ initial }: { initial: Project[] }) {
           ))}
 
           {filtered.length === 0 && (
-            <div className="bg-slate-800/40 px-4 py-10 text-center text-sm text-slate-500">
-              Không tìm thấy project nào khớp “{query}”.
+            <div className="bg-surface px-4 py-10 text-center text-sm text-ink-400">
+              Không tìm thấy mục nào khớp “{query}”.
             </div>
           )}
         </div>
