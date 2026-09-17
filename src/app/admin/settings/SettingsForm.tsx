@@ -178,19 +178,41 @@ export default function SettingsForm({
           </Field>
         </div>
 
-        <div>
-          <span className="mb-1.5 block text-sm font-semibold text-ink-700">
-            Ảnh bìa trang chủ
-          </span>
-          <ImagePicker
-            value={form.hero_image_url || null}
-            onChange={(url) => set("hero_image_url", url ?? "")}
-          />
-          <span className="mt-1.5 block text-xs leading-relaxed text-ink-400">
-            Ảnh nằm bên phải phần giới thiệu đầu trang chủ. Nên dùng ảnh ngang,
-            khoảng 1200×900 trở lên. Bỏ trống thì web dùng khối trang trí vẽ sẵn.
-          </span>
-        </div>
+        <div className="space-y-3">
+  <div>
+    <span className="block text-sm font-semibold text-ink-700">
+      Ảnh bìa trang chủ (Hero Banner)
+    </span>
+    <span className="text-xs text-ink-400">
+      Khung xem trước bên dưới hiển thị đúng tỷ lệ thực tế khi ra ngoài trang chủ.
+    </span>
+  </div>
+
+  <ImagePicker
+    value={form.hero_image_url || null}
+    onChange={(url) => set("hero_image_url", url ?? "")}
+  />
+
+  {/* Khung xem trước đúng tỷ lệ trang chủ */}
+  {form.hero_image_url && (
+    <div className="mt-3 rounded-xl border border-line bg-page p-3">
+      <p className="mb-2 text-xs font-semibold text-ink-500">
+        Xem trước hiển thị thực tế trên trang chủ:
+      </p>
+      <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-sm">
+        <img
+          src={form.hero_image_url}
+          alt="Xem trước ảnh bìa"
+          className="w-full h-auto block object-contain"
+        />
+      </div>
+    </div>
+  )}
+
+  <span className="block text-xs leading-relaxed text-ink-400">
+    💡 <strong>Mẹo:</strong> Thiết kế ảnh dạng banner ngang (khoảng 1920×450 px hoặc 1200×300 px) để đạt độ nét cao nhất trên cả máy tính và điện thoại.
+  </span>
+</div>
 
         <Field
           label="Câu tâm đắc"

@@ -10,6 +10,7 @@ import type {
   SkillGroup,
 } from "@/lib/types";
 import { Card, Field, inputClass } from "@/components/admin/ui";
+import RichEditor from "@/components/admin/RichEditor";
 
 export default function AboutForm({
   about,
@@ -74,16 +75,17 @@ export default function AboutForm({
           />
         </Field>
 
-        <Field
-          label="Nội dung bio"
-          hint="Mỗi đoạn cách nhau 1 dòng trống. Dùng **chữ đậm** để nhấn mạnh."
-        >
-          <textarea
-            className={`${inputClass} min-h-[260px] resize-y font-mono text-[13px] leading-relaxed`}
-            value={bio}
-            onChange={(e) => setBio(e.target.value)}
-          />
-        </Field>
+        <div>
+          <span className="mb-1.5 block text-sm font-semibold text-ink-700">
+            Nội dung bio
+          </span>
+          <RichEditor value={bio} onChange={setBio} />
+          <span className="mt-1.5 block text-xs leading-relaxed text-ink-400">
+            Bôi đen phần chữ rồi chọn định dạng ở thanh trên. Nội dung cũ viết bằng
+            **hai dấu sao** vẫn giữ nguyên, chỉ cần bôi đen và bấm B là thành chữ đậm
+            thật.
+          </span>
+        </div>
       </Card>
 
       {/* SKILLS */}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import SiteShell from "@/components/SiteShell";
-import Hero from "@/components/home/Hero";
 import { PostCard } from "@/components/content/PostCard";
+import { UniversityLookup } from "@/components/UniversityLookup";
 import {
   ButtonLink,
   Card,
@@ -40,7 +40,7 @@ const QUICK_LINKS = [
   { href: "/bai-viet", label: "Bài viết", Icon: IconFile },
   { href: "/ai-tools", label: "AI Tools", Icon: IconSparkle },
   { href: "/du-an", label: "Dự án", Icon: IconRocket },
-  { href: "/tai-nguyen", label: "Tài nguyên", Icon: IconBook },
+  { href: "#tra-cuu-dai-hoc", label: "Điểm chuẩn", Icon: IconBook },
   { href: "/tu-van", label: "Tư vấn", Icon: IconChat },
   { href: "/gioi-thieu", label: "Giới thiệu", Icon: IconUser },
 ];
@@ -71,10 +71,21 @@ export default async function Home() {
   const social = settings.social ?? {};
   const socialLinks = SOCIAL_SHORT.filter((s) => social[s.key]);
 
+  // Ưu tiên lấy ảnh từ Supabase settings, nếu chưa có thì lấy file tĩnh banner.jpg trong thư mục public
+  const heroImageSrc = settings.hero_image_url || "/banner.jpg";
+
   return (
     <SiteShell>
       <Container className="py-6 sm:py-8">
-        <Hero settings={settings} />
+        {/* ============ ẢNH BÌA NGUYÊN MẢNG LỚN (TỰ CO GIÃN THEO TỶ LỆ ẢNH) ============ */}
+        <section className="relative w-full overflow-hidden rounded-card-lg border border-line bg-surface shadow-soft">
+          <img
+            src={heroImageSrc}
+            alt={settings.hero_title || "Ảnh bìa trang chủ"}
+            className="w-full h-auto block object-contain"
+            loading="eager"
+          />
+        </section>
 
         <div className="mt-6 grid items-start gap-5 lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_19rem] 2xl:grid-cols-[17rem_minmax(0,1fr)_20rem] 2xl:gap-6">
           {/* ============ CỘT TRÁI ============ */}
@@ -379,6 +390,13 @@ export default async function Home() {
             )}
           </div>
         </div>
+
+        {/* ============ KHU VỰC TRA CỨU ĐIỂM CHUẨN ĐẠI HỌC ============ */}
+        <section id="tra-cuu-dai-hoc" className="mt-10 scroll-mt-6">
+          <Card className="p-4 sm:p-6 shadow-soft">
+            <UniversityLookup />
+          </Card>
+        </section>
       </Container>
     </SiteShell>
   );

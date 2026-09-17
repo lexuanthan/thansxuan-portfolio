@@ -11,6 +11,10 @@ import {
   toneForLabel,
 } from "@/components/ui";
 import { IconArrow, IconChart, IconCheck, IconUser } from "@/components/ui/icons";
+import HtmlContent from "@/components/HtmlContent";
+import RichText from "@/components/RichText";
+import { looksLikeHtml } from "@/lib/html";
+import { previewText, truncate } from "@/lib/format";
 import { getAbout, getSettings } from "@/lib/queries";
 
 export const revalidate = 60;
@@ -26,17 +30,41 @@ export default async function GioiThieuPage() {
   return (
     <SiteShell>
       <Container className="py-10">
+        {/*
+          Đoạn mô tả dưới tiêu đề chỉ là một dòng tóm tắt. Trước đây nó nhận cả
+          bài bio — bio giờ lưu HTML nên đổ thẳng vào đây sẽ lòi ra đống thẻ, mà
+          để nguyên cũng quá dài cho một dòng dẫn.
+        */}
         <PageHeading
           eyebrow="Giới thiệu"
           title={about.heading || "Đôi nét về tôi"}
           description={
-            about.bio ||
+            truncate(previewText(about.bio), 180) ||
             "Người sáng tạo nội dung và xây dựng ứng dụng công nghệ, luôn tìm cách biến ý tưởng thành công cụ dùng được."
           }
         />
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="space-y-6">
+            {/* Bio đầy đủ */}
+            {about.bio && (
+              <Card>
+                <CardHeader
+                  icon={<IconUser className="h-4 w-4" />}
+                  title="Về tôi"
+                />
+                {looksLikeHtml(about.bio) ? (
+                  <HtmlContent html={about.bio} />
+                ) : (
+                  <RichText
+                    text={about.bio}
+                    className="space-y-4"
+                    paragraphClassName="text-[15px] leading-[1.9] text-ink-700"
+                  />
+                )}
+              </Card>
+            )}
+
             {/* Hành trình */}
             <Card>
               <CardHeader icon={<IconChart className="h-4 w-4" />} title="Hành trình" />

@@ -1,0 +1,2258 @@
+[
+  {
+    "id": "7140101",
+    "code": "7140101",
+    "name": "Giáo dục học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140103",
+    "code": "7140103",
+    "name": "Công nghệ giáo dục",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140114",
+    "code": "7140114",
+    "name": "Quản lý giáo dục",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140201",
+    "code": "7140201",
+    "name": "Giáo dục Mầm non",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140202",
+    "code": "7140202",
+    "name": "Giáo dục Tiểu học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140203",
+    "code": "7140203",
+    "name": "Giáo dục Đặc biệt",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140204",
+    "code": "7140204",
+    "name": "Giáo dục Công dân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140205",
+    "code": "7140205",
+    "name": "Giáo dục Chính trị",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140206",
+    "code": "7140206",
+    "name": "Giáo dục Thể chất",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140207",
+    "code": "7140207",
+    "name": "Chuyển đến nhóm ngành 78103",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140208",
+    "code": "7140208",
+    "name": "Giáo dục Quốc phòng - An ninh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140209",
+    "code": "7140209",
+    "name": "Sư phạm Toán học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140210",
+    "code": "7140210",
+    "name": "Sư phạm Tin học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140211",
+    "code": "7140211",
+    "name": "Sư phạm Vật lý",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140212",
+    "code": "7140212",
+    "name": "Sư phạm Hóa học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140213",
+    "code": "7140213",
+    "name": "Sư phạm Sinh học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140214",
+    "code": "7140214",
+    "name": "Sư phạm Kỹ thuật công nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140215",
+    "code": "7140215",
+    "name": "Sư phạm Kỹ thuật nông nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140217",
+    "code": "7140217",
+    "name": "Sư phạm Ngữ văn",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140218",
+    "code": "7140218",
+    "name": "Sư phạm Lịch sử",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140219",
+    "code": "7140219",
+    "name": "Sư phạm Địa lý",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140221",
+    "code": "7140221",
+    "name": "Sư phạm Âm nhạc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140222",
+    "code": "7140222",
+    "name": "Sư phạm Mỹ thuật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140223",
+    "code": "7140223",
+    "name": "Sư phạm Tiếng Bana",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140224",
+    "code": "7140224",
+    "name": "Sư phạm Tiếng Êđê",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140225",
+    "code": "7140225",
+    "name": "Sư phạm Tiếng Jrai",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140226",
+    "code": "7140226",
+    "name": "Sư phạm Tiếng Khmer",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140227",
+    "code": "7140227",
+    "name": "Sư phạm Tiếng H'mong",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140228",
+    "code": "7140228",
+    "name": "Sư phạm Tiếng Chăm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140229",
+    "code": "7140229",
+    "name": "Sư phạm Tiếng M'nông",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140230",
+    "code": "7140230",
+    "name": "Sư phạm Tiếng Xêđăng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140231",
+    "code": "7140231",
+    "name": "Sư phạm Tiếng Anh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140232",
+    "code": "7140232",
+    "name": "Sư phạm Tiếng Nga",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140233",
+    "code": "7140233",
+    "name": "Sư phạm Tiếng Pháp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140234",
+    "code": "7140234",
+    "name": "Sư phạm Tiếng Trung Quốc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140235",
+    "code": "7140235",
+    "name": "Sư phạm Tiếng Đức",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140236",
+    "code": "7140236",
+    "name": "Sư phạm Tiếng Nhật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140237",
+    "code": "7140237",
+    "name": "Sư phạm Tiếng Hàn Quốc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140245",
+    "code": "7140245",
+    "name": "Sư phạm nghệ thuật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140246",
+    "code": "7140246",
+    "name": "Sư phạm công nghệ",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140247",
+    "code": "7140247",
+    "name": "Sư phạm Khoa học tự nhiên",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140248",
+    "code": "7140248",
+    "name": "Giáo dục pháp luật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7140249",
+    "code": "7140249",
+    "name": "Sư phạm Lịch sử - Địa lý",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210101",
+    "code": "7210101",
+    "name": "Lý luận, lịch sử và phê bình mỹ thuật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210103",
+    "code": "7210103",
+    "name": "Hội họa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210104",
+    "code": "7210104",
+    "name": "Đồ họa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210105",
+    "code": "7210105",
+    "name": "Điêu khắc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210110",
+    "code": "7210110",
+    "name": "Mỹ thuật đô thị",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210201",
+    "code": "7210201",
+    "name": "Âm nhạc học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210203",
+    "code": "7210203",
+    "name": "Sáng tác âm nhạc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210204",
+    "code": "7210204",
+    "name": "Chỉ huy âm nhạc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210205",
+    "code": "7210205",
+    "name": "Thanh nhạc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210207",
+    "code": "7210207",
+    "name": "Biểu diễn nhạc cụ phương tây",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210208",
+    "code": "7210208",
+    "name": "Piano",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210209",
+    "code": "7210209",
+    "name": "Nhạc Jazz",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210210",
+    "code": "7210210",
+    "name": "Biểu diễn nhạc cụ truyền thống",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210221",
+    "code": "7210221",
+    "name": "Lý luận, lịch sử và phê bình sân khấu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210225",
+    "code": "7210225",
+    "name": "Biên kịch sân khấu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210226",
+    "code": "7210226",
+    "name": "Diễn viên sân khấu kịch hát",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210227",
+    "code": "7210227",
+    "name": "Đạo diễn sân khấu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210231",
+    "code": "7210231",
+    "name": "Lý luận, lịch sử và phê bình điện ảnh, truyền hình",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210233",
+    "code": "7210233",
+    "name": "Biên kịch điện ảnh, truyền hình",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210234",
+    "code": "7210234",
+    "name": "Diễn viên kịch, điện ảnh - truyền hình",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210235",
+    "code": "7210235",
+    "name": "Đạo diễn điện ảnh, truyền hình",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210236",
+    "code": "7210236",
+    "name": "Quay phim",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210241",
+    "code": "7210241",
+    "name": "Lý luận, lịch sử và phê bình múa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210242",
+    "code": "7210242",
+    "name": "Diễn viên múa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210243",
+    "code": "7210243",
+    "name": "Biên đạo múa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210244",
+    "code": "7210244",
+    "name": "Huấn luyện múa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210301",
+    "code": "7210301",
+    "name": "Nhiếp ảnh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210302",
+    "code": "7210302",
+    "name": "Công nghệ điện ảnh, truyền hình",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210303",
+    "code": "7210303",
+    "name": "Thiết kế âm thanh, ánh sáng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210402",
+    "code": "7210402",
+    "name": "Thiết kế công nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210403",
+    "code": "7210403",
+    "name": "Thiết kế đồ họa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210404",
+    "code": "7210404",
+    "name": "Thiết kế thời trang",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7210406",
+    "code": "7210406",
+    "name": "Thiết kế mỹ thuật sân khấu, điện ảnh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220101",
+    "code": "7220101",
+    "name": "Tiếng Việt và văn hóa Việt Nam",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220104",
+    "code": "7220104",
+    "name": "Hán Nôm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220105",
+    "code": "7220105",
+    "name": "Ngôn ngữ Jrai",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220106",
+    "code": "7220106",
+    "name": "Ngôn ngữ Khmer",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220107",
+    "code": "7220107",
+    "name": "Ngôn ngữ H'mong",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220108",
+    "code": "7220108",
+    "name": "Ngôn ngữ Chăm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220110",
+    "code": "7220110",
+    "name": "Sáng tác văn học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220112",
+    "code": "7220112",
+    "name": "Văn hóa các dân tộc thiểu số Việt Nam",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220201",
+    "code": "7220201",
+    "name": "Ngôn ngữ Anh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220202",
+    "code": "7220202",
+    "name": "Ngôn ngữ Nga",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220203",
+    "code": "7220203",
+    "name": "Ngôn ngữ Pháp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220204",
+    "code": "7220204",
+    "name": "Ngôn ngữ Trung Quốc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220205",
+    "code": "7220205",
+    "name": "Ngôn ngữ Đức",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220206",
+    "code": "7220206",
+    "name": "Ngôn ngữ Tây Ban Nha",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220207",
+    "code": "7220207",
+    "name": "Ngôn ngữ Bồ Đào Nha",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220208",
+    "code": "7220208",
+    "name": "Ngôn ngữ Italia",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220209",
+    "code": "7220209",
+    "name": "Ngôn ngữ Nhật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220210",
+    "code": "7220210",
+    "name": "Ngôn ngữ Hàn Quốc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7220211",
+    "code": "7220211",
+    "name": "Ngôn ngữ Ảrập",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229001",
+    "code": "7229001",
+    "name": "Triết học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229008",
+    "code": "7229008",
+    "name": "Sửa mã ngành (mã cũ là 729008)",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229009",
+    "code": "7229009",
+    "name": "Tôn giáo học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229010",
+    "code": "7229010",
+    "name": "Lịch sử",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229020",
+    "code": "7229020",
+    "name": "Ngôn ngữ học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229030",
+    "code": "7229030",
+    "name": "Văn học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229040",
+    "code": "7229040",
+    "name": "Văn hóa học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229042",
+    "code": "7229042",
+    "name": "Quản lý văn hóa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7229045",
+    "code": "7229045",
+    "name": "Gia đình học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310101",
+    "code": "7310101",
+    "name": "Kinh tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310102",
+    "code": "7310102",
+    "name": "Kinh tế chính trị",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310104",
+    "code": "7310104",
+    "name": "Kinh tế đầu tư",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310105",
+    "code": "7310105",
+    "name": "Kinh tế phát triển",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310106",
+    "code": "7310106",
+    "name": "Kinh tế quốc tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310107",
+    "code": "7310107",
+    "name": "Thống kê kinh tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310108",
+    "code": "7310108",
+    "name": "Toán kinh tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310109",
+    "code": "7310109",
+    "name": "Kinh tế số",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310201",
+    "code": "7310201",
+    "name": "Chính trị học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310202",
+    "code": "7310202",
+    "name": "Xây dựng Đảng và chính quyền nhà nước",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310205",
+    "code": "7310205",
+    "name": "Quản lý nhà nước",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310206",
+    "code": "7310206",
+    "name": "Quan hệ quốc tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310301",
+    "code": "7310301",
+    "name": "Xã hội học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310302",
+    "code": "7310302",
+    "name": "Nhân học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310401",
+    "code": "7310401",
+    "name": "Tâm lý học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310403",
+    "code": "7310403",
+    "name": "Tâm lý học giáo dục",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310501",
+    "code": "7310501",
+    "name": "Địa lý học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310601",
+    "code": "7310601",
+    "name": "Quốc tế học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310602",
+    "code": "7310602",
+    "name": "Châu Á học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310607",
+    "code": "7310607",
+    "name": "Thái Bình Dương học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310608",
+    "code": "7310608",
+    "name": "Đông phương học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310612",
+    "code": "7310612",
+    "name": "Trung Quốc học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310613",
+    "code": "7310613",
+    "name": "Nhật Bản học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310614",
+    "code": "7310614",
+    "name": "Hàn Quốc học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310620",
+    "code": "7310620",
+    "name": "Đông Nam Á học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7310630",
+    "code": "7310630",
+    "name": "Việt Nam học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320101",
+    "code": "7320101",
+    "name": "Báo chí",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320104",
+    "code": "7320104",
+    "name": "Truyền thông đa phương tiện",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320105",
+    "code": "7320105",
+    "name": "Truyền thông đại chúng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320106",
+    "code": "7320106",
+    "name": "Công nghệ truyền thông",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320107",
+    "code": "7320107",
+    "name": "Truyền thông quốc tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320108",
+    "code": "7320108",
+    "name": "Quan hệ công chúng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320201",
+    "code": "7320201",
+    "name": "Thông tin - Thư viện",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320205",
+    "code": "7320205",
+    "name": "Quản lý thông tin",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320303",
+    "code": "7320303",
+    "name": "Lưu trữ học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320305",
+    "code": "7320305",
+    "name": "Bảo tàng học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320401",
+    "code": "7320401",
+    "name": "Xuất bản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7320402",
+    "code": "7320402",
+    "name": "Kinh doanh xuất bản phẩm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340101",
+    "code": "7340101",
+    "name": "Quản trị kinh doanh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340115",
+    "code": "7340115",
+    "name": "Marketing",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340116",
+    "code": "7340116",
+    "name": "Bất động sản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340120",
+    "code": "7340120",
+    "name": "Kinh doanh quốc tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340121",
+    "code": "7340121",
+    "name": "Kinh doanh thương mại",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340122",
+    "code": "7340122",
+    "name": "Thương mại điện tử",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340123",
+    "code": "7340123",
+    "name": "Kinh doanh thời trang và dệt may",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340201",
+    "code": "7340201",
+    "name": "Tài chính - Ngân hàng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340204",
+    "code": "7340204",
+    "name": "Bảo hiểm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340205",
+    "code": "7340205",
+    "name": "Công nghệ tài chính",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340301",
+    "code": "7340301",
+    "name": "Kế toán",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340302",
+    "code": "7340302",
+    "name": "Kiểm toán",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340401",
+    "code": "7340401",
+    "name": "Khoa học quản lý",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340403",
+    "code": "7340403",
+    "name": "Quản lý công",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340404",
+    "code": "7340404",
+    "name": "Quản trị nhân lực",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340405",
+    "code": "7340405",
+    "name": "Hệ thống thông tin quản lý",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340406",
+    "code": "7340406",
+    "name": "Quản trị văn phòng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340408",
+    "code": "7340408",
+    "name": "Quan hệ lao động",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7340409",
+    "code": "7340409",
+    "name": "Quản lý dự án",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7380101",
+    "code": "7380101",
+    "name": "Luật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7380102",
+    "code": "7380102",
+    "name": "Luật hiến pháp và luật hành chính",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7380103",
+    "code": "7380103",
+    "name": "Luật dân sự và tố tụng dân sự",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7380104",
+    "code": "7380104",
+    "name": "Luật hình sự và tố tụng hình sự",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7380107",
+    "code": "7380107",
+    "name": "Luật kinh tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7380108",
+    "code": "7380108",
+    "name": "Luật quốc tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7420101",
+    "code": "7420101",
+    "name": "Sinh học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7420201",
+    "code": "7420201",
+    "name": "Công nghệ sinh học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7420202",
+    "code": "7420202",
+    "name": "Kỹ thuật sinh học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7420203",
+    "code": "7420203",
+    "name": "Sinh học ứng dụng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440101",
+    "code": "7440101",
+    "name": "Thiên văn học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440102",
+    "code": "7440102",
+    "name": "Vật lý học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440106",
+    "code": "7440106",
+    "name": "Vật lý nguyên tử và hạt nhân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440110",
+    "code": "7440110",
+    "name": "Cơ học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440112",
+    "code": "7440112",
+    "name": "Hóa học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440122",
+    "code": "7440122",
+    "name": "Khoa học vật liệu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440201",
+    "code": "7440201",
+    "name": "Địa chất học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440212",
+    "code": "7440212",
+    "name": "Bản đồ học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440217",
+    "code": "7440217",
+    "name": "Địa lý tự nhiên",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440222",
+    "code": "7440222",
+    "name": "Sửa mã ngành (mã cũ là 7440221)",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440224",
+    "code": "7440224",
+    "name": "Thủy văn học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440228",
+    "code": "7440228",
+    "name": "Hải dương học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7440301",
+    "code": "7440301",
+    "name": "Khoa học môi trường",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7460101",
+    "code": "7460101",
+    "name": "Toán học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7460107",
+    "code": "7460107",
+    "name": "Khoa học tính toán",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7460108",
+    "code": "7460108",
+    "name": "Khoa học dữ liệu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7460112",
+    "code": "7460112",
+    "name": "Toán ứng dụng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7460115",
+    "code": "7460115",
+    "name": "Toán cơ",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7460117",
+    "code": "7460117",
+    "name": "Toán tin",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7460201",
+    "code": "7460201",
+    "name": "Thống kê",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480101",
+    "code": "7480101",
+    "name": "Khoa học máy tính",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480102",
+    "code": "7480102",
+    "name": "Mạng máy tính và truyền thông dữ liệu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480103",
+    "code": "7480103",
+    "name": "Kỹ thuật phần mềm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480104",
+    "code": "7480104",
+    "name": "Hệ thống thông tin",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480106",
+    "code": "7480106",
+    "name": "Kỹ thuật máy tính",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480107",
+    "code": "7480107",
+    "name": "Trí tuệ nhân tạo",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480108",
+    "code": "7480108",
+    "name": "Công nghệ kỹ thuật máy tính",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480201",
+    "code": "7480201",
+    "name": "Công nghệ thông tin",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7480202",
+    "code": "7480202",
+    "name": "An toàn thông tin",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510101",
+    "code": "7510101",
+    "name": "Công nghệ kỹ thuật kiến trúc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510102",
+    "code": "7510102",
+    "name": "Công nghệ kỹ thuật công trình xây dựng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510103",
+    "code": "7510103",
+    "name": "Công nghệ kỹ thuật xây dựng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510104",
+    "code": "7510104",
+    "name": "Công nghệ kỹ thuật giao thông",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510105",
+    "code": "7510105",
+    "name": "Công nghệ kỹ thuật vật liệu xây dựng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510201",
+    "code": "7510201",
+    "name": "Công nghệ kỹ thuật cơ khí",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510202",
+    "code": "7510202",
+    "name": "Công nghệ chế tạo máy",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510203",
+    "code": "7510203",
+    "name": "Công nghệ kỹ thuật cơ điện tử",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510205",
+    "code": "7510205",
+    "name": "Công nghệ kỹ thuật ô tô",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510206",
+    "code": "7510206",
+    "name": "Công nghệ kỹ thuật nhiệt",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510207",
+    "code": "7510207",
+    "name": "Công nghệ kỹ thuật tàu thủy",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510211",
+    "code": "7510211",
+    "name": "Bảo dưỡng công nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510301",
+    "code": "7510301",
+    "name": "Công nghệ kỹ thuật điện, điện tử",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510302",
+    "code": "7510302",
+    "name": "Công nghệ kỹ thuật điện tử - viễn thông",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510303",
+    "code": "7510303",
+    "name": "Công nghệ kỹ thuật điều khiển và tự động hóa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510401",
+    "code": "7510401",
+    "name": "Công nghệ kỹ thuật hóa học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510402",
+    "code": "7510402",
+    "name": "Công nghệ vật liệu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510406",
+    "code": "7510406",
+    "name": "Công nghệ kỹ thuật môi trường",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510407",
+    "code": "7510407",
+    "name": "Công nghệ kỹ thuật hạt nhân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510601",
+    "code": "7510601",
+    "name": "Quản lý công nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510604",
+    "code": "7510604",
+    "name": "Kinh tế công nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510605",
+    "code": "7510605",
+    "name": "Logistics và Quản lý chuỗi cung ứng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510701",
+    "code": "7510701",
+    "name": "Công nghệ dầu khí và khai thác dầu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7510801",
+    "code": "7510801",
+    "name": "Công nghệ kỹ thuật in",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520101",
+    "code": "7520101",
+    "name": "Cơ kỹ thuật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520103",
+    "code": "7520103",
+    "name": "Kỹ thuật cơ khí",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520114",
+    "code": "7520114",
+    "name": "Kỹ thuật cơ điện tử",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520115",
+    "code": "7520115",
+    "name": "Kỹ thuật nhiệt",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520116",
+    "code": "7520116",
+    "name": "Kỹ thuật cơ khí động lực",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520117",
+    "code": "7520117",
+    "name": "Kỹ thuật công nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520118",
+    "code": "7520118",
+    "name": "Kỹ thuật hệ thống công nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520120",
+    "code": "7520120",
+    "name": "Kỹ thuật hàng không",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520121",
+    "code": "7520121",
+    "name": "Kỹ thuật không gian",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520122",
+    "code": "7520122",
+    "name": "Kỹ thuật tàu thủy",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520130",
+    "code": "7520130",
+    "name": "Kỹ thuật ô tô",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520137",
+    "code": "7520137",
+    "name": "Kỹ thuật in",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520138",
+    "code": "7520138",
+    "name": "Kỹ thuật hàng hải",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520201",
+    "code": "7520201",
+    "name": "Kỹ thuật điện",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520204",
+    "code": "7520204",
+    "name": "Kỹ thuật rađa - dẫn đường",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520205",
+    "code": "7520205",
+    "name": "Kỹ thuật thủy âm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520206",
+    "code": "7520206",
+    "name": "Kỹ thuật biển",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520207",
+    "code": "7520207",
+    "name": "Kỹ thuật điện tử - viễn thông",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520212",
+    "code": "7520212",
+    "name": "Kỹ thuật y sinh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520216",
+    "code": "7520216",
+    "name": "Kỹ thuật điều khiển và tự động hóa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520301",
+    "code": "7520301",
+    "name": "Kỹ thuật hóa học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520309",
+    "code": "7520309",
+    "name": "Kỹ thuật vật liệu",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520310",
+    "code": "7520310",
+    "name": "Kỹ thuật vật liệu kim loại",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520312",
+    "code": "7520312",
+    "name": "Kỹ thuật dệt",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520320",
+    "code": "7520320",
+    "name": "Kỹ thuật môi trường",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520401",
+    "code": "7520401",
+    "name": "Vật lý kỹ thuật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520402",
+    "code": "7520402",
+    "name": "Kỹ thuật hạt nhân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520501",
+    "code": "7520501",
+    "name": "Kỹ thuật địa chất",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520502",
+    "code": "7520502",
+    "name": "Kỹ thuật địa vật lý",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520503",
+    "code": "7520503",
+    "name": "Kỹ thuật trắc địa - bản đồ",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520601",
+    "code": "7520601",
+    "name": "Kỹ thuật mỏ",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520602",
+    "code": "7520602",
+    "name": "Kỹ thuật thăm dò và khảo sát",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520604",
+    "code": "7520604",
+    "name": "Kỹ thuật dầu khí",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7520607",
+    "code": "7520607",
+    "name": "Kỹ thuật tuyển khoáng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540101",
+    "code": "7540101",
+    "name": "Công nghệ thực phẩm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540102",
+    "code": "7540102",
+    "name": "Kỹ thuật thực phẩm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540104",
+    "code": "7540104",
+    "name": "Công nghệ sau thu hoạch",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540105",
+    "code": "7540105",
+    "name": "Công nghệ chế biến thủy sản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540106",
+    "code": "7540106",
+    "name": "Đảm bảo chất lượng và an toàn thực phẩm",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540202",
+    "code": "7540202",
+    "name": "Công nghệ sợi, dệt",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540203",
+    "code": "7540203",
+    "name": "Công nghệ vật liệu dệt, may",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540204",
+    "code": "7540204",
+    "name": "Công nghệ dệt, may",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7540206",
+    "code": "7540206",
+    "name": "Công nghệ da giày",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7549001",
+    "code": "7549001",
+    "name": "Công nghệ chế biến lâm sản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580101",
+    "code": "7580101",
+    "name": "Kiến trúc",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580102",
+    "code": "7580102",
+    "name": "Kiến trúc cảnh quan",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580103",
+    "code": "7580103",
+    "name": "Kiến trúc nội thất",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580104",
+    "code": "7580104",
+    "name": "Kiến trúc đô thị",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580105",
+    "code": "7580105",
+    "name": "Quy hoạch vùng và đô thị",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580106",
+    "code": "7580106",
+    "name": "Quản lý đô thị và công trình",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580108",
+    "code": "7580108",
+    "name": "Thiết kế nội thất",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580111",
+    "code": "7580111",
+    "name": "Bảo tồn di sản kiến trúc - Đô thị",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580112",
+    "code": "7580112",
+    "name": "Đô thị học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580201",
+    "code": "7580201",
+    "name": "Kỹ thuật xây dựng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580202",
+    "code": "7580202",
+    "name": "Kỹ thuật xây dựng công trình thủy",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580203",
+    "code": "7580203",
+    "name": "Kỹ thuật xây dựng công trình biển",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580205",
+    "code": "7580205",
+    "name": "Kỹ thuật xây dựng công trình giao thông",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580210",
+    "code": "7580210",
+    "name": "Kỹ thuật cơ sở hạ tầng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580211",
+    "code": "7580211",
+    "name": "Địa kỹ thuật xây dựng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580212",
+    "code": "7580212",
+    "name": "Kỹ thuật tài nguyên nước",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580213",
+    "code": "7580213",
+    "name": "Kỹ thuật cấp thoát nước",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580301",
+    "code": "7580301",
+    "name": "Kinh tế xây dựng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7580302",
+    "code": "7580302",
+    "name": "Quản lý xây dựng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620101",
+    "code": "7620101",
+    "name": "Nông nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620102",
+    "code": "7620102",
+    "name": "Khuyến nông",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620103",
+    "code": "7620103",
+    "name": "Khoa học đất",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620105",
+    "code": "7620105",
+    "name": "Chăn nuôi",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620109",
+    "code": "7620109",
+    "name": "Nông học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620110",
+    "code": "7620110",
+    "name": "Khoa học cây trồng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620112",
+    "code": "7620112",
+    "name": "Bảo vệ thực vật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620113",
+    "code": "7620113",
+    "name": "Công nghệ rau hoa quả và cảnh quan",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620114",
+    "code": "7620114",
+    "name": "Kinh doanh nông nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620115",
+    "code": "7620115",
+    "name": "Kinh tế nông nghiệp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620116",
+    "code": "7620116",
+    "name": "Phát triển nông thôn",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620201",
+    "code": "7620201",
+    "name": "Lâm học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620202",
+    "code": "7620202",
+    "name": "Lâm nghiệp đô thị",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620205",
+    "code": "7620205",
+    "name": "Lâm sinh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620211",
+    "code": "7620211",
+    "name": "Quản lý tài nguyên rừng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620301",
+    "code": "7620301",
+    "name": "Nuôi trồng thủy sản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620302",
+    "code": "7620302",
+    "name": "Bệnh học thủy sản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620303",
+    "code": "7620303",
+    "name": "Khoa học thủy sản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620304",
+    "code": "7620304",
+    "name": "Khai thác thủy sản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7620305",
+    "code": "7620305",
+    "name": "Quản lý thủy sản",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7640101",
+    "code": "7640101",
+    "name": "Thú y",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720101",
+    "code": "7720101",
+    "name": "Y khoa",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720110",
+    "code": "7720110",
+    "name": "Y học dự phòng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720115",
+    "code": "7720115",
+    "name": "Y học cổ truyền",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720201",
+    "code": "7720201",
+    "name": "Dược học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720203",
+    "code": "7720203",
+    "name": "Hóa dược",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720301",
+    "code": "7720301",
+    "name": "Điều dưỡng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720302",
+    "code": "7720302",
+    "name": "Hộ sinh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720401",
+    "code": "7720401",
+    "name": "Dinh dưỡng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720501",
+    "code": "7720501",
+    "name": "Răng - Hàm - Mặt",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720502",
+    "code": "7720502",
+    "name": "Kỹ thuật phục hình răng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720601",
+    "code": "7720601",
+    "name": "Kỹ thuật xét nghiệm y học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720602",
+    "code": "7720602",
+    "name": "Kỹ thuật hình ảnh y học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720603",
+    "code": "7720603",
+    "name": "Kỹ thuật Phục hồi chức năng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720701",
+    "code": "7720701",
+    "name": "Y tế công cộng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720801",
+    "code": "7720801",
+    "name": "Tổ chức và Quản lý y tế",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7720802",
+    "code": "7720802",
+    "name": "Quản lý bệnh viện",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7729001",
+    "code": "7729001",
+    "name": "Y sinh học thể dục thể thao",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7760101",
+    "code": "7760101",
+    "name": "Công tác xã hội",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7760102",
+    "code": "7760102",
+    "name": "Công tác thanh thiếu niên",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7760103",
+    "code": "7760103",
+    "name": "Sửa mã ngành (mã cũ là 8760103)",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7810101",
+    "code": "7810101",
+    "name": "Du lịch",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7810103",
+    "code": "7810103",
+    "name": "Quản trị dịch vụ du lịch và lữ hành",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7810201",
+    "code": "7810201",
+    "name": "Quản trị khách sạn",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7810202",
+    "code": "7810202",
+    "name": "Quản trị nhà hàng và dịch vụ ăn uống",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7810301",
+    "code": "7810301",
+    "name": "Quản lý thể dục thể thao",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7810302",
+    "code": "7810302",
+    "name": "Ngành chuyển đến từ nhóm ngành 71402 (mã cũ là 7140207)",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7810501",
+    "code": "7810501",
+    "name": "Kinh tế gia đình",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7840101",
+    "code": "7840101",
+    "name": "Khai thác vận tải",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7840102",
+    "code": "7840102",
+    "name": "Quản lý hoạt động bay",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7840104",
+    "code": "7840104",
+    "name": "Kinh tế vận tải",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7840106",
+    "code": "7840106",
+    "name": "Khoa học hàng hải",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7850101",
+    "code": "7850101",
+    "name": "Quản lý tài nguyên và môi trường",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7850102",
+    "code": "7850102",
+    "name": "Kinh tế tài nguyên thiên nhiên",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7850103",
+    "code": "7850103",
+    "name": "Quản lý đất đai",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7850201",
+    "code": "7850201",
+    "name": "Bảo hộ lao động",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860101",
+    "code": "7860101",
+    "name": "Trinh sát an ninh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860102",
+    "code": "7860102",
+    "name": "Trinh sát cảnh sát",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860103",
+    "code": "7860103",
+    "name": "Trinh sát kỹ thuật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860104",
+    "code": "7860104",
+    "name": "Điều tra hình sự",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860107",
+    "code": "7860107",
+    "name": "Kỹ thuật Công an nhân dân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860108",
+    "code": "7860108",
+    "name": "Kỹ thuật hình sự",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860109",
+    "code": "7860109",
+    "name": "Quản lý nhà nước về an ninh trật tự",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860110",
+    "code": "7860110",
+    "name": "Quản lý trật tự an toàn giao thông",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860111",
+    "code": "7860111",
+    "name": "Thi hành án hình sự và hỗ trợ tư pháp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860112",
+    "code": "7860112",
+    "name": "Tham mưu, chỉ huy công an nhân dân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860113",
+    "code": "7860113",
+    "name": "Phòng cháy chữa cháy và cứu nạn cứu hộ",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860116",
+    "code": "7860116",
+    "name": "Hậu cần công an nhân dân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860117",
+    "code": "7860117",
+    "name": "Tình báo an ninh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860201",
+    "code": "7860201",
+    "name": "Chỉ huy tham mưu Lục quân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860202",
+    "code": "7860202",
+    "name": "Chỉ huy tham mưu Hải quân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860203",
+    "code": "7860203",
+    "name": "Chỉ huy tham mưu Không quân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860204",
+    "code": "7860204",
+    "name": "Chỉ huy tham mưu Phòng không",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860205",
+    "code": "7860205",
+    "name": "Chỉ huy tham mưu Pháo binh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860206",
+    "code": "7860206",
+    "name": "Chỉ huy tham mưu Tăng - thiết giáp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860207",
+    "code": "7860207",
+    "name": "Chỉ huy tham mưu Đặc công",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860214",
+    "code": "7860214",
+    "name": "Biên phòng",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860217",
+    "code": "7860217",
+    "name": "Tình báo quân sự",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860218",
+    "code": "7860218",
+    "name": "Hậu cần quân sự",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860219",
+    "code": "7860219",
+    "name": "Sửa mã ngành (mã cũ là 7860220)",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860220",
+    "code": "7860220",
+    "name": "Chỉ huy, quản lý kỹ thuật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860222",
+    "code": "7860222",
+    "name": "Quân sự cơ sở",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860226",
+    "code": "7860226",
+    "name": "Chỉ huy kỹ thuật Phòng không",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860227",
+    "code": "7860227",
+    "name": "Chỉ huy kỹ thuật Tăng - thiết giáp",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860228",
+    "code": "7860228",
+    "name": "Chỉ huy kỹ thuật công binh",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860229",
+    "code": "7860229",
+    "name": "Chỉ huy kỹ thuật hóa học",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860231",
+    "code": "7860231",
+    "name": "Trinh sát kỹ thuật",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860232",
+    "code": "7860232",
+    "name": "Chỉ huy kỹ thuật hải quân",
+    "group": "Khối ngành chung"
+  },
+  {
+    "id": "7860233",
+    "code": "7860233",
+    "name": "Chỉ huy kỹ thuật tác chiến điện tử",
+    "group": "Khối ngành chung"
+  }
+]

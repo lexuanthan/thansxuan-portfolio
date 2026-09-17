@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:rls": "node tests/rls-check.mjs",
-    "verify": "vitest run && next build"
+    "verify": "vitest run && next build",
+    "verify:build": "next build"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
@@ -34,5 +35,8 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.0.0"
+  },
+  "overrides": {
+    "rollup": "npm:@rollup/wasm-node@^4"
   }
 }

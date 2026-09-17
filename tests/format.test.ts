@@ -3,6 +3,7 @@ import {
   formatCount,
   formatDate,
   plainText,
+  previewText,
   searchKey,
   stripDiacritics,
   truncate,
@@ -109,6 +110,36 @@ describe("plainText", () => {
   it("chịu được dữ liệu rỗng", () => {
     expect(plainText(null)).toBe("");
     expect(plainText(undefined)).toBe("");
+  });
+});
+
+describe("previewText", () => {
+  it("bóc thẻ khi nội dung là HTML", () => {
+    expect(previewText("<p>Tôi là <strong>Lê Xuân Thân</strong></p>")).toBe(
+      "Tôi là Lê Xuân Thân"
+    );
+  });
+
+  it("bóc dấu sao khi nội dung là chữ thuần kiểu cũ", () => {
+    expect(previewText("Tôi là **Lê Xuân Thân**")).toBe("Tôi là Lê Xuân Thân");
+  });
+
+  it("gộp nhiều đoạn HTML thành một dòng", () => {
+    expect(previewText("<p>Đoạn một</p><p>Đoạn hai</p>")).toBe("Đoạn một Đoạn hai");
+  });
+
+  it("không để lọt thẻ ra đoạn xem trước", () => {
+    const out = previewText('<div><span style="color:red">màu</span><br>xuống dòng</div>');
+    expect(out).not.toContain("<");
+    expect(out).not.toContain(">");
+    expect(out).toContain("màu");
+    expect(out).toContain("xuống dòng");
+  });
+
+  it("chịu được dữ liệu rỗng", () => {
+    expect(previewText(null)).toBe("");
+    expect(previewText(undefined)).toBe("");
+    expect(previewText("")).toBe("");
   });
 });
 

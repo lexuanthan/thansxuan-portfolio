@@ -1,3 +1,5 @@
+import { htmlToText, looksLikeHtml } from "@/lib/html";
+
 /**
  * Định dạng hiển thị dùng chung.
  *
@@ -65,6 +67,20 @@ export function plainText(text: string | null | undefined): string {
     .replace(/__(.+?)__/g, "$1")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+/**
+ * Rút phần chữ thuần để làm đoạn xem trước, bất kể nội dung lưu kiểu nào.
+ *
+ * Cùng một trường trong database giờ có thể chứa hai dạng: bài cũ lưu chữ thuần
+ * với **hai dấu sao**, bài mới lưu HTML từ trình soạn thảo. Chỗ nào chỉ in chữ
+ * trơn — thẻ bài viết, ô "Về tôi" ngoài trang chủ — đều phải đi qua đây, nếu
+ * không người đọc sẽ thấy nguyên đống thẻ hoặc dấu sao lòi ra.
+ */
+export function previewText(content: string | null | undefined): string {
+  const raw = content ?? "";
+  if (!raw) return "";
+  return looksLikeHtml(raw) ? htmlToText(raw) : plainText(raw);
 }
 
 /** Cắt bớt phần mô tả dài mà không chặt ngang giữa một từ. */
