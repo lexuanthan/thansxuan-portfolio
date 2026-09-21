@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type DragEvent } from "react";
+import { useRef, useState, type DragEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { uploadMedia } from "@/lib/media";
 import type { MediaItem } from "@/lib/types";
@@ -28,25 +28,23 @@ export default function ImagePicker({
    */
   const dragDepth = useRef(0);
 
-  useEffect(() => {
-    if (!showLibrary || library.length > 0) return;
-    let cancelled = false;
-    setLoadingLibrary(true);
-    createClient()
-      .from("media")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(60)
-      .then(({ data }) => {
-        if (!cancelled) {
-          setLibrary((data ?? []) as MediaItem[]);
-          setLoadingLibrary(false);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [showLibrary, library.length]);
+  async function toggleLibrary() {
+    const next = !showLibrary;
+    setShowLibrary(next);
+    if (next && library.length === 0 && !loadingLibrary) {
+      setLoadingLibrary(true);
+      try {
+        const { data } = await createClient()
+          .from("media")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(60);
+        setLibrary((data ?? []) as MediaItem[]);
+      } finally {
+        setLoadingLibrary(false);
+      }
+    }
+  }
 
   async function handleFile(file: File) {
     setError(null);
@@ -175,7 +173,7 @@ export default function ImagePicker({
         </button>
         <button
           type="button"
-          onClick={() => setShowLibrary((v) => !v)}
+          onClick={toggleLibrary}
           className="rounded-lg border border-line px-3.5 py-2 text-xs font-semibold text-ink-700 transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
         >
           {showLibrary ? "Đóng thư viện" : "🖼 Chọn từ thư viện"}

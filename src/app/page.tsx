@@ -71,17 +71,18 @@ export default async function Home() {
   const social = settings.social ?? {};
   const socialLinks = SOCIAL_SHORT.filter((s) => social[s.key]);
 
-  // Ưu tiên lấy ảnh từ Supabase settings, nếu chưa có thì lấy file tĩnh banner.jpg trong thư mục public
-  const heroImageSrc = settings.hero_image_url || "/banner.jpg";
+  // Ưu tiên lấy ảnh từ Supabase settings, nếu chưa có thì lấy file tĩnh banner.png trong thư mục public
+  const heroImageSrc = settings.hero_image_url || "/banner.png";
 
   return (
     <SiteShell>
       <Container className="py-6 sm:py-8">
         {/* ============ ẢNH BÌA NGUYÊN MẢNG LỚN (TỰ CO GIÃN THEO TỶ LỆ ẢNH) ============ */}
-        <section className="relative w-full overflow-hidden rounded-card-lg border border-line bg-surface shadow-soft">
+        <section className="relative w-full overflow-hidden rounded-card-lg border border-line bg-surface shadow-soft transition-all duration-300 hover:shadow-lift">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroImageSrc}
-            alt={settings.hero_title || "Ảnh bìa trang chủ"}
+            alt={settings.hero_title || "Ảnh bìa trang chủ Lê Xuân Thân"}
             className="w-full h-auto block object-contain"
             loading="eager"
           />

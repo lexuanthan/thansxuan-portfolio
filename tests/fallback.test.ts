@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   FALLBACK_ABOUT,
   FALLBACK_AI_TOOLS,
+  FALLBACK_CATEGORIES,
+  FALLBACK_POSTS,
   FALLBACK_PROJECTS,
   FALLBACK_SETTINGS,
 } from "@/lib/fallback";
@@ -43,8 +45,10 @@ describe("FALLBACK_PROJECTS", () => {
 });
 
 describe("FALLBACK_AI_TOOLS", () => {
-  it("có đủ 6 tool, đều published", () => {
+  it("có đủ 6 tool, đều published và id không trùng", () => {
     expect(FALLBACK_AI_TOOLS).toHaveLength(6);
+    const ids = FALLBACK_AI_TOOLS.map((t) => t.id);
+    expect(new Set(ids).size).toBe(ids.length);
     for (const t of FALLBACK_AI_TOOLS) {
       expect(t.published).toBe(true);
       expect(t.icon.length).toBeGreaterThan(0);
@@ -107,3 +111,55 @@ describe("FALLBACK_SETTINGS", () => {
     expect((FALLBACK_SETTINGS.hero_title ?? "").length).toBeGreaterThan(0);
   });
 });
+
+describe("FALLBACK_CATEGORIES", () => {
+  it("có đủ 5 chuyên mục với slug, tên chuẩn và id không trùng", () => {
+    expect(FALLBACK_CATEGORIES.length).toBeGreaterThanOrEqual(5);
+    const ids = FALLBACK_CATEGORIES.map((c) => c.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const slugs = FALLBACK_CATEGORIES.map((c) => c.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const c of FALLBACK_CATEGORIES) {
+      expect(c.name.trim().length).toBeGreaterThan(0);
+      expect(c.slug.trim().length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe("FALLBACK_POSTS", () => {
+  it("có danh sách bài viết đa dạng về AI và định hướng nghề nghiệp, slug và id không trùng", () => {
+    expect(FALLBACK_POSTS.length).toBeGreaterThanOrEqual(5);
+    const ids = FALLBACK_POSTS.map((p) => p.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const slugs = FALLBACK_POSTS.map((p) => p.slug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+  });
+
+  it("mọi bài viết dự phòng đều có tiêu đề, slug, nội dung và chuyên mục hợp lệ", () => {
+    for (const p of FALLBACK_POSTS) {
+      expect(p.title.trim().length).toBeGreaterThan(0);
+      expect(p.slug.trim().length).toBeGreaterThan(0);
+      expect((p.content ?? "").trim().length).toBeGreaterThan(0);
+      expect(p.category_name).toBeTruthy();
+      expect(Array.isArray(p.tags)).toBe(true);
+      expect(p.tags.length).toBeGreaterThan(0);
+      expect(p.published).toBe(true);
+      expect(p.views).toBeGreaterThanOrEqual(0);
+      expect(Number.isNaN(Date.parse(p.created_at))).toBe(false);
+      expect(Number.isNaN(Date.parse(p.updated_at))).toBe(false);
+      if (p.published && p.published_at) {
+        expect(Number.isNaN(Date.parse(p.published_at))).toBe(false);
+      }
+    }
+  });
+
+  it("đảm bảo tính toàn vẹn quan hệ: category_id tồn tại trong FALLBACK_CATEGORIES và khớp category_name", () => {
+    const categoryMap = new Map(FALLBACK_CATEGORIES.map((c) => [c.id, c.name]));
+    for (const p of FALLBACK_POSTS) {
+      expect(p.category_id).toBeTruthy();
+      expect(categoryMap.has(p.category_id!)).toBe(true);
+      expect(p.category_name).toBe(categoryMap.get(p.category_id!));
+    }
+  });
+});
+

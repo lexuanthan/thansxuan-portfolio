@@ -200,6 +200,7 @@ export default function SettingsForm({
         Xem trước hiển thị thực tế trên trang chủ:
       </p>
       <div className="overflow-hidden rounded-lg border border-line bg-surface shadow-sm">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={form.hero_image_url}
           alt="Xem trước ảnh bìa"

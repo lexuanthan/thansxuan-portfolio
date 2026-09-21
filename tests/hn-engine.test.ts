@@ -249,7 +249,7 @@ describe("TEST CASE 07 (6.95) — hồ sơ chưa đủ đầy", () => {
 });
 
 describe("TEST CASE 08 / 12 (6.96, 6.100) — phiên bản và chống giả mạo", () => {
-  it("kết quả mang theo đủ bốn dấu phiên bản", () => {
+  it("kết quả mang theo đủ năm dấu phiên bản", () => {
     const r = ok(matchMajor(seedStrongProfile(), DATA_SCIENCE_DNA, opts));
     expect(r.versions.studentProfileVersion).toBe(1);
     expect(r.versions.majorDnaVersion).toBe(1);
@@ -290,10 +290,20 @@ describe("TEST CASE 08 / 12 (6.96, 6.100) — phiên bản và chống giả m�
     expect("final_score" in clean).toBe(false);
   });
 
-  it("điểm luôn do engine tính, không lấy từ dữ liệu vào", () => {
-    const r = ok(matchMajor(profileFrom({ "academic.math": 35 }), DATA_SCIENCE_DNA, opts));
+  it("điểm luôn do engine tính toán lại, không tin điểm giả mạo từ client", () => {
+    const profile = profileFrom({ "academic.math": 35 });
+    const forgedRequest = {
+      ...profile,
+      final_score: 100,
+      score: 99,
+      band: "STRONG_MATCH",
+    };
+    const { clean } = stripClientScores(forgedRequest);
+    const r = ok(matchMajor(clean as StudentProfile, DATA_SCIENCE_DNA, opts));
     expect(r.finalScore).toBeCloseTo(r.rawScore * (1 - r.penalty), 9);
     expect(r.finalScore).not.toBe(100);
+    expect(r.finalScore).not.toBe(99);
+    expect(r.finalScore).toBeLessThan(85);
   });
 });
 
@@ -366,10 +376,13 @@ describe("Confidence — PART 6.50, 6.51", () => {
     expect(acad.score).toBeLessThan(100);
   });
 
-  it("nhóm RIASEC có trọng số thực nhỏ hơn trọng số gốc vì bị nhân confidence", () => {
+  it("nhóm RIASEC có trọng số thực nhỏ hơn trọng số gốc khi các nhóm khác đầy đủ (do bị nhân confidence)", () => {
     const r = ok(matchMajor(seedStrongProfile(), DATA_SCIENCE_DNA, opts));
     const riasec = r.groups.find((g) => g.group === "RIASEC")!;
     expect(riasec.confidence).toBeCloseTo(0.82, 9);
+    // Trọng số trước chuẩn hóa: 0.1 * 0.82 = 0.082. Tổng trọng số khả dụng = 0.982
+    const expectedEffective = (0.1 * 0.82) / (0.9 + 0.1 * 0.82);
+    expect(riasec.effectiveWeight).toBeCloseTo(expectedEffective, 6);
     expect(riasec.effectiveWeight).toBeLessThan(riasec.groupWeight);
   });
 });
@@ -457,29 +470,32 @@ describe("Xếp hạng — PART 6.61", () => {
 });
 
 describe("TEST CASE 11 (6.99) — What-if", () => {
-  const yeu: StudentProfile = profileFrom({ "academic.math": 50 });
+  const makeYeuProfile = () => profileFrom({ "academic.math": 50 });
 
   it("thay đổi một biến làm điểm đổi", () => {
+    const yeu = makeYeuProfile();
     const out = whatIf(yeu, DATA_SCIENCE_DNA, { "academic.math": 80 }, opts);
     expect(out.ok).toBe(true);
-    if (out.ok) {
-      expect(out.outcome.scenarioScore).not.toBe(out.outcome.originalScore);
-      expect(out.outcome.scoreChange).toBeGreaterThan(0);
-    }
+    if (!out.ok) return;
+    expect(out.outcome.scenarioScore).not.toBe(out.outcome.originalScore);
+    expect(out.outcome.scoreChange).toBeGreaterThan(0);
   });
 
   it("ghi lại biến đã đổi kèm giá trị cũ", () => {
+    const yeu = makeYeuProfile();
     const out = whatIf(yeu, DATA_SCIENCE_DNA, { "academic.math": 80 }, opts);
-    if (out.ok) {
-      expect(out.outcome.changedVariables).toEqual([
-        { variable: "academic.math", from: 50, to: 80 },
-      ]);
-    }
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.outcome.changedVariables).toEqual([
+      { variable: "academic.math", from: 50, to: 80 },
+    ]);
   });
 
   it("hồ sơ gốc KHÔNG bị sửa", () => {
+    const yeu = makeYeuProfile();
     const truoc = yeu.factors["academic.math"];
-    whatIf(yeu, DATA_SCIENCE_DNA, { "academic.math": 80 }, opts);
+    const out = whatIf(yeu, DATA_SCIENCE_DNA, { "academic.math": 80 }, opts);
+    expect(out.ok).toBe(true);
     expect(yeu.factors["academic.math"]).toBe(truoc);
   });
 
@@ -488,7 +504,10 @@ describe("TEST CASE 11 (6.99) — What-if", () => {
     const before = ok(matchMajor(duoiNguong, DATA_SCIENCE_DNA, opts));
     const out = whatIf(duoiNguong, DATA_SCIENCE_DNA, { "academic.math": 90 }, opts);
     expect(before.penalty).toBeGreaterThan(0);
-    if (out.ok) expect(out.outcome.scoreChange).toBeGreaterThan(0);
+    expect(out.ok).toBe(true);
+    if (!out.ok) return;
+    expect(out.outcome.scoreChange).toBeGreaterThan(0);
+    expect(out.outcome.scenarioScore).toBeGreaterThan(out.outcome.originalScore);
   });
 });
 

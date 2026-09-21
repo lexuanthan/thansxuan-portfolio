@@ -2,6 +2,12 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import rawUniversities from "@/data/universities.json";
+import {
+  calculateEduPathRecommendations,
+  ScoredMajorRecommendation,
+} from "@/data/majorsDatabase";
+import { openPrintWindow, downloadHtmlFile } from "@/lib/reportGenerator";
 
 // ============================================================================
 // DANH SÁCH CHUẨN 34 TỈNH / THÀNH PHỐ
@@ -79,6 +85,7 @@ export default function EduPathGamePage() {
   const [currentChapter, setCurrentChapter] = useState(1);
   const [xp, setXp] = useState(100);
   const [uniTab, setUniTab] = useState<"ALL" | "SAFE" | "TARGET" | "REACH">("ALL");
+  const [selectedMajorCode, setSelectedMajorCode] = useState<string>("");
 
   const [formData, setFormData] = useState({
     grade: "Lớp 11",
@@ -162,11 +169,54 @@ export default function EduPathGamePage() {
     };
   }, [formData]);
 
+  // Tính toán bảng xếp hạng 12 ngành theo hồ sơ thực tế của học sinh
+  const rankedMajors = useMemo(() => {
+    return calculateEduPathRecommendations(formData);
+  }, [formData]);
+
+  // Ngành đang được chọn để xem chi tiết và mô phỏng trường đại học
+  const activeMajor: ScoredMajorRecommendation = useMemo(() => {
+    if (selectedMajorCode) {
+      const found = rankedMajors.find((m) => m.code === selectedMajorCode);
+      if (found) return found;
+    }
+    return rankedMajors[0] || ({} as ScoredMajorRecommendation);
+  }, [rankedMajors, selectedMajorCode]);
+
   const matchedUniversities = useMemo(() => {
     const targetCity = formData.targetCities[0] || "Toàn quốc";
+    const keywords = activeMajor?.searchKeywords || ["công nghệ thông tin", "phần mềm"];
 
     return UNIVERSITIES.map((u) => {
-      const delta = formData.estimatedScore - u.cutoff;
+      let effectiveCutoff = u.cutoff;
+      const rawList = (rawUniversities as unknown) as Array<{
+        name: string;
+        shortName?: string;
+        code?: string;
+        majors?: Array<{ major_name: string; cutoff_score: number }>;
+      }>;
+
+      const rawUni = rawList.find(
+        (r) =>
+          r.name.toLowerCase().includes(u.shortName.toLowerCase()) ||
+          (r.shortName && r.shortName.toLowerCase() === u.shortName.toLowerCase()) ||
+          r.name.toLowerCase().includes(u.name.toLowerCase())
+      );
+
+      if (rawUni?.majors && rawUni.majors.length > 0) {
+        const foundMajor = rawUni.majors.find((m) =>
+          keywords.some((kw) => m.major_name.toLowerCase().includes(kw.toLowerCase()))
+        );
+        if (foundMajor && foundMajor.cutoff_score > 12) {
+          effectiveCutoff = foundMajor.cutoff_score;
+        } else if (activeMajor?.avgCutoff) {
+          effectiveCutoff = Number((activeMajor.avgCutoff + (u.cutoff - 25.5) * 0.5).toFixed(2));
+        }
+      } else if (activeMajor?.avgCutoff) {
+        effectiveCutoff = Number((activeMajor.avgCutoff + (u.cutoff - 25.5) * 0.5).toFixed(2));
+      }
+
+      const delta = formData.estimatedScore - effectiveCutoff;
       let tier: "SAFE" | "TARGET" | "REACH" = "TARGET";
       let tierLabel = "Vừa sức";
       let tierColor = "bg-amber-50 text-amber-800 border-amber-200";
@@ -192,6 +242,7 @@ export default function EduPathGamePage() {
 
       return {
         ...u,
+        cutoff: effectiveCutoff,
         delta,
         tier,
         tierLabel,
@@ -203,7 +254,115 @@ export default function EduPathGamePage() {
       .filter((u) => u.isCityMatched)
       .filter((u) => (uniTab === "ALL" ? true : u.tier === uniTab))
       .sort((a, b) => b.cutoff - a.cutoff);
-  }, [formData.estimatedScore, formData.targetCities, formData.tuitionBudget, uniTab]);
+  }, [formData.estimatedScore, formData.targetCities, formData.tuitionBudget, uniTab, activeMajor]);
+
+  const generateEduPathReportHtml = () => {
+    return `
+      <div class="header">
+        <div>
+          <h1 class="brand-title">BÁO CÁO ĐỊNH HƯỚNG NGHỀ NGHIỆP & CHIẾN LƯỢC NGUYỆN VỌNG EDUPATH 2026</h1>
+          <div class="brand-sub">Hệ thống phân tích năng lực đa chiều & bản đồ ngành đại học — Lê Xuân Thân</div>
+        </div>
+        <div class="report-badge">EDUPATH REPORT</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span>HỌC SINH / NĂM TN</span>
+          <strong>${formData.grade} · TN ${formData.gradYear}</strong>
+        </div>
+        <div class="info-item">
+          <span>ĐỊA BÀN MỤC TIÊU</span>
+          <strong>${formData.targetCities[0]}</strong>
+        </div>
+        <div class="info-item">
+          <span>ĐIỂM DỰ KIẾN / NGÂN SÁCH</span>
+          <strong>${formData.estimatedScore}đ · ~${formData.tuitionBudget}tr/năm</strong>
+        </div>
+      </div>
+
+      <h2 class="section-title">1. CHỈ SỐ NĂNG LỰC & THIÊN HƯỚNG HỌC THUẬT</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px;">
+        <div style="background: #fdfaf3; border: 1px solid #f0e7d5; padding: 8px; border-radius: 6px; text-align: center;">
+          <div style="font-size: 11px; color: #78716c;">Công nghệ / Kỹ thuật</div>
+          <strong style="font-size: 16px; color: #0284c7;">${liveStats.tech}%</strong>
+        </div>
+        <div style="background: #fdfaf3; border: 1px solid #f0e7d5; padding: 8px; border-radius: 6px; text-align: center;">
+          <div style="font-size: 11px; color: #78716c;">Sáng tạo & Đổi mới</div>
+          <strong style="font-size: 16px; color: #db2777;">${liveStats.creative}%</strong>
+        </div>
+        <div style="background: #fdfaf3; border: 1px solid #f0e7d5; padding: 8px; border-radius: 6px; text-align: center;">
+          <div style="font-size: 11px; color: #78716c;">Tư duy Phân tích</div>
+          <strong style="font-size: 16px; color: #7c3aed;">${liveStats.analytical}%</strong>
+        </div>
+        <div style="background: #fdfaf3; border: 1px solid #f0e7d5; padding: 8px; border-radius: 6px; text-align: center;">
+          <div style="font-size: 11px; color: #78716c;">Xã hội & Kết nối</div>
+          <strong style="font-size: 16px; color: #059669;">${liveStats.social}%</strong>
+        </div>
+      </div>
+
+      <h2 class="section-title">2. TOP 5 NGÀNH NGHỀ TƯƠNG THÍCH NHẤT (MA TRẬN 12 NGÀNH)</h2>
+      ${rankedMajors.slice(0, 5).map((m, idx) => `
+        <div class="major-card">
+          <div class="major-header">
+            <div class="major-name">#${idx + 1}. ${m.name} (${m.field})</div>
+            <div class="match-tag">${m.matchPercentage}% Phù hợp</div>
+          </div>
+          <p style="margin: 4px 0 6px 0; color: #57534e; font-size: 12px;">${m.description}</p>
+          <div style="font-size: 11px; margin-bottom: 4px;">
+            <strong style="color: #065f46;">✓ Điểm mạnh tương thích:</strong> ${m.strengthNote}
+          </div>
+          <div style="font-size: 11px;">
+            <strong style="color: #9f1239;">⚠️ Điểm cần lưu ý:</strong> ${m.gapNote}
+          </div>
+        </div>
+      `).join('')}
+
+      <h2 class="section-title">3. CHIẾN LƯỢC TRƯỜNG ĐẠI HỌC CHO NGÀNH: ${activeMajor?.name || 'Mục tiêu'}</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Tên Trường Đại Học</th>
+            <th>Địa Điểm</th>
+            <th>Điểm Chuẩn</th>
+            <th>Học Phí / Năm</th>
+            <th>Tỷ Lệ Việc Làm</th>
+            <th>Đánh Giá Nguyện Vọng</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${matchedUniversities.slice(0, 10).map((u) => `
+            <tr>
+              <td><strong>${u.name}</strong> (${u.shortName})</td>
+              <td>${u.city}</td>
+              <td>${u.cutoff}</td>
+              <td>~${u.tuition} tr</td>
+              <td>${u.employmentRate}%</td>
+              <td><span class="badge ${u.tier === 'SAFE' ? 'badge-safe' : u.tier === 'REACH' ? 'badge-reach' : 'badge-target'}">${u.tierLabel}</span></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+
+      <h2 class="section-title">4. LỘ TRÌNH HÀNH ĐỘNG 12 THÁNG ĐỀ XUẤT</h2>
+      <div style="background: #fdfaf3; border: 1px solid #f0e7d5; padding: 12px; border-radius: 8px; font-size: 11px; line-height: 1.6;">
+        <div><strong>• Giai đoạn 1 (Tháng 1-3):</strong> Tập trung củng cố 3 môn tổ hợp chủ lực; tham gia các câu lạc bộ hoặc dự án thực tế liên quan đến ${activeMajor?.field}.</div>
+        <div><strong>• Giai đoạn 2 (Tháng 4-6):</strong> Thi lấy chứng chỉ ngoại ngữ (IELTS/TOEIC) nếu cần; đăng ký thi thử Đánh giá năng lực (ĐGNL ĐHQG).</div>
+        <div><strong>• Giai đoạn 3 (Tháng 7-9):</strong> Tận dụng các phương thức xét tuyển sớm (học bạ, giải thưởng); tham gia Ngày hội tư vấn tuyển sinh Open Day.</div>
+        <div><strong>• Giai đoạn 4 (Tháng 10-12):</strong> Tối ưu hóa thứ tự nguyện vọng theo tỷ lệ vàng: 2 NV Thử thách, 3 NV Vừa sức, 2 NV An toàn tuyệt đối.</div>
+      </div>
+    `;
+  };
+
+  const handlePrintReport = () => {
+    const html = generateEduPathReportHtml();
+    openPrintWindow("Bao-Cao-EduPath-2026", html);
+  };
+
+  const handleDownloadHtml = () => {
+    const html = generateEduPathReportHtml();
+    downloadHtmlFile("Bao-Cao-EduPath-2026", html);
+  };
 
   return (
     <main className="min-h-screen bg-[#fdfaf3] py-8 px-4 sm:px-6 lg:px-8 text-stone-900 font-sans">
@@ -724,45 +883,194 @@ export default function EduPathGamePage() {
           {/* MÀN 9: BẢN ĐỒ KẾT QUẢ & WHAT-IF ENGINE */}
           {currentChapter === 9 && (
             <div className="space-y-6">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 font-mono">
-                  ★ HỒ SƠ ĐỊNH HƯỚNG ĐÃ MỞ KHÓA
-                </span>
-                <h2 className="text-2xl font-extrabold text-stone-900 mt-1">Kết quả khớp nối Ngành & Trường</h2>
-                <p className="text-sm text-stone-500">
-                  Phân tích theo dữ liệu học sinh tại {formData.currentProvince} và khu vực xét tuyển: {formData.targetCities[0]}.
-                </p>
-              </div>
-
-              {/* THẺ TOP 1 NGÀNH */}
-              <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 shadow-sm space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <span className="text-xs font-extrabold text-amber-700 uppercase tracking-wide">
-                      🟢 RẤT PHÙ HỢP (STRONG MATCH)
-                    </span>
-                    <h3 className="text-2xl font-black text-amber-950 mt-0.5">
-                      Kỹ thuật Phần mềm (Software Engineering)
-                    </h3>
-                  </div>
-                  <div className="text-4xl font-black text-amber-600">93%</div>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 font-mono">
+                    ★ HỒ SƠ ĐỊNH HƯỚNG ĐÃ MỞ KHÓA
+                  </span>
+                  <h2 className="text-2xl font-extrabold text-stone-900 mt-1">Kết quả khớp nối Ngành & Trường</h2>
+                  <p className="text-sm text-stone-500">
+                    Phân tích đa chiều từ 10 môn học, năng lực hành vi, đam mê và ma trận 12 nhóm ngành đại học 2026.
+                  </p>
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-3 text-xs">
-                  <div className="p-3 bg-white/80 rounded-xl border border-amber-200">
-                    <span className="font-bold text-emerald-800">✓ Điểm mạnh tương thích:</span>
-                    <p className="text-stone-600 mt-0.5">
-                      Tư duy logic tốt ({formData.subjects.math.score}/10 Toán), đam mê công nghệ và khả năng làm việc độc lập.
-                    </p>
-                  </div>
-                  <div className="p-3 bg-white/80 rounded-xl border border-amber-200">
-                    <span className="font-bold text-rose-800">⚠️ Điểm cần lưu ý (Negative Gap):</span>
-                    <p className="text-stone-600 mt-0.5">
-                      Khả năng tự học ({formData.selfLearningRating}/5★) cần kiên trì hơn để tự đọc tài liệu tiếng Anh chuyên ngành.
-                    </p>
-                  </div>
+                {/* Thanh nút xuất báo cáo */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handlePrintReport}
+                    className="px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-black text-xs shadow-sm transition flex items-center gap-1.5"
+                  >
+                    <span>🖨️</span> In / Tải Báo Cáo (PDF)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownloadHtml}
+                    className="px-4 py-2.5 rounded-xl bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 font-bold text-xs shadow-sm transition flex items-center gap-1.5"
+                  >
+                    <span>💾</span> Tải file HTML
+                  </button>
                 </div>
               </div>
+
+              {/* BẢNG TOP 5 NGÀNH NGHỀ PHÙ HỢP NHẤT */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-extrabold text-stone-800 uppercase tracking-wide flex items-center gap-2">
+                    <span>🏆</span> Top 5 Ngành Phù Hợp Nhất (Chọn ngành để xem mô phỏng trường)
+                  </h3>
+                  <span className="text-xs text-stone-400 font-medium">Bấm vào ngành để chuyển đổi</span>
+                </div>
+
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {rankedMajors.slice(0, 5).map((major, idx) => {
+                    const isSelected = activeMajor?.code === major.code;
+                    const rankLabels = [
+                      "Top 1 · Lựa chọn hàng đầu",
+                      "Top 2 · Dự phòng chiến lược",
+                      "Top 3 · Tiềm năng mở rộng",
+                      "Top 4 · Thích ứng tốt",
+                      "Top 5 · Thử sức mới"
+                    ];
+
+                    return (
+                      <button
+                        key={major.code}
+                        type="button"
+                        onClick={() => setSelectedMajorCode(major.code)}
+                        className={`text-left p-4 rounded-2xl border-2 transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
+                          isSelected
+                            ? "bg-gradient-to-br from-amber-50 to-orange-50/80 border-amber-400 shadow-md ring-2 ring-amber-300/60"
+                            : "bg-white border-stone-200 hover:border-amber-300 hover:bg-stone-50/50 shadow-xs"
+                        }`}
+                      >
+                        <div className="space-y-1.5">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="text-[10px] font-extrabold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-md">
+                              {rankLabels[idx]}
+                            </span>
+                            <span className="text-lg font-black text-amber-600">
+                              {major.matchPercentage}%
+                            </span>
+                          </div>
+
+                          <h4 className="font-extrabold text-sm text-stone-900 leading-snug">
+                            {major.name}
+                          </h4>
+
+                          <div className="text-[11px] font-bold text-stone-500">
+                            {major.field}
+                          </div>
+                        </div>
+
+                        <div className="mt-3 pt-2.5 border-t border-stone-100 flex items-center justify-between text-[11px]">
+                          <span className="text-stone-400 font-medium">
+                            {isSelected ? "🟢 Đang phân tích" : "👉 Bấm chọn ngành này"}
+                          </span>
+                          <span className="font-bold text-stone-700">
+                            Điểm sàn ~{major.avgCutoff}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* CHI TIẾT ĐÁNH GIÁ CHUYÊN SÂU CỦA NGÀNH ĐANG CHỌN */}
+              {activeMajor && (
+                <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-50 via-orange-50/40 to-yellow-50 border border-amber-200 shadow-sm space-y-4 animate-fadeIn">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200/80 pb-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-amber-800 bg-amber-200/60 px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                          🎯 NGÀNH ĐANG PHÂN TÍCH CHI TIẾT
+                        </span>
+                        <span className="text-xs font-semibold text-stone-500">
+                          Mã ngành: {activeMajor.code}
+                        </span>
+                      </div>
+                      <h3 className="text-2xl font-black text-stone-900 mt-1">
+                        {activeMajor.name}
+                      </h3>
+                      <p className="text-xs text-stone-600 mt-0.5">{activeMajor.description}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-xs text-stone-500 font-bold uppercase">Mức độ tương thích</div>
+                      <div className="text-4xl font-black text-amber-600">{activeMajor.matchPercentage}%</div>
+                    </div>
+                  </div>
+
+                  {/* 4 THANH THÀNH PHẦN PHÙ HỢP */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <div className="p-3 bg-white/90 rounded-xl border border-amber-200/80">
+                      <div className="text-[10px] font-bold text-stone-500 uppercase">1. Học thuật (35%)</div>
+                      <div className="text-base font-extrabold text-stone-900 mt-0.5">{activeMajor.academicScore}%</div>
+                      <div className="h-1.5 w-full bg-stone-100 rounded-full mt-1.5 overflow-hidden">
+                        <div className="h-full bg-blue-500 rounded-full" style={{ width: `${activeMajor.academicScore}%` }} />
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-white/90 rounded-xl border border-amber-200/80">
+                      <div className="text-[10px] font-bold text-stone-500 uppercase">2. Năng lực (30%)</div>
+                      <div className="text-base font-extrabold text-stone-900 mt-0.5">{activeMajor.abilityScore}%</div>
+                      <div className="h-1.5 w-full bg-stone-100 rounded-full mt-1.5 overflow-hidden">
+                        <div className="h-full bg-purple-500 rounded-full" style={{ width: `${activeMajor.abilityScore}%` }} />
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-white/90 rounded-xl border border-amber-200/80">
+                      <div className="text-[10px] font-bold text-stone-500 uppercase">3. Đam mê (20%)</div>
+                      <div className="text-base font-extrabold text-stone-900 mt-0.5">{activeMajor.interestScore}%</div>
+                      <div className="h-1.5 w-full bg-stone-100 rounded-full mt-1.5 overflow-hidden">
+                        <div className="h-full bg-pink-500 rounded-full" style={{ width: `${activeMajor.interestScore}%` }} />
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-white/90 rounded-xl border border-amber-200/80">
+                      <div className="text-[10px] font-bold text-stone-500 uppercase">4. Giá trị (15%)</div>
+                      <div className="text-base font-extrabold text-stone-900 mt-0.5">{activeMajor.valueScore}%</div>
+                      <div className="h-1.5 w-full bg-stone-100 rounded-full mt-1.5 overflow-hidden">
+                        <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${activeMajor.valueScore}%` }} />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ĐIỂM MẠNH & LƯU Ý CÁ NHÂN HÓA */}
+                  <div className="grid sm:grid-cols-2 gap-3 text-xs">
+                    <div className="p-3.5 bg-white/90 rounded-xl border border-emerald-200 shadow-2xs">
+                      <span className="font-extrabold text-emerald-800 flex items-center gap-1.5">
+                        <span>✓</span> Điểm mạnh tương thích thực tế:
+                      </span>
+                      <p className="text-stone-700 mt-1 leading-relaxed">
+                        {activeMajor.strengthNote}
+                      </p>
+                    </div>
+
+                    <div className="p-3.5 bg-white/90 rounded-xl border border-rose-200 shadow-2xs">
+                      <span className="font-extrabold text-rose-800 flex items-center gap-1.5">
+                        <span>⚠️</span> Điểm cần lưu ý & chuẩn bị:
+                      </span>
+                      <p className="text-stone-700 mt-1 leading-relaxed">
+                        {activeMajor.gapNote}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* TỐ CHẤT & KỸ NĂNG */}
+                  <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+                    <span className="font-bold text-stone-700">Đặc trưng thế mạnh của ngành:</span>
+                    {activeMajor.pros.map((pro) => (
+                      <span
+                        key={pro}
+                        className="px-2.5 py-1 rounded-lg bg-white border border-amber-200 text-amber-900 font-semibold text-[11px]"
+                      >
+                        ★ {pro}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* BỘ MÔ PHỎNG WHAT-IF */}
               <div className="p-6 rounded-3xl bg-stone-50 border border-stone-200 space-y-5">
@@ -835,16 +1143,18 @@ export default function EduPathGamePage() {
                       Tìm thấy {matchedUniversities.length} trường phù hợp:
                     </span>
                     <div className="flex gap-1.5 text-xs font-bold">
-                      {[
-                        { key: "ALL", label: "Tất cả" },
-                        { key: "SAFE", label: "🟢 An toàn" },
-                        { key: "TARGET", label: "🟡 Vừa sức" },
-                        { key: "REACH", label: "🔴 Thử thách" },
-                      ].map((t) => (
+                      {(
+                        [
+                          { key: "ALL", label: "Tất cả" },
+                          { key: "SAFE", label: "🟢 An toàn" },
+                          { key: "TARGET", label: "🟡 Vừa sức" },
+                          { key: "REACH", label: "🔴 Thử thách" },
+                        ] as const
+                      ).map((t) => (
                         <button
                           key={t.key}
                           type="button"
-                          onClick={() => setUniTab(t.key as any)}
+                          onClick={() => setUniTab(t.key)}
                           className={`px-3 py-1 rounded-lg border transition ${
                             uniTab === t.key
                               ? "bg-amber-500 text-white border-amber-500"
@@ -862,7 +1172,7 @@ export default function EduPathGamePage() {
                     {matchedUniversities.length === 0 ? (
                       <div className="p-8 bg-white rounded-2xl border border-stone-200 text-center text-xs text-stone-500 space-y-1">
                         <p className="font-bold text-stone-700">Không tìm thấy trường nào trong khoảng lọc này.</p>
-                        <p>Hãy thử tăng ngân sách học phí hoặc chọn khu vực "Toàn quốc".</p>
+                        <p>Hãy thử tăng ngân sách học phí hoặc chọn khu vực &ldquo;Toàn quốc&rdquo;.</p>
                       </div>
                     ) : (
                       matchedUniversities.map((u) => (
@@ -922,13 +1232,24 @@ export default function EduPathGamePage() {
                 <span>→</span>
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={() => alert("Hệ thống đã lưu hồ sơ và tạo lộ trình 12 tháng cá nhân hóa cho bạn!")}
-                className="px-8 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-sm shadow-sm transition"
-              >
-                💾 Xuất Báo Cáo & Lộ Trình 12 Tháng
-              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handlePrintReport}
+                  className="px-6 py-3 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 font-black text-sm shadow-sm transition flex items-center gap-2"
+                >
+                  <span>🖨️</span>
+                  <span>In / Tải Báo Cáo (PDF)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadHtml}
+                  className="px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm shadow-sm transition flex items-center gap-2"
+                >
+                  <span>💾</span>
+                  <span>Lưu File Báo Cáo (HTML)</span>
+                </button>
+              </div>
             )}
           </div>
         </div>

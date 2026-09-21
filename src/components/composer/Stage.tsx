@@ -30,6 +30,15 @@ type Drag =
   | { mode: "rotate"; id: string; startAngle: number; startRotation: number }
   | null;
 
+let sharedMeasureContext: CanvasRenderingContext2D | null = null;
+function getMeasureContext(): CanvasRenderingContext2D | null {
+  if (typeof document === "undefined") return null;
+  if (!sharedMeasureContext) {
+    sharedMeasureContext = document.createElement("canvas").getContext("2d");
+  }
+  return sharedMeasureContext;
+}
+
 export default function Stage({
   doc,
   images,
@@ -47,15 +56,9 @@ export default function Stage({
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const measureRef = useRef<CanvasRenderingContext2D | null>(null);
   const dragRef = useRef<Drag>(null);
 
   const [guides, setGuides] = useState<{ v: boolean; h: boolean }>({ v: false, h: false });
-
-  // Canvas ẩn chỉ dùng để đo chữ.
-  if (measureRef.current === null && typeof document !== "undefined") {
-    measureRef.current = document.createElement("canvas").getContext("2d");
-  }
 
   // Vẽ lại bản xem trước mỗi khi tài liệu hoặc ảnh đổi.
   useEffect(() => {
@@ -207,7 +210,7 @@ export default function Stage({
       const hPx = wPx / (layer.aspect > 0 ? layer.aspect : 1);
       return { w: (wPx / doc.width) * 100, h: (hPx / doc.height) * 100 };
     }
-    const ctx = measureRef.current;
+    const ctx = getMeasureContext();
     if (!ctx) return { w: layer.maxWidth * 100, h: 10 };
     const m = measureTextBlock(ctx, layer, doc.width);
     return { w: (m.width / doc.width) * 100, h: (m.height / doc.height) * 100 };

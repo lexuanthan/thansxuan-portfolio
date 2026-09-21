@@ -2,6 +2,8 @@
 
 import React, { useState, useMemo } from 'react';
 import rawUniversities from '../../data/universities.json';
+import { MAJORS_DATABASE, MajorRule } from '../../data/majorsDatabase';
+import { openPrintWindow, downloadHtmlFile } from '@/lib/reportGenerator';
 
 // Kiểu dữ liệu trường đại học
 interface UniversityItem {
@@ -86,34 +88,8 @@ const LIKERT_OPTIONS = [
 ];
 
 // ==========================================
-// 2. MA TRẬN NGHỀ NGHIỆP
+// 2. MA TRẬN NGHỀ NGHIỆP: Sử dụng MAJORS_DATABASE từ src/data/majorsDatabase.ts
 // ==========================================
-interface MajorRule {
-  code: string;
-  name: string;
-  field: string;
-  fieldColor: string;
-  riasecCodes: string[];
-  miCodes: string[];
-  description: string;
-  pros: string[];
-  searchKeywords: string[]; // Dùng để tìm kiếm trường đào tạo
-}
-
-const MAJORS_DATABASE: MajorRule[] = [
-  { code: '7480108', name: 'Khoa học dữ liệu & Trí tuệ nhân tạo (AI)', field: 'Máy tính & CNTT', fieldColor: 'from-purple-500 to-indigo-600', riasecCodes: ['I', 'C'], miCodes: ['LOGIC', 'INTRA'], description: 'Phân tích dữ liệu lớn, xây dựng mô hình máy học và thuật toán AI thông minh.', pros: ['Tư duy toán học', 'Phân tích hệ thống', 'Tự học chuyên sâu'], searchKeywords: ['dữ liệu', 'trí tuệ nhân tạo', 'khoa học dữ liệu', 'ai', 'công nghệ thông tin'] },
-  { code: '7480103', name: 'Kỹ thuật phần mềm', field: 'Máy tính & CNTT', fieldColor: 'from-purple-500 to-indigo-600', riasecCodes: ['I', 'R'], miCodes: ['LOGIC', 'SPAT'], description: 'Thiết kế kiến trúc hệ thống phần mềm, lập trình web/app và bảo mật.', pros: ['Tư duy thuật toán', 'Cấu trúc không gian', 'Giải quyết sự cố'], searchKeywords: ['phần mềm', 'software', 'công nghệ thông tin'] },
-  { code: '7480201', name: 'Công nghệ thông tin', field: 'Máy tính & CNTT', fieldColor: 'from-purple-500 to-indigo-600', riasecCodes: ['I', 'R'], miCodes: ['LOGIC', 'INTRA'], description: 'Quản trị hạ tầng mạng, tích hợp giải pháp phần cứng và dịch vụ đám mây.', pros: ['Thao tác kỹ thuật', 'Logic nhân quả', 'Bảo trì hệ thống'], searchKeywords: ['công nghệ thông tin', 'tin học', 'cntt'] },
-  { code: '7340101', name: 'Quản trị kinh doanh & Khởi nghiệp', field: 'Kinh doanh & Quản trị', fieldColor: 'from-blue-500 to-cyan-600', riasecCodes: ['E', 'S'], miCodes: ['INTER', 'LOGIC'], description: 'Hoạch định chiến lược kinh doanh, quản trị dự án và vận hành tổ chức.', pros: ['Kỹ năng lãnh đạo', 'Giao tiếp đàm phán', 'Tư duy chiến lược'], searchKeywords: ['quản trị kinh doanh', 'kinh doanh', 'kinh tế'] },
-  { code: '7340115', name: 'Marketing & Truyền thông số', field: 'Kinh doanh & Quản trị', fieldColor: 'from-blue-500 to-cyan-600', riasecCodes: ['E', 'A'], miCodes: ['LING', 'INTER'], description: 'Nghiên cứu thị trường, phát triển thương hiệu và sáng tạo chiến dịch nội dung.', pros: ['Thấu hiểu tâm lý', 'Biểu đạt ngôn từ', 'Bắt nhịp xu hướng'], searchKeywords: ['marketing', 'tiếp thị', 'thương mại'] },
-  { code: '7340201', name: 'Tài chính - Ngân hàng số', field: 'Kinh tế & Tài chính', fieldColor: 'from-emerald-500 to-teal-600', riasecCodes: ['C', 'E'], miCodes: ['LOGIC', 'INTRA'], description: 'Quản trị danh mục đầu tư, phân tích rủi ro tài chính và tín dụng số.', pros: ['Nhạy bén với số', 'Kỷ luật tài chính', 'Kiểm soát rủi ro'], searchKeywords: ['tài chính', 'ngân hàng', 'kinh tế'] },
-  { code: '7340301', name: 'Kế toán - Kiểm toán', field: 'Kinh tế & Tài chính', fieldColor: 'from-emerald-500 to-teal-600', riasecCodes: ['C', 'I'], miCodes: ['LOGIC', 'INTRA'], description: 'Giám sát tính minh bạch sổ sách, kiểm toán nội bộ và tuân thủ thuế.', pros: ['Tỉ mỉ cẩn trọng', 'Chính trực nguyên tắc', 'Rà soát chi tiết'], searchKeywords: ['kế toán', 'kiểm toán'] },
-  { code: '7720101', name: 'Y đa khoa & Răng Hàm Mặt', field: 'Khoa học Sức khỏe', fieldColor: 'from-rose-500 to-red-600', riasecCodes: ['I', 'S'], miCodes: ['LOGIC', 'INTER', 'NATU'], description: 'Khám chữa bệnh, bảo vệ tính mạng và nâng cao sức khỏe cộng đồng.', pros: ['Lòng trắc ẩn', 'Kiên trì học hỏi', 'Bình tĩnh áp lực cao'], searchKeywords: ['y khoa', 'y đa khoa', 'y dược', 'bác sĩ'] },
-  { code: '7210403', name: 'Thiết kế đồ họa & UI/UX', field: 'Nghệ thuật & Thiết kế', fieldColor: 'from-pink-500 to-fuchsia-600', riasecCodes: ['A', 'R'], miCodes: ['SPAT', 'LING'], description: 'Sáng tạo bộ nhận diện thương hiệu, thiết kế trải nghiệm người dùng số.', pros: ['Gu thẩm mỹ cao', 'Tư duy hình ảnh 3D', 'Sáng tạo phá cách'], searchKeywords: ['thiết kế', 'đồ họa', 'mỹ thuật', 'kiến trúc'] },
-  { code: '7140201', name: 'Sư phạm & Đào tạo phát triển', field: 'Sư phạm & Giáo dục', fieldColor: 'from-amber-500 to-orange-600', riasecCodes: ['S', 'I'], miCodes: ['INTER', 'LING'], description: 'Giảng dạy, truyền cảm hứng tri thức và đồng hành cùng người học.', pros: ['Kiên nhẫn thấu hiểu', 'Diễn đạt khúc chiết', 'Tâm huyết phụng sự'], searchKeywords: ['sư phạm', 'giáo dục'] },
-  { code: '7380107', name: 'Luật kinh tế & Pháp chế doanh nghiệp', field: 'Pháp luật', fieldColor: 'from-amber-500 to-orange-600', riasecCodes: ['E', 'C'], miCodes: ['LING', 'LOGIC'], description: 'Bảo vệ quyền lợi hợp pháp, tư vấn hợp đồng và giải quyết tranh chấp.', pros: ['Lập luận đanh thép', 'Tư duy phản biện', 'Tôn trọng pháp luật'], searchKeywords: ['luật', 'pháp lý', 'kinh tế luật'] },
-  { code: '7520130', name: 'Kỹ thuật Cơ điện tử & Tự động hóa', field: 'Kỹ thuật & Công nghệ', fieldColor: 'from-cyan-600 to-blue-700', riasecCodes: ['R', 'I'], miCodes: ['BODI', 'LOGIC', 'SPAT'], description: 'Nghiên cứu, lắp ráp và vận hành dây chuyền cánh tay robot thông minh.', pros: ['Đam mê máy móc', 'Tư duy mạch điện', 'Khéo léo kỹ thuật'], searchKeywords: ['cơ điện tử', 'tự động hóa', 'cơ khí', 'điện tử'] }
-];
 
 export default function SurveyWizard() {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -300,6 +276,96 @@ export default function SurveyWizard() {
       MUSI: '🎵 Âm nhạc', NATU: '🌿 Khám phá tự nhiên'
     };
 
+    const generateReportHtml = () => {
+      const topRiasecText = results.topRiasec.map((r) => riasecLabels[r] ?? r).join(" · ");
+      const topMiText = results.topMI.map((m) => miLabels[m] ?? m).join(" & ");
+
+      return `
+        <div class="header">
+          <div>
+            <h1 class="brand-title">BÁO CÁO TƯ VẤN HƯỚNG NGHIỆP & NGUYỆN VỌNG ĐẠI HỌC 2026</h1>
+            <div class="brand-sub">Nền tảng Hướng nghiệp Thông minh — Lê Xuân Thân</div>
+          </div>
+          <div class="report-badge">HỒ SƠ HỌC SINH</div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span>MÃ TÍNH CÁCH RIASEC TRỘI</span>
+            <strong>${topRiasecText}</strong>
+          </div>
+          <div class="info-item">
+            <span>THẾ MẠNH TRÍ TUỆ (MI)</span>
+            <strong>${topMiText}</strong>
+          </div>
+          <div class="info-item">
+            <span>ĐIỂM THI THPT DỰ KIẾN</span>
+            <strong>${userScore} điểm</strong>
+          </div>
+        </div>
+
+        <h2 class="section-title">1. TOP 5 NGÀNH NGHỀ TƯƠNG THÍCH CAO NHẤT</h2>
+        ${results.top5.map((m, idx) => `
+          <div class="major-card">
+            <div class="major-header">
+              <div class="major-name">#${idx + 1}. ${m.name} (${m.field})</div>
+              <div class="match-tag">${m.matchPercentage}% Phù hợp</div>
+            </div>
+            <p style="margin: 4px 0 6px 0; color: #57534e; font-size: 12px;">${m.description}</p>
+            <div style="font-size: 11px; color: #44403c;">
+              <strong>Điểm mạnh đặc trưng:</strong> ${m.pros.join(' · ')}
+            </div>
+          </div>
+        `).join('')}
+
+        <h2 class="section-title">2. GỢI Ý CÁC TRƯỜNG ĐẠI HỌC THAM KHẢO (ĐIỂM XUNG QUANH ${userScore} ĐIỂM)</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Tên Trường Đại Học</th>
+              <th>Địa Điểm</th>
+              <th>Điểm Chuẩn</th>
+              <th>Chênh Lệch</th>
+              <th>Đánh Giá Khả Năng</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${(selectedMajorModal && recommendedSchools.length > 0 ? recommendedSchools : universitiesData.slice(0, 8)).map(u => {
+              const estCutoff = 'estimatedCutoff' in u ? (u as unknown as { estimatedCutoff: number }).estimatedCutoff : u.cutoff;
+              const diff = Number((userScore - estCutoff).toFixed(2));
+              let badgeClass = 'badge-target';
+              let statusText = 'Vừa sức (70-85%)';
+              if (diff >= 1.5) { badgeClass = 'badge-safe'; statusText = 'Khả năng đỗ cao (≥90%)'; }
+              else if (diff < -1.0) { badgeClass = 'badge-reach'; statusText = 'Thử thách (NV1)'; }
+
+              return `
+                <tr>
+                  <td><strong>${u.name}</strong> (${u.id || (u as unknown as { code: string }).code})</td>
+                  <td>${u.city}</td>
+                  <td>${estCutoff}</td>
+                  <td>${diff >= 0 ? `+${diff}` : diff}</td>
+                  <td><span class="badge ${badgeClass}">${statusText}</span></td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+        <p style="margin-top: 14px; font-size: 11px; color: #78716c; font-style: italic;">
+          * Lưu ý: Điểm chuẩn tham khảo theo kỳ thi tốt nghiệp THPT gần nhất. Khuyến nghị phân bổ nguyện vọng theo công thức: 2-3 NV Thử thách, 3-4 NV Vừa sức, 2-3 NV An toàn.
+        </p>
+      `;
+    };
+
+    const handlePrintReport = () => {
+      const html = generateReportHtml();
+      openPrintWindow("Bao-Cao-Huong-Nghiep-2026", html);
+    };
+
+    const handleDownloadHtml = () => {
+      const html = generateReportHtml();
+      downloadHtmlFile("Bao-Cao-Huong-Nghiep-2026", html);
+    };
+
     return (
       <div className="space-y-8 animate-fadeIn">
         {/* Banner kết quả rực rỡ */}
@@ -307,19 +373,38 @@ export default function SurveyWizard() {
           <span className="inline-block rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-wider backdrop-blur-md">
             Hồ sơ hướng nghiệp & Gợi ý nguyện vọng 2026
           </span>
-          <h2 className="mt-3 text-3xl font-black sm:text-4xl">
-            Mã tính cách trội: <span className="underline decoration-yellow-300 decoration-wavy">{results.topRiasec.join(' - ')}</span>
+          <h2 className="mt-3 text-2xl font-black sm:text-3xl">
+            Mã tính cách trội:{" "}
+            <span className="underline decoration-yellow-300 decoration-wavy">
+              {results.topRiasec.map((r) => riasecLabels[r] ?? r).join(" · ")}
+            </span>
           </h2>
           <p className="mt-2 max-w-2xl text-sm font-medium text-purple-100 sm:text-base">
             Thế mạnh trí tuệ: <strong className="text-yellow-300">{results.topMI.map((m) => miLabels[m]).join(' & ')}</strong>
           </p>
 
-          <button
-            onClick={handleReset}
-            className="mt-6 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-indigo-700 shadow-md transition-all hover:bg-yellow-300 hover:text-ink-900"
-          >
-            🔄 Khảo sát lại
-          </button>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleReset}
+              className="rounded-xl bg-white/90 px-4 py-2.5 text-xs font-bold text-indigo-700 shadow-md transition-all hover:bg-yellow-300 hover:text-ink-900"
+            >
+              🔄 Khảo sát lại
+            </button>
+            <button
+              type="button"
+              onClick={handlePrintReport}
+              className="rounded-xl bg-amber-400 px-4 py-2.5 text-xs font-black text-ink-950 shadow-md transition-all hover:bg-amber-300 flex items-center gap-1.5"
+            >
+              <span>🖨️</span> In / Tải Báo Cáo (PDF)
+            </button>
+            <button
+              type="button"
+              onClick={handleDownloadHtml}
+              className="rounded-xl bg-white/20 border border-white/40 px-4 py-2.5 text-xs font-bold text-white shadow-md transition-all hover:bg-white/30 flex items-center gap-1.5 backdrop-blur-xs"
+            >
+              <span>💾</span> Tải file HTML Offline
+            </button>
+          </div>
         </div>
 
         {/* Thanh công cụ: Nhập điểm thi dự kiến */}
@@ -505,7 +590,14 @@ export default function SurveyWizard() {
               )}
 
               {/* Footer modal */}
-              <div className="mt-6 flex justify-end border-t border-line pt-4">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+                <button
+                  type="button"
+                  onClick={handlePrintReport}
+                  className="rounded-xl bg-amber-400 px-4 py-2 text-xs font-bold text-ink-950 hover:bg-amber-300 flex items-center gap-1.5 shadow-xs"
+                >
+                  <span>🖨️</span> In báo cáo đầy đủ
+                </button>
                 <button
                   onClick={() => setSelectedMajorModal(null)}
                   className="rounded-xl bg-gray-100 px-5 py-2 text-xs font-bold text-ink-700 hover:bg-gray-200"
