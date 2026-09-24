@@ -45,8 +45,8 @@ describe("FALLBACK_PROJECTS", () => {
 });
 
 describe("FALLBACK_AI_TOOLS", () => {
-  it("có đủ 6 tool, đều published và id không trùng", () => {
-    expect(FALLBACK_AI_TOOLS).toHaveLength(6);
+  it("có đủ 7 tool, đều published và id không trùng", () => {
+    expect(FALLBACK_AI_TOOLS).toHaveLength(7);
     const ids = FALLBACK_AI_TOOLS.map((t) => t.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const t of FALLBACK_AI_TOOLS) {

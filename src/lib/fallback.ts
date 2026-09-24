@@ -68,11 +68,12 @@ export const FALLBACK_PROJECTS: Project[] = [
   ),
   project(
     "brand-strategy-analyzer",
-    "Brand Strategy & Design System",
-    "Hệ thống định vị thương hiệu, bảng màu, typography và bộ tài liệu nhận diện số cho các dự án công nghệ.",
-    ["Strategy", "Design System", "Branding"],
-    "from-orange-100 to-red-100",
-    5
+    "Brand Strategy & AI Persona Studio",
+    "Hệ thống định vị 12 hình mẫu thương hiệu Carl Jung, ma trận tông giọng Do's & Don'ts và tạo AI System Prompt tự hành.",
+    ["Branding", "AI System Prompt", "Strategy"],
+    "from-purple-100 to-pink-100",
+    5,
+    "/ai-tools/brand-strategy"
   ),
   project(
     "social-media-content-lab",
@@ -112,6 +113,17 @@ function tool(
 }
 
 export const FALLBACK_AI_TOOLS: AiTool[] = [
+  tool(
+    "career-guidance-v3",
+    "Trợ lý AI Hướng nghiệp & Ra Quyết định",
+    "Hệ thống trí tuệ hướng nghiệp toàn diện: Đánh giá thích ứng, so khớp tất định 80+ nghề & 60+ ngành, phân tích khoảng trống kỹ năng, lộ trình 5 chặng và AI Coach đồng hành.",
+    "🧭",
+    "from-indigo-100 to-blue-100",
+    0,
+    "Mới • VIP",
+    "green",
+    "/ai-tools/career-guidance"
+  ),
   tool(
     "edupath-2026",
     "EduPath 2026",
@@ -156,14 +168,15 @@ export const FALLBACK_AI_TOOLS: AiTool[] = [
     "yellow"
   ),
   tool(
-    "brand-advisor",
-    "Brand & Strategy Insights",
-    "Tư vấn định vị thương hiệu, phân tích đối thủ và tối ưu thông điệp cốt lõi.",
-    "🎨",
-    "from-green-100 to-emerald-100",
-    5,
-    "Đang phát triển",
-    "yellow"
+    "brand-strategy-studio",
+    "Brand Voice & Strategy Studio",
+    "Định vị 12 hình mẫu Carl Jung, ma trận quy tắc phát ngôn Do's & Don'ts và xuất System Prompt chuẩn hóa cho AI.",
+    "🎯",
+    "from-purple-100 to-pink-100",
+    4,
+    "Sẵn sàng",
+    "green",
+    "/ai-tools/brand-strategy"
   ),
   tool(
     "seo-optimizer",
@@ -553,6 +566,49 @@ export const FALLBACK_POSTS: Post[] = [
     updated_at: NOW,
     excerpt: "So sánh chi tiết ưu nhược điểm, chi phí và trường hợp sử dụng tối ưu của 14 mô hình trí tuệ nhân tạo hàng đầu hiện nay từ OpenAI, Anthropic, Google, Meta và Mistral.",
     content: `<p>Đánh giá chi tiết và so sánh ưu khuyết điểm của các mô hình AI phổ biến nhất hiện nay như ChatGPT, Claude, Gemini, Llama, Mistral và cách lựa chọn mô hình phù hợp với nhu cầu công việc thực tế.</p>`,
+  },
+  {
+    id: "d9e8f7a6-b5c4-4321-9876-123456789abc",
+    title: "Chiến Lược Định Vị Thương Hiệu Kỷ Nguyên AI: Khi Brand Voice Trở Thành AI Persona Tự Hành",
+    slug: "chien-luoc-dinh-vi-thuong-hieu-ky-nguyen-ai-brand-persona",
+    category_id: "3f70b98f-353d-4a04-b407-7c21e43f462f",
+    category_name: "Thương hiệu",
+    cover_url: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1200&q=80",
+    tags: ["Branding", "AI Strategy", "Brand Voice", "GenAI", "Quản trị thương hiệu"],
+    featured: true,
+    published: true,
+    views: 345,
+    published_at: "2026-09-22T08:00:00Z",
+    created_at: NOW,
+    updated_at: NOW,
+    excerpt: "Trong kỷ nguyên Generative AI, cẩm nang thương hiệu tĩnh (PDF Guidelines) không còn đủ sức bảo vệ tính nhất quán của nhãn hàng. Doanh nghiệp cần chuyển dịch sang 'AI Brand Persona' — một thực thể tự hành thấu hiểu trọn vẹn bản sắc, tông giọng và triết lý thương hiệu trên mọi điểm chạm số.",
+    content: `<h2>Sự sụp đổ của Cẩm nang Thương hiệu Tĩnh (Static Brand Guidelines)</h2>
+<p>Suốt nửa thế kỷ qua, quy chuẩn quản trị thương hiệu luôn xoay quanh một cuốn cẩm nang dày hàng trăm trang (Brand Identity Guidelines): quy định từ mã màu hex, khoảng cách an toàn của logo đến các tính từ miêu tả giọng điệu. Nhưng bước sang năm 2026, khi các doanh nghiệp xuất bản hàng ngàn mẩu nội dung mỗi tuần thông qua các công cụ Generative AI, cuốn cẩm nang PDF tĩnh ấy đã chính thức bất lực.</p>
+<p>Khi mỗi nhân viên, mỗi agency và mỗi hệ thống tự động đều đang dùng ChatGPT, Claude hay Midjourney để sáng tạo nội dung, thương hiệu đối mặt với một cuộc khủng hoảng mới: <strong>sự phân mảnh nhận diện (Brand Dissolution)</strong>. Nội dung được sản xuất với tốc độ ánh sáng, nhưng nhạt nhòa, rập khuôn và đánh mất hoàn toàn linh hồn thương hiệu.</p>
+<p>Giải pháp duy nhất không phải là cấm dùng AI, mà là nâng cấp cẩm nang thương hiệu thành một <strong>AI Brand Persona tự hành (Autonomous Brand Persona)</strong>.</p>
+<h2>Cấu trúc 4 Tầng của một AI Brand Persona Hiện Đại</h2>
+<p>Dưới góc nhìn nghiên cứu quản lý kinh tế và hệ thống thông tin, một AI Brand Persona không đơn thuần là một prompt dài, mà là một kiến trúc tri thức gồm 4 tầng vững chắc: Tầng Triết lý Cốt lõi & Hình mẫu Tâm lý, Hệ thống Quy tắc Tông giọng Động, Ranh giới Đạo đức & Giao thức Khủng hoảng, và Bộ nhớ Bối cảnh & Dữ liệu Tri thức Nội bộ.</p>`,
+  },
+  {
+    id: "c8d7e6f5-a4b3-4210-8765-012345678def",
+    title: "Ứng Dụng Generative AI & Synthetic Personas: Cách Mạng Hóa Nghiên Cứu Thị Trường & Định Vị Khách Hàng",
+    slug: "ung-dung-generative-ai-synthetic-personas-nghien-cuu-khach-hang",
+    category_id: "3f70b98f-353d-4a04-b407-7c21e43f462f",
+    category_name: "Thương hiệu",
+    cover_url: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
+    tags: ["Thương hiệu", "Market Research", "Synthetic Data", "AI Agent", "Hành vi người tiêu dùng"],
+    featured: true,
+    published: true,
+    views: 289,
+    published_at: "2026-09-23T09:00:00Z",
+    created_at: NOW,
+    updated_at: NOW,
+    excerpt: "Tạo lập chân dung khách hàng ảo (Synthetic Buyer Personas) bằng các mô hình ngôn ngữ lớn đang làm thay đổi căn bản cách các thương hiệu thử nghiệm thông điệp, khảo sát phản ứng sản phẩm và tối ưu chi phí R&D marketing trước khi tiếp cận thị trường thật.",
+    content: `<h2>Nghịch lý của Nghiên cứu Thị trường Truyền thống</h2>
+<p>Mọi nhà quản trị thương hiệu đều biết rõ tầm quan trọng sống còn của việc thấu hiểu khách hàng mục tiêu. Tuy nhiên, các phương pháp nghiên cứu truyền thống như Focus Group hay phỏng vấn định tính thường tốn kém hàng trăm triệu đồng và nhiều tuần chờ đợi.</p>
+<p>Đó là lý do <strong>Synthetic Personas (Chân dung khách hàng ảo tổng hợp)</strong> đang trở thành vũ khí bí mật của các chiến lược gia thương hiệu hàng đầu thế giới.</p>
+<h2>3 Ứng Dụng Thực Chiến Trong Chiến Lược Thương Hiệu</h2>
+<p>1. Thử nghiệm thông điệp & Bao bì ảo (Virtual Message Testing).<br/>2. Mô phỏng phỏng vấn định tính 24/7 (Simulated In-depth Interviews).<br/>3. Đóng vai đối thủ cạnh tranh (Red-Teaming the Brand).</p>`,
   },
 ];
 

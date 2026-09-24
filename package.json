@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:rls": "node tests/rls-check.mjs",
+    "audit": "node scripts/audit_site.mjs",
     "verify": "vitest run && next build",
     "verify:build": "next build"
   },

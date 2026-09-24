@@ -194,6 +194,13 @@ export const IconClock = (p: IconProps) => (
   </Svg>
 );
 
+export const IconCopy = (p: IconProps) => (
+  <Svg {...p}>
+    <rect width="13" height="13" x="9" y="9" rx="2" ry="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </Svg>
+);
+
 /* -------------------------------------------------------------
    Logo mặt trời — dấu nhận diện của thương hiệu, vẽ đặc thay vì
    dùng nét để nổi bật hơn phần còn lại của giao diện.
