@@ -2,6 +2,7 @@ import Link from "next/link";
 import SiteShell from "@/components/SiteShell";
 import { PostCard } from "@/components/content/PostCard";
 import { UniversityLookup } from "@/components/UniversityLookup";
+import { CareerGuidanceHeroSection } from "@/components/career-guidance/CareerGuidanceHeroSection";
 import {
   ButtonLink,
   Card,
@@ -37,8 +38,9 @@ import type { SocialLinks } from "@/lib/types";
 export const revalidate = 60;
 
 const QUICK_LINKS = [
+  { href: "/ai-tools/career-guidance", label: "AI Hướng nghiệp", Icon: IconSparkle },
   { href: "/bai-viet", label: "Bài viết", Icon: IconFile },
-  { href: "/ai-tools", label: "AI Tools", Icon: IconSparkle },
+  { href: "/ai-tools", label: "AI Tools", Icon: IconGrid },
   { href: "/du-an", label: "Dự án", Icon: IconRocket },
   { href: "#tra-cuu-dai-hoc", label: "Điểm chuẩn", Icon: IconBook },
   { href: "/tu-van", label: "Tư vấn", Icon: IconChat },
@@ -86,6 +88,11 @@ export default async function Home() {
             className="w-full h-auto block object-contain"
             loading="eager"
           />
+        </section>
+
+        {/* ============ KHU VỰC TRỌNG TÂM: TRỢ LÝ AI TƯ VẤN HƯỚNG NGHIỆP ============ */}
+        <section className="mt-6">
+          <CareerGuidanceHeroSection />
         </section>
 
         <div className="mt-6 grid items-start gap-5 lg:grid-cols-[16rem_minmax(0,1fr)] xl:grid-cols-[16rem_minmax(0,1fr)_19rem] 2xl:grid-cols-[17rem_minmax(0,1fr)_20rem] 2xl:gap-6">
@@ -395,6 +402,29 @@ export default async function Home() {
         {/* ============ KHU VỰC TRA CỨU ĐIỂM CHUẨN ĐẠI HỌC ============ */}
         <section id="tra-cuu-dai-hoc" className="mt-10 scroll-mt-6">
           <Card className="p-4 sm:p-6 shadow-soft">
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-brand-200 bg-gradient-to-r from-brand-50 via-indigo-50 to-surface p-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-lg text-white shadow-sm">
+                  🧭
+                </span>
+                <div>
+                  <h3 className="text-sm font-bold text-ink-900">
+                    Chưa biết mình phù hợp với ngành học & trường đại học nào?
+                  </h3>
+                  <p className="text-xs text-ink-600">
+                    Dùng Trợ lý AI Tư vấn Hướng nghiệp để phân tích điểm mạnh, sở thích và tính toán ngưỡng trúng tuyển An toàn / Mục tiêu.
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/ai-tools/career-guidance?tab=assessment"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3.5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-brand-700"
+              >
+                Làm trắc nghiệm Career DNA
+                <IconArrow className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
             <UniversityLookup />
           </Card>
         </section>
