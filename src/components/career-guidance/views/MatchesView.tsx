@@ -1147,7 +1147,8 @@ export function MatchesView({
               </div>
               <button
                 onClick={() => setShowCompareModal(false)}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                aria-label="Đóng"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 cursor-pointer"
               >
                 ✕
               </button>
@@ -1207,19 +1208,34 @@ export function MatchesView({
               ))}
             </div>
 
-            <div className="flex justify-between items-center border-t border-slate-100 dark:border-slate-800 pt-3">
+            <div className="flex flex-wrap justify-between items-center gap-2 border-t border-slate-100 dark:border-slate-800 pt-3">
               <button
                 onClick={() => setCompareItems([])}
-                className="text-xs text-slate-500 hover:text-accent-red-600 underline"
+                className="text-xs text-slate-500 hover:text-accent-red-600 underline cursor-pointer"
               >
                 Xóa tất cả mục đã chọn
               </button>
-              <button
-                onClick={() => setShowCompareModal(false)}
-                className="rounded-lg bg-brand-900 px-4 py-2 text-xs font-bold text-white hover:bg-brand-800"
-              >
-                Đóng bảng so sánh
-              </button>
+              <div className="flex items-center gap-2">
+                {onNavigateView && (
+                  <button
+                    onClick={() => {
+                      setShowCompareModal(false);
+                      onNavigateView("compare");
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-brand-300 bg-brand-50 px-3.5 py-2 text-xs font-bold text-brand-700 hover:bg-brand-100 transition cursor-pointer"
+                  >
+                    <IconScale className="w-3.5 h-3.5" />
+                    <span>Mở Bàn làm việc So sánh chuyên sâu →</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setShowCompareModal(false)}
+                  aria-label="Đóng bảng so sánh"
+                  className="rounded-lg bg-brand-900 px-4 py-2 text-xs font-bold text-white hover:bg-brand-800 transition cursor-pointer"
+                >
+                  Đóng bảng so sánh
+                </button>
+              </div>
             </div>
           </div>
         </div>

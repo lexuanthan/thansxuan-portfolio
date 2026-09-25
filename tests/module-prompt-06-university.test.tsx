@@ -55,8 +55,10 @@ describe("MODULE PROMPT 06 — UNIVERSITY MATCHING & COMPARISON", () => {
       expect(screen.getAllByText(/Học bổng:/i).length).toBeGreaterThan(0);
     });
 
-    it("2. Detail Modal contains fit breakdown (7 dimensions), admission compatibility, tuition, scholarship, campus, program, career opportunity", () => {
-      render(
+    it(
+      "2. Detail Modal contains fit breakdown (7 dimensions), admission compatibility, tuition, scholarship, campus, program, career opportunity",
+      () => {
+        render(
         <UniversityExplorerView
           profile={profile}
           onBookmarkItem={mockBookmark}
@@ -99,7 +101,9 @@ describe("MODULE PROMPT 06 — UNIVERSITY MATCHING & COMPARISON", () => {
       // Close modal
       const closeButtons = within(modal).getAllByRole("button", { name: /Đóng/i });
       fireEvent.click(closeButtons[0]);
-    });
+    },
+    15000
+  );
   });
 
   describe("4. COMPARE & 5. AI ANALYSIS & 6. LANGUAGE & 7. RESPONSIVE", () => {

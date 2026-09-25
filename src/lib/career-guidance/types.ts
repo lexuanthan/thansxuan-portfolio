@@ -383,3 +383,17 @@ export interface ChatMessage {
   trust?: AiCoachTrustBlock;
   suggested_actions?: string[];
 }
+
+export type ActiveView =
+  | "landing"
+  | "assessment"
+  | "profile"
+  | "matches"
+  | "career_explorer"
+  | "major_explorer"
+  | "university_explorer"
+  | "compare"
+  | "skill_gap"
+  | "roadmap"
+  | "coach"
+  | "saved";

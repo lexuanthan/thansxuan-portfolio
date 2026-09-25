@@ -7,7 +7,8 @@ import {
   MajorMatchResult,
   PersonalRoadmap,
   ChatMessage,
-  AiCoachTrustBlock
+  AiCoachTrustBlock,
+  ActiveView
 } from "@/lib/career-guidance/types";
 import { SmartNextAction } from "../common/SmartNextAction";
 import {
@@ -34,7 +35,7 @@ interface AiCoachViewProps {
   topMajors: MajorMatchResult[];
   roadmap: PersonalRoadmap | null;
   initialQuery?: string;
-  onNavigateView?: (view: any) => void;
+  onNavigateView?: (view: ActiveView) => void;
 }
 
 type ContextualActionType = "explain" | "compare" | "plan" | "improve" | "evaluate";
@@ -137,6 +138,12 @@ Bạn có thể bấm các **nút hành động cố vấn** phía trên để g
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  useEffect(() => {
+    if (initialQuery) {
+      setInputVal(initialQuery);
+    }
+  }, [initialQuery]);
 
   useEffect(() => {
     scrollToBottom();

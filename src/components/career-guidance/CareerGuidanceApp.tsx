@@ -177,6 +177,7 @@ export default function CareerGuidanceApp() {
         const matched = normalizeTab(currentTab);
         if (matched) {
           setActiveView(matched);
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }
       }
     };
@@ -199,6 +200,7 @@ export default function CareerGuidanceApp() {
   const handleSwitchView = (view: ActiveView) => {
     setActiveView(view);
     if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
       const url = new URL(window.location.href);
       url.searchParams.set("tab", view);
       window.history.pushState({}, "", url.toString());
@@ -661,7 +663,7 @@ export default function CareerGuidanceApp() {
       </nav>
 
       {/* View Container */}
-      <main className="transition-all animate-in fade-in duration-200">
+      <main key={activeView} className="transition-all animate-in fade-in-50 duration-200">
         {activeView === "landing" && (
           <LandingView
             onStartAssessment={() => handleSwitchView("assessment")}
@@ -775,6 +777,7 @@ export default function CareerGuidanceApp() {
 
         {activeView === "roadmap" && (
           <RoadmapView
+            key={roadmap?.target_career_id || "roadmap-view"}
             profile={profile}
             currentRoadmap={roadmap}
             onUpdateRoadmap={(r) => setRoadmap(r)}
@@ -805,7 +808,7 @@ export default function CareerGuidanceApp() {
       </main>
 
       {/* Mobile Bottom Navigation with Clean SVG Icons */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-surface/95 backdrop-blur-md lg:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-surface/95 backdrop-blur-md pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:hidden">
         <div className="grid grid-cols-5 text-center py-2 px-1">
           {[
             { id: "landing" as ActiveView, label: "Trang chủ", icon: <IconHome className="w-5 h-5 mx-auto" /> },

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SavedItems } from "@/lib/career-guidance/types";
+import { SavedItems, ActiveView } from "@/lib/career-guidance/types";
 import { CAREERS_DATA } from "@/lib/career-guidance/careersData";
 import { MAJORS_DATA } from "@/lib/career-guidance/majorsData";
 import rawUniversities from "@/data/universities.json";
@@ -18,7 +18,7 @@ interface SavedViewProps {
   savedItems: SavedItems;
   onRemoveBookmark: (type: "career" | "major" | "university", id: string) => void;
   onAskCoachAboutItem: (name: string) => void;
-  onNavigateView?: (view: any) => void;
+  onNavigateView?: (view: ActiveView) => void;
 }
 
 export function SavedView({
@@ -31,7 +31,15 @@ export function SavedView({
 
   const bookmarkedCareers = CAREERS_DATA.filter((c) => (savedItems?.careers || []).includes(c.id));
   const bookmarkedMajors = MAJORS_DATA.filter((m) => (savedItems?.majors || []).includes(m.id));
-  const bookmarkedUnis = (rawUniversities as any[]).filter((u) => (savedItems?.universities || []).includes(u.id));
+  const bookmarkedUnis = (
+    rawUniversities as unknown as {
+      id: string;
+      name: string;
+      shortName?: string;
+      city: string;
+      type?: string;
+    }[]
+  ).filter((u) => (savedItems?.universities || []).includes(u.id));
 
   return (
     <div className="space-y-6">
@@ -47,7 +55,18 @@ export function SavedView({
           </p>
         </div>
 
-        <div className="flex gap-1.5 rounded-[10px] bg-surface-soft p-1 border border-line">
+        <div className="flex flex-wrap items-center gap-2">
+          {onNavigateView && (
+            <button
+              onClick={() => onNavigateView("compare")}
+              className="inline-flex items-center gap-1.5 rounded-[10px] border border-brand-300 bg-brand-50 px-3.5 py-2 text-xs font-bold text-brand-700 hover:bg-brand-100 transition shadow-xs cursor-pointer"
+            >
+              <IconScale className="w-4 h-4 text-brand-600" />
+              <span>So sánh mục đã lưu →</span>
+            </button>
+          )}
+
+          <div className="flex gap-1.5 rounded-[10px] bg-surface-soft p-1 border border-line">
           <button
             onClick={() => setActiveTab("career")}
             className={`inline-flex items-center gap-1.5 rounded-[8px] px-3.5 py-1.5 text-xs font-bold transition ${
@@ -77,6 +96,7 @@ export function SavedView({
           </button>
         </div>
       </div>
+    </div>
 
       {activeTab === "career" && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -96,7 +116,7 @@ export function SavedView({
                 </button>
               </div>
               <h3 className="font-bold text-ink-900 text-sm">{c.name}</h3>
-              <p className="text-xs text-ink-500 italic">"{c.tagline}"</p>
+              <p className="text-xs text-ink-500 italic">&ldquo;{c.tagline}&rdquo;</p>
               <div className="pt-2 border-t border-line flex justify-end">
                 <button
                   onClick={() => onAskCoachAboutItem(c.name)}

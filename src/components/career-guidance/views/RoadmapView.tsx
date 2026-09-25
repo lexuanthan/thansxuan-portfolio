@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { PersonalRoadmap, StudentCareerProfile, TimeHorizon, TaskStatus } from "@/lib/career-guidance/types";
+import React, { useState, useMemo } from "react";
+import { PersonalRoadmap, StudentCareerProfile, TimeHorizon, TaskStatus, ActiveView } from "@/lib/career-guidance/types";
 import { CAREERS_DATA } from "@/lib/career-guidance/careersData";
 import {
   generatePersonalRoadmap,
@@ -12,13 +12,9 @@ import {
   IconMap,
   IconCheck,
   IconClock,
-  IconTarget,
   IconBot,
-  IconArrowRight,
   IconSparkles,
-  IconAlertCircle,
-  IconAward,
-  HcmuteBrandMark
+  IconAward
 } from "../common/CareerIcons";
 
 interface RoadmapViewProps {
@@ -26,7 +22,7 @@ interface RoadmapViewProps {
   currentRoadmap: PersonalRoadmap | null;
   onUpdateRoadmap: (roadmap: PersonalRoadmap) => void;
   onAskCoachAboutItem: (name: string) => void;
-  onNavigateView?: (view: any) => void;
+  onNavigateView?: (view: ActiveView) => void;
 }
 
 export function RoadmapView({
@@ -43,19 +39,21 @@ export function RoadmapView({
   }, [currentRoadmap, profile]);
 
   const [roadmap, setRoadmap] = useState<PersonalRoadmap>(initialRoadmap);
+  const [prevPropRoadmap, setPrevPropRoadmap] = useState(currentRoadmap);
   const [activeHorizon, setActiveHorizon] = useState<TimeHorizon>("30_days");
+
+  // Adjust state during render when currentRoadmap prop updates
+  if (currentRoadmap !== prevPropRoadmap) {
+    setPrevPropRoadmap(currentRoadmap);
+    if (currentRoadmap) {
+      setRoadmap(currentRoadmap);
+    }
+  }
 
   // AI Roadmap Optimization state
   const [isAiOptimizeModalOpen, setIsAiOptimizeModalOpen] = useState(false);
   const [availableHours, setAvailableHours] = useState(profile.user_context?.weekly_learning_hours || 15);
   const [aiOptimizeSuccessMessage, setAiOptimizeSuccessMessage] = useState<string | null>(null);
-
-  // Sync state when currentRoadmap prop updates
-  useEffect(() => {
-    if (currentRoadmap) {
-      setRoadmap(currentRoadmap);
-    }
-  }, [currentRoadmap]);
 
   const totalTasks = useMemo(() => {
     return roadmap.stages.reduce((acc, stage) => acc + stage.tasks.length, 0);

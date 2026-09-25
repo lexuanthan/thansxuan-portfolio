@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { CAREERS_DATA } from "@/lib/career-guidance/careersData";
 import { MAJORS_DATA } from "@/lib/career-guidance/majorsData";
-import { CareerMatchResult, MajorMatchResult, StudentCareerProfile, UniversityMatchResult } from "@/lib/career-guidance/types";
+import { CareerMatchResult, MajorMatchResult, StudentCareerProfile, UniversityMatchResult, ActiveView } from "@/lib/career-guidance/types";
 import { matchUniversities } from "@/lib/career-guidance/universityMatching";
 import { createDefaultProfile } from "@/lib/career-guidance/seedProfile";
 import { SmartNextAction } from "../common/SmartNextAction";
@@ -24,7 +24,7 @@ interface CompareViewProps {
   majorMatches: MajorMatchResult[];
   profile?: StudentCareerProfile;
   onAskCoachAboutItem: (name: string) => void;
-  onNavigateView?: (view: any) => void;
+  onNavigateView?: (view: ActiveView) => void;
 }
 
 function UniLogoBadge({ shortName, isHcmute }: { shortName: string; isHcmute?: boolean }) {
@@ -53,16 +53,18 @@ export function CompareView({
 
   const [compareType, setCompareType] = useState<"career" | "major" | "university">("university");
 
-  const [selectedCareerIds, setSelectedCareerIds] = useState<string[]>([
-    CAREERS_DATA[0].id,
-    CAREERS_DATA[1].id,
-    CAREERS_DATA[2].id
-  ]);
-  const [selectedMajorIds, setSelectedMajorIds] = useState<string[]>([
-    MAJORS_DATA[0].id,
-    MAJORS_DATA[1].id,
-    MAJORS_DATA[3].id
-  ]);
+  const [selectedCareerIds, setSelectedCareerIds] = useState<string[]>(() => {
+    if (careerMatches && careerMatches.length >= 2) {
+      return careerMatches.slice(0, 3).map((m) => m.career.id);
+    }
+    return [CAREERS_DATA[0].id, CAREERS_DATA[1].id, CAREERS_DATA[2].id];
+  });
+  const [selectedMajorIds, setSelectedMajorIds] = useState<string[]>(() => {
+    if (majorMatches && majorMatches.length >= 2) {
+      return majorMatches.slice(0, 3).map((m) => m.major.id);
+    }
+    return [MAJORS_DATA[0].id, MAJORS_DATA[1].id, MAJORS_DATA[3].id];
+  });
   const [selectedUniIds, setSelectedUniIds] = useState<string[]>(["SPK", "QSB", "UEH"]);
 
   const [highlightDifference, setHighlightDifference] = useState(true);

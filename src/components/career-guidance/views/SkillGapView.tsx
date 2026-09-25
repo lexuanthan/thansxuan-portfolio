@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { StudentCareerProfile, SkillGapItem, GapCategory } from "@/lib/career-guidance/types";
+import { StudentCareerProfile, SkillGapItem, GapCategory, ActiveView } from "@/lib/career-guidance/types";
 import { CAREERS_DATA } from "@/lib/career-guidance/careersData";
 import { analyzeSkillGaps, getCareerExperiments } from "@/lib/career-guidance/skillGapEngine";
 import { SmartNextAction } from "../common/SmartNextAction";
@@ -9,12 +9,8 @@ import {
   IconArrowRight,
   IconSparkles,
   IconCheck,
-  IconAlertCircle,
   IconClock,
-  IconTarget,
-  IconBookOpen,
-  IconAward,
-  HcmuteBrandMark
+  IconTarget
 } from "../common/CareerIcons";
 
 interface SkillGapViewProps {
@@ -22,7 +18,7 @@ interface SkillGapViewProps {
   initialTargetCareerId?: string;
   onGoToRoadmap: () => void;
   onAskCoachAboutItem: (name: string) => void;
-  onNavigateView?: (view: any) => void;
+  onNavigateView?: (view: ActiveView) => void;
 }
 
 export function SkillGapView({

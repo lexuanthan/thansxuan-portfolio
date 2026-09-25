@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { UniversityMatchResult, StudentCareerProfile, UniversityFitBreakdown } from "@/lib/career-guidance/types";
+import { UniversityMatchResult, StudentCareerProfile, ActiveView } from "@/lib/career-guidance/types";
 import { matchUniversities } from "@/lib/career-guidance/universityMatching";
 import { SmartNextAction } from "../common/SmartNextAction";
 import { MetricGauge } from "../common/MetricGauge";
@@ -8,14 +8,10 @@ import {
   IconBookmark,
   IconBot,
   IconSearch,
-  IconCheck,
   IconAlertCircle,
   IconAward,
-  IconTrendingUp,
   IconScale,
   IconSparkles,
-  IconGraduationCap,
-  IconBriefcase,
   HcmuteBrandMark
 } from "../common/CareerIcons";
 
@@ -24,7 +20,7 @@ interface UniversityExplorerViewProps {
   onBookmarkItem: (type: "university", id: string) => void;
   isBookmarked: (type: "university", id: string) => boolean;
   onAskCoachAboutItem: (name: string) => void;
-  onNavigateView?: (view: any) => void;
+  onNavigateView?: (view: ActiveView) => void;
 }
 
 // Logo đại học: HCMUTE Brand Mark cho HCMUTE, Monogram học thuật trang trọng cho các trường khác

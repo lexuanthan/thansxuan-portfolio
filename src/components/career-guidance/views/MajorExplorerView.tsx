@@ -571,10 +571,22 @@ export function MajorExplorerView({
               ))}
             </div>
 
-            <div className="flex justify-end border-t border-slate-100 dark:border-slate-800 pt-3">
+            <div className="flex flex-wrap justify-between items-center gap-2 border-t border-slate-100 dark:border-slate-800 pt-3">
+              {onNavigateView && (
+                <button
+                  onClick={() => {
+                    setShowCompareModal(false);
+                    onNavigateView("compare");
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-accent-red-300 bg-accent-red-50 px-3.5 py-2 text-xs font-bold text-accent-red-800 hover:bg-accent-red-100 transition cursor-pointer"
+                >
+                  <IconScale className="w-3.5 h-3.5 text-accent-red-600" />
+                  <span>Mở Bàn làm việc So sánh chuyên sâu →</span>
+                </button>
+              )}
               <button
                 onClick={() => setShowCompareModal(false)}
-                className="rounded-lg bg-slate-200 dark:bg-slate-700 px-4 py-2 text-xs font-bold text-slate-800 dark:text-white"
+                className="rounded-lg bg-slate-200 dark:bg-slate-700 px-4 py-2 text-xs font-bold text-slate-800 dark:text-white cursor-pointer"
               >
                 Đóng
               </button>
