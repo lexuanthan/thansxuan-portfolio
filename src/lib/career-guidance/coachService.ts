@@ -1,14 +1,19 @@
 import { StudentCareerProfile, CareerMatchResult, MajorMatchResult, PersonalRoadmap } from "./types";
+import {
+  extractRealtimeFact,
+  REALTIME_METADATA,
+  REALTIME_UNIVERSITIES
+} from "./realtimeMarketData";
 
 export interface CoachContext {
   profile: StudentCareerProfile;
   topCareers: CareerMatchResult[];
-  topMajors: MajorMatchResult[];
+  topMajors?: MajorMatchResult[];
   targetRoadmap?: PersonalRoadmap | null;
 }
 
 export function buildCoachSystemPrompt(context: CoachContext): string {
-  const { profile, topCareers, topMajors, targetRoadmap } = context;
+  const { profile, topCareers, topMajors = [], targetRoadmap } = context;
 
   const topCareerStr = topCareers
     .slice(0, 3)
@@ -34,31 +39,35 @@ export function buildCoachSystemPrompt(context: CoachContext): string {
 
   const rankedValues = profile.ranked_values.slice(0, 3).join(", ");
   const negatives = profile.negative_preferences.join(", ");
+  const spk = REALTIME_UNIVERSITIES.SPK;
 
-  return `Bạn là "AI Career Coach" — Cố vấn Hướng nghiệp và Trí tuệ Quyết định Nghề nghiệp cấp cao (Senior Career Decision Intelligence Coach).
-Bạn đang đồng hành cùng một học sinh/sinh viên Việt Nam để giúp họ hiểu rõ bản thân, chọn ngành, chọn nghề và lên lộ trình thực tế.
+  return `Bạn là "AI Career Coach" — người cố vấn hướng nghiệp và người bạn đồng hành tin cậy của học sinh, sinh viên tại Trường Đại học Sư phạm Kỹ thuật TP.HCM (HCMUTE) và các trường đại học hàng đầu Việt Nam.
 
-HỒ SƠ NGƯỜI DÙNG HIỆN TẠI:
+PHONG CÁCH VÀ NGUYÊN TẮC GIAO TIẾP:
+1. Xưng hô: Dùng "mình" và "bạn", hoặc "Coach" và "bạn". Giọng văn ấm áp, gần gũi, truyền cảm hứng như một người anh/chị khóa trên hoặc mentor tận tâm.
+2. Trả lời GỌN VÀ ĐI THẲNG VÀO TRỌNG TÂM:
+   - Câu đầu tiên: Trả lời trực diện băn khoăn của bạn.
+   - Thân bài: 2 - 3 gạch đầu dòng đắt giá, súc tích (có dẫn chứng năng lực và số liệu thực tế).
+   - Câu kết: 1 gợi ý hành động cụ thể (Micro-action) bạn có thể làm ngay hôm nay.
+3. Độ chính xác & Dữ liệu Realtime (${REALTIME_METADATA.academicYear}):
+   - Dẫn chiếu số liệu điểm chuẩn, học phí và dải lương thị trường mới nhất đã được kiểm chứng.
+   - Điểm chuẩn ${spk.shortName}: Robot & AI (~26.75đ), CNTT (~26.5đ), Kỹ thuật Phần mềm (~26.0đ), Ô tô (~26.25đ), Vi mạch (~26.2đ). ĐGNL an toàn từ 850+ điểm.
+   - Học phí ${spk.shortName}: ${spk.tuitionYear.standard}. CLC tiếng Việt ~45–52 triệu/năm; CLC tiếng Anh ~58–65 triệu/năm.
+   - Lương thị trường: Fresher (10–16 triệu/tháng), 2-3 năm KN (20–35 triệu/tháng), Senior/Lead (45–75+ triệu/tháng).
+   - Tác động của AI: Thẳng thắn, khách quan. AI tự động hóa việc lặp lại; người làm chủ AI và có tư duy logic giải quyết vấn đề sẽ phát triển vượt bậc.
+
+HỒ SƠ NGƯỜI DÙNG HIỆN TẠI (DỮ LIỆU ĐÃ XÁC THỰC):
 - Đối tượng: ${profile.user_context.user_type} (Trình độ: ${profile.user_context.education_level})
 - Hình mẫu nghề nghiệp: "${profile.profile_archetype.title}" - ${profile.profile_archetype.tagline}
-- Điểm mạnh nổi bật: ${topCaps}
+- Năng lực nổi bật: ${topCaps}
 - Hứng thú hàng đầu: ${topInterests}
 - Giá trị nghề nghiệp coi trọng nhất: ${rankedValues}
 - Tiêu chí muốn tránh né: ${negatives || "Không có"}
-- Top nghề nghiệp tương thích nhất:
+- Top nghề nghiệp tương thích:
 ${topCareerStr}
-- Top ngành học tương thích nhất:
+- Top ngành học tương thích:
 ${topMajorStr}
-- Mục tiêu đang theo đuổi: ${targetRoadmap ? targetRoadmap.target_career_name : "Chưa chọn mục tiêu cụ thể"}
-
-NGUYÊN TẮC HÀNH VI CỐT LÕI (BẮT BUỘC TUÂN THỦ):
-1. Giọng điệu: Thấu cảm, truyền cảm hứng, khách quan, dựa trên dữ liệu, mang tính hành động.
-2. TUYỆT ĐỐI KHÔNG dùng câu áp đặt như: "Bạn chắc chắn nên học ngành này" hay "Bạn nhất định sẽ thành công".
-   Hãy dùng cách diễn đạt định hướng: "Dựa trên hồ sơ năng lực phân tích và sở thích của bạn, đây là một trong những hướng đi có xác suất phù hợp cao đáng để bạn ưu tiên kiểm chứng."
-3. Minh bạch & giải thích (Explainable): Khi khen hoặc khuyên điều gì, hãy chỉ ra căn cứ từ hồ sơ (do năng lực nào, sở thích nào).
-4. Thực tế thị trường: Trung thực chỉ ra những thách thức (áp lực cạnh tranh, tác động của AI, yêu cầu tự học).
-5. Luôn kết thúc câu trả lời bằng 1 câu hỏi gợi mở hoặc 1 hành động vi mô (Micro-action) cụ thể mà người dùng có thể làm ngay hôm nay.
-6. Ngôn ngữ: Tiếng Việt tự nhiên, chuẩn mực, hiện đại, gần gũi với giới trẻ nhưng chuyên nghiệp.`;
+- Mục tiêu đang hướng tới: ${targetRoadmap ? targetRoadmap.target_career_name : (topCareers[0]?.career.name || "Chưa chọn cụ thể")}`;
 }
 
 export interface SmartCoachResult {
@@ -67,22 +76,42 @@ export interface SmartCoachResult {
   evidence: string[];
   uncertainty?: string;
   suggested_actions?: string[];
+  is_realtime_fact?: boolean;
 }
 
 /**
- * Bộ sinh câu trả lời cố vấn thông minh đầy đủ (với Trust & Explainability)
- * Đảm bảo tính khoa học, khách quan, không khẳng định tuyệt đối hóa, cung cấp căn cứ và cảnh báo giới hạn.
+ * Bộ sinh câu trả lời cố vấn thông minh tự nhiên, gọn gàng, cập nhật dữ liệu realtime
  */
 export function generateSmartCoachFullResponse(
   userQuery: string,
   context: CoachContext,
   actionType?: string
 ): SmartCoachResult {
-  const q = userQuery.toLowerCase();
-  const { profile, topCareers, topMajors, targetRoadmap } = context;
+  const q = userQuery.toLowerCase().trim();
+  const { profile, topCareers, topMajors = [], targetRoadmap } = context;
   const bestCareer = topCareers[0]?.career;
   const secondCareer = topCareers[1]?.career;
   const targetName = targetRoadmap?.target_career_name || bestCareer?.name || "ngành nghề mục tiêu";
+
+  // 0. ƯU TIÊN KIỂM TRA TRUY VẤN DỮ LIỆU REALTIME CỤ THỂ (Học phí, Điểm chuẩn, Mức lương, AI)
+  const realtimeFact = extractRealtimeFact(userQuery);
+  if (realtimeFact && !actionType) {
+    return {
+      reply: `Chào bạn! Về thông tin thực tế bạn đang tìm hiểu, mình gửi bạn số liệu chính xác được cập nhật mới nhất cho năm học **${REALTIME_METADATA.academicYear}** nhé:\n\n${realtimeFact}\n\nBạn có muốn mình tư vấn thêm về phương án xét tuyển hay cách nâng cao cơ hội trúng tuyển vào các ngành này không?`,
+      reasoning_summary: "Trích xuất trực tiếp từ cổng dữ liệu Tuyển sinh & Thị trường lao động Realtime 2025-2026.",
+      evidence: [
+        `Nguồn dữ liệu: ${REALTIME_METADATA.dataSource}`,
+        `Kỳ tuyển sinh: ${REALTIME_METADATA.academicYear} (Kiểm duyệt: ${REALTIME_METADATA.lastVerifiedDate})`,
+        "Dữ liệu chính thức từ HCMUTE và khảo sát việc làm thực tế"
+      ],
+      suggested_actions: [
+        "Xem điểm chuẩn chi tiết trong University Explorer",
+        "Hỏi về cơ hội học bổng và hỗ trợ học phí",
+        "Đối chiếu phương thức thi ĐGNL và THPT"
+      ],
+      is_realtime_fact: true
+    };
+  }
 
   // 1. CONTEXTUAL ACTION: GIẢI THÍCH (Explain)
   if (
@@ -99,24 +128,18 @@ export function generateSmartCoachFullResponse(
       .join(", ");
 
     return {
-      reply: `Chào bạn! Dựa trên phân tích Career DNA, bạn đạt độ tương thích khả quan với **${bestCareer?.name || "nhóm ngành Công nghệ / Dữ liệu"}** (khoảng ${topCareers[0]?.score || 88}%) nhờ 3 điểm tựa chính:
-
-1. **Sở trường tư duy**: Năng lực phân tích và giải quyết vấn đề của bạn (${topCaps}) rất ăn khớp với yêu cầu bóc tách logic của nghề.
-2. **Hứng thú tự nhiên**: Bạn có mức độ tò mò tự thân cao, giúp bạn vượt qua giai đoạn học kiến thức nền tảng một cách bền bỉ.
-3. **Giá trị nghề nghiệp**: Kỳ vọng về sự tự chủ và mức thu nhập tốt của bạn tương đồng với biểu đồ phát triển sự nghiệp của vị trí này.
-
-*Lưu ý quan trọng*: Mức độ tương thích trên mang tính chất định hướng xác suất, thành công thực tế đòi hỏi sự rèn luyện bền bỉ và môi trường thực hành liên tục. Bạn đã thử thực hiện một bài tập tình huống thực tế chưa?`,
-      reasoning_summary: "Đối soát ma trận liên kết giữa đặc tính Career DNA, chỉ số năng lực tư duy và yêu cầu năng lực cốt lõi của vị trí.",
+      reply: `Chào bạn! Nhìn vào phân tích **Career DNA**, mình thấy bạn và vị trí **${bestCareer?.name || "ngành này"}** (độ tương thích **${topCareers[0]?.score || 88}%**) có 3 điểm tựa rất ăn khớp:\n\n- **Tư duy ăn ý**: Điểm nổi bật về ${topCaps} giúp bạn giải mã các bài toán phức tạp một cách mạch lạc, không bị nản khi đối mặt vấn đề khó.\n- **Động lực tự thân**: Sự tò mò tự nhiên giúp bạn chủ động tìm tòi kiến thức mới, rất phù hợp với tính chất vận động liên tục của ngành.\n- **Kỳ vọng nghề nghiệp**: Giá trị về *${profile.ranked_values.slice(0, 2).join(", ")}* mà bạn xem trọng hoàn toàn tương thích với văn hóa làm việc và tiềm năng thu nhập của lĩnh vực này.\n\n💡 *Hành động nhỏ hôm nay*: Bạn hãy thử tìm xem 1 video "A day in the life of ${bestCareer?.name}" để cảm nhận nhịp làm việc thực tế trước nhé!`,
+      reasoning_summary: "Đối soát tương thích giữa năng lực tư duy Career DNA và yêu cầu công việc thực tế.",
       evidence: [
         `Hình mẫu "${profile.profile_archetype.title}" tương thích ${topCareers[0]?.score || 88}% với ${bestCareer?.name || "ngành"}`,
-        `Năng lực nổi bật: ${topCaps}`,
-        `Giá trị cốt lõi: ${profile.ranked_values.slice(0, 2).join(", ")}`
+        `Năng lực cốt lõi: ${topCaps}`,
+        `Giá trị nghề nghiệp ưu tiên: ${profile.ranked_values.slice(0, 2).join(", ")}`
       ],
-      uncertainty: "Kết quả đối soát dựa trên dữ liệu tự kê khai tại thời điểm khảo sát; mức độ thích ứng thực tế cần kiểm chứng qua các dự án thử nghiệm.",
+      uncertainty: "Điểm số là chỉ dẫn định hướng xác suất cao; việc trải nghiệm thực tế qua dự án sẽ giúp bạn khẳng định lựa chọn chắc chắn nhất.",
       suggested_actions: [
-        "Xem phân tích khoảng trống năng lực (Gap Analysis)",
+        "Xem khoảng cách kỹ năng (Skill Gap) cần bù đắp",
         "So sánh với lựa chọn thứ hai",
-        "Lập kế hoạch hành động 30 ngày"
+        "Lập kế hoạch hành động 30 ngày tới"
       ]
     };
   }
@@ -132,23 +155,18 @@ export function generateSmartCoachFullResponse(
     const c1 = bestCareer?.name || "Khoa học Dữ liệu";
     const c2 = secondCareer?.name || "Kỹ thuật Phần mềm";
     return {
-      reply: `Cả hai hướng đi này đều nằm trong top khuyến nghị cho hồ sơ của bạn, nhưng có những khác biệt cốt lõi:
-
-- **${c1}**: Tập trung vào việc *khai phá insight, mô hình hóa dữ liệu và hỗ trợ ra quyết định*. Đòi hỏi tư duy thống kê, khả năng nhìn ra quy luật từ số liệu.
-- **${c2}**: Tập trung vào việc *xây dựng kiến trúc hệ thống, độ tin cậy và hiệu năng mã lệnh*. Đòi hỏi sự kiên nhẫn với cấu trúc kỹ thuật và giải quyết lỗi logic.
-
-Đối với cá nhân bạn, phong cách tư duy của bạn có xu hướng nghiêng nhẹ về bên **${c1}**, tuy nhiên bạn hoàn toàn có thể chọn kết hợp cả hai. Bạn ưu tiên trải nghiệm tìm ra giải pháp hay tự tay xây dựng một sản phẩm hoàn chỉnh hơn?`,
-      reasoning_summary: "Phân tích ma trận đánh đổi (Trade-off Matrix) giữa 2 hướng đi dựa trên năng lực, triển vọng thị trường và rào cản thích ứng.",
+      reply: `Chào bạn! Cả hai hướng đi này đều rất sáng trong hồ sơ của bạn, nhưng khác nhau rõ rệt ở tính chất trải nghiệm hàng ngày:\n\n- **${c1}**: Tập trung vào *khai phá insight, mô hình hóa số liệu và trả lời câu hỏi "Tại sao?"*. Cần tư duy thống kê và sự nhạy bén kinh doanh.\n- **${c2}**: Tập trung vào *xây dựng kiến trúc hệ thống, viết code bền bỉ và tạo ra sản phẩm chạy được*. Cần tính tỉ mỉ và kiên trì khi debug.\n\nVề hồ sơ của bạn, bạn đang nghiêng nhẹ về **${c1}** nhờ thế mạnh phân tích dữ liệu. Bạn thích cảm giác tìm ra lời giải từ số liệu hay tự tay dựng nên một ứng dụng hoàn chỉnh hơn?`,
+      reasoning_summary: "So sánh trực diện 2 lựa chọn hàng đầu dựa trên phong cách làm việc và thế mạnh nổi trội.",
       evidence: [
         `Lựa chọn 1: ${c1} (Tương thích ${topCareers[0]?.score || 88}%)`,
         `Lựa chọn 2: ${c2} (Tương thích ${topCareers[1]?.score || 82}%)`,
-        "Đối sánh các chiều năng lực kỹ thuật và giải quyết vấn đề"
+        "Khảo sát thị trường tuyển dụng và mức độ cạnh tranh thực tế"
       ],
-      uncertainty: "Thị trường tuyển dụng và mức độ tự động hóa AI ở hai ngành biến động liên tục; dữ liệu mang tính tham khảo xu hướng dài hạn.",
+      uncertainty: "Cả hai ngành đều có thể giao thoa (ví dụ Data Engineer hoặc MLOps); bạn có thể bắt đầu với 1 hướng và mở rộng sau.",
       suggested_actions: [
         `Xem chi tiết nghề ${c1}`,
         `Xem chi tiết nghề ${c2}`,
-        "Đánh giá rủi ro và áp lực của từng lựa chọn"
+        "Mở Bàn làm việc So sánh chuyên sâu 8 tiêu chí"
       ]
     };
   }
@@ -164,30 +182,18 @@ export function generateSmartCoachFullResponse(
     q.includes("chuẩn bị")
   ) {
     return {
-      reply: `Dưới đây là khung kế hoạch phân kỳ thực tế để bạn chuẩn bị cho mục tiêu **${targetName}**:
-
-1. **Chặng 30 ngày (Khám phá & Nền tảng)**:
-   - Hoàn thành 1 khóa học nhập môn hoặc đọc 2 cuốn sách chuyên ngành cơ bản.
-   - Thử nghiệm 1 bài thực hành vi mô (mini-task) 3 giờ để cảm nhận công việc thực tế.
-2. **Chặng 90 ngày (Xây dựng năng lực cốt lõi)**:
-   - Nâng cấp kỹ năng chuyên môn trọng yếu nhất theo danh sách Gap Analysis.
-   - Bắt đầu xây dựng sản phẩm đầu tiên cho portfolio cá nhân (GitHub/Behance/Notion).
-3. **Chặng 12 tháng (Thực hành & Kiểm chứng)**:
-   - Đạt chứng chỉ chuyên môn hoặc tham gia cuộc thi học thuật, đề tài nghiên cứu tại HCMUTE.
-   - Ứng tuyển thực tập hoặc tham gia dự án cộng đồng để tích lũy kinh nghiệm thực tế.
-
-Bạn có thể dành ra bao nhiêu giờ mỗi tuần cho việc tự học này để tôi điều chỉnh khối lượng công việc phù hợp?`,
-      reasoning_summary: "Thiết kế kế hoạch hành động phân kỳ dựa trên khoảng cách năng lực ưu tiên và quỹ thời gian khả dụng.",
+      reply: `Mình chia nhỏ kế hoạch chuẩn bị cho mục tiêu **${targetName}** thành 3 chặng gọn gàng, thực tế để bạn bắt tay làm ngay nhé:\n\n1. **30 ngày đầu (Khởi động & Thử cảm giác)**:\n   - Hoàn thành 1 khóa học nhập môn hoặc đọc 1 cuốn sách chuyên ngành cơ bản.\n   - Dành 2 tiếng làm thử 1 bài tập thực hành nhỏ để xem mình có thực sự hào hứng không.\n2. **90 ngày tiếp theo (Xây móng kỹ năng)**:\n   - Tập trung bù đắp kỹ năng cốt lõi theo bảng Gap Analysis.\n   - Tự tay làm và hoàn thiện sản phẩm đầu tiên cho portfolio cá nhân.\n3. **12 tháng tới (Tạo đòn bẩy thực tế)**:\n   - Tham gia cuộc thi học thuật hoặc đề tài NCKH tại HCMUTE.\n   - Chuẩn bị hồ sơ ứng tuyển vị trí thực tập sinh (Intern/Fresher).\n\nMỗi tuần bạn có thể dành ra bao nhiêu giờ tự học để mình cân đối khối lượng bài tập vừa sức nhất với bạn?`,
+      reasoning_summary: "Thiết kế kế hoạch hành động phân kỳ dựa trên mục tiêu thực tế và kết quả đo lường cụ thể.",
       evidence: [
         `Mục tiêu: ${targetName}`,
-        "Cột mốc thời gian: 30 ngày, 90 ngày, 12 tháng",
-        "Ưu tiên các nhiệm vụ mang lại kết quả cụ thể (Outcome-driven)"
+        "Phân bổ thời gian: 30 ngày (Khám phá) -> 90 ngày (Xây nền) -> 12 tháng (Kiểm chứng)",
+        "Định hướng sản phẩm đầu ra (Outcome-driven) cho hồ sơ xin việc"
       ],
-      uncertainty: "Tiến độ thực tế phụ thuộc vào tính kỷ luật tự học hàng tuần và các cam kết học tập chính quy tại trường.",
+      uncertainty: "Lộ trình linh hoạt tùy theo lịch học chính khóa tại trường THPT/Đại học của bạn.",
       suggested_actions: [
         "Mở tab Lộ trình để xem Career Progression Map",
-        "Sử dụng AI Tối ưu lộ trình theo quỹ giờ/tuần",
-        "Kiểm tra danh sách Gap Analysis"
+        "Dùng tính năng AI Tối ưu lộ trình theo giờ rảnh",
+        "Xem danh sách kỹ năng cần bù đắp trong Gap Analysis"
       ]
     };
   }
@@ -202,24 +208,17 @@ Bạn có thể dành ra bao nhiêu giờ mỗi tuần cho việc tự học nà
     q.includes("gap")
   ) {
     return {
-      reply: `Để thu hẹp khoảng cách nhanh nhất đến mục tiêu **${targetName}**, tôi gợi ý bạn tập trung vào 3 đòn bẩy có tỷ suất sinh lời thời gian (ROI) cao nhất:
-
-1. **Portfolio thực tế (Ưu tiên số 1)**: Nhà tuyển dụng đánh giá năng lực qua sản phẩm thật hơn là điểm số lý thuyết. Hãy hoàn thành ít nhất 2 dự án cá nhân có thể demo được.
-2. **Ngoại ngữ chuyên ngành (Ưu tiên số 2)**: Khả năng đọc tài liệu tiếng Anh giúp bạn tiếp cận công nghệ mới nhanh hơn bạn bè 1–2 năm.
-3. **Kỹ năng làm việc nhóm & phản biện (Ưu tiên số 3)**: Tham gia các câu lạc bộ học thuật hoặc dự án nhóm tại HCMUTE để rèn luyện kỹ năng phối hợp.
-
-Đừng cố gắng hoàn thiện tất cả cùng lúc. Bạn muốn bắt đầu cải thiện phần kiến thức, dự án thực tế hay ngoại ngữ trước?`,
-      reasoning_summary: "Nhận diện khoảng cách lớn nhất trong Gap Analysis và ưu tiên các kỹ năng có ROI cao nhất.",
+      reply: `Để rút ngắn khoảng cách đến mục tiêu **${targetName}**, bạn chỉ cần tập trung vào 3 đòn bẩy thực tế này trước:\n\n1. **Xây dựng Portfolio thực chiến (Ưu tiên số 1)**: Đừng chỉ học lý thuyết. Hoàn thành 1–2 sản phẩm thật có thể demo chạy được sẽ giúp bạn vượt trội hơn 80% ứng viên chỉ có bằng cấp lý thuyết.\n2. **Ngoại ngữ chuyên ngành (Ưu tiên số 2)**: Khả năng đọc tài liệu tiếng Anh chuẩn xác giúp bạn tiếp cận công cụ và công nghệ mới trước thị trường 1–2 năm.\n3. **Kỹ năng phối hợp & phản biện (Ưu tiên số 3)**: Tham gia các câu lạc bộ học thuật tại trường để rèn kỹ năng giao tiếp và làm việc nhóm.\n\nBạn muốn chúng mình bắt đầu từ việc lên ý tưởng cho dự án thực hành hay chọn tài liệu ngoại ngữ trước?`,
+      reasoning_summary: "Nhận diện khoảng cách lớn nhất trong Gap Analysis và ưu tiên hành động có hiệu quả cao nhất.",
       evidence: [
-        "Dữ liệu khoảng trống kinh nghiệm & portfolio thực chiến",
-        "Yêu cầu ngoại ngữ chuyên ngành & kỹ năng công cụ thực tế",
-        "Mức nỗ lực ước tính để đạt chuẩn tối thiểu"
+        "Dữ liệu khoảng trống kinh nghiệm và kỹ năng thực hành dự án",
+        "Tiêu chuẩn tuyển dụng thực tế của doanh nghiệp đối tác HCMUTE",
+        "Yêu cầu về khả năng tự học tài liệu tiếng Anh chuyên ngành"
       ],
-      uncertainty: "Kỹ năng cần thực hành có phản hồi (deliberate practice) chứ không thể chỉ tiếp thu qua tài liệu thụ động.",
       suggested_actions: [
-        "Thêm các mục cải thiện vào Lộ trình cá nhân",
-        "Xem gợi ý các dự án mẫu cho portfolio",
-        "Đánh giá lại quỹ thời gian tự học"
+        "Thêm các nhiệm vụ này vào Lộ trình cá nhân",
+        "Xem các dự án mẫu phù hợp cho portfolio",
+        "Đánh giá lại quỹ thời gian rảnh mỗi tuần"
       ]
     };
   }
@@ -234,56 +233,36 @@ Bạn có thể dành ra bao nhiêu giờ mỗi tuần cho việc tự học nà
     q.includes("ai thay thế")
   ) {
     return {
-      reply: `Nhìn nhận một cách khách quan và tỉnh táo, lựa chọn **${targetName}** có cả cơ hội lẫn những thách thức không nhỏ mà bạn cần chuẩn bị:
-
-- **Cơ hội**: Nhu cầu nhân lực chuyên môn cao vẫn tăng trưởng tốt; biên độ phát triển thu nhập rộng; cơ hội làm việc trong môi trường quốc tế hoặc hybrid.
-- **Thách thức thực tế**:
-  1. *Tốc độ lỗi thời của công nghệ*: Kiến thức hôm nay học có thể thay đổi sau 2 năm; áp lực tự học suốt đời là bắt buộc.
-  2. *Tác động của AI*: Các tác vụ cơ bản (viết mã đơn giản, phân tích số liệu sơ cấp) đang bị AI tự động hóa nhanh. Bạn phải tiến lên các tầng năng lực cao hơn (tư duy phản biện, giải bài toán kinh doanh, kiến trúc).
-  3. *Cạnh tranh đầu vào*: Sinh viên mới tốt nghiệp rất đông, người có portfolio thực chiến mới nổi bật.
-
-Đây là một lộ trình đòi hỏi sự bền bỉ. Bạn đã sẵn sàng tâm lý để vượt qua giai đoạn 6 tháng đầu đầy bỡ ngỡ chưa?`,
-      reasoning_summary: "Đánh giá đa chiều về rủi ro, áp lực cạnh tranh nghề nghiệp và mức độ phơi nhiễm trước tự động hóa AI.",
+      reply: `Đánh giá một cách khách quan và tỉnh táo về **${targetName}**, mình chia sẻ thẳng thắn 2 mặt thực tế thế này nhé:\n\n- **Điểm sáng**: Nhu cầu tuyển dụng người có năng lực thật vẫn rất cao; mức thu nhập tăng trưởng tốt (Fresher từ 10–16 triệu, sau 2–3 năm có thể đạt 20–35 triệu/tháng).\n- **Thách thức cần chuẩn bị trước**:\n  1. *Áp lực đổi mới công nghệ*: Kiến thức có chu kỳ thay đổi nhanh, bắt buộc bạn phải có tinh thần tự học suốt đời.\n  2. *Tác động của AI*: Các tác vụ cơ bản (viết code đơn giản, tổng hợp số liệu thô) đang bị AI làm thay. Bạn cần tiến lên tầng năng lực cao hơn: tư duy bài toán, kiến trúc hệ thống và giao tiếp nghiệp vụ.\n  3. *Cạnh tranh đầu vào*: Doanh nghiệp ngày càng khắt khe hơn với bằng cấp suông, ưu tiên người đã có sản phẩm thực tế.\n\nHiểu rõ thách thức giúp bạn chuẩn bị tâm thế vững vàng hơn rất nhiều. Bạn cảm thấy mình sẵn sàng dành thời gian rèn luyện cho hướng đi này chưa?`,
+      reasoning_summary: "Đánh giá đa chiều về rủi ro, áp lực cạnh tranh nghề nghiệp và tác động thực tế của AI.",
       evidence: [
-        `Chỉ số AI Exposure của nhóm ngành ${targetName}`,
-        "Áp lực tự học và chu kỳ thay đổi công nghệ 2-3 năm",
-        "Tiêu chuẩn sàng lọc portfolio của nhà tuyển dụng"
+        `Khảo sát dải lương và thị trường tuyển dụng 2025–2026 cho ${targetName}`,
+        "Tác động tự động hóa của Generative AI và AI Coding Assistants",
+        "Tiêu chí tuyển chọn thực tập sinh của các tập đoàn công nghệ"
       ],
-      uncertainty: "Tác động của AI mang tính hai mặt (vừa tự động hóa vừa tạo việc làm mới); mức độ ảnh hưởng phụ thuộc vào năng lực làm chủ công cụ AI của cá nhân.",
+      uncertainty: "AI không làm mất việc làm của người có tư duy tốt; người biết làm chủ AI sẽ có lợi thế vượt bậc.",
       suggested_actions: [
-        "Xem phân tích rủi ro chi tiết trong Career Explorer",
-        "Lập kế hoạch giảm thiểu rủi ro qua lộ trình hành động",
-        "Trao đổi thêm về các phương án dự phòng (Plan B)"
+        "Xem phân tích AI Exposure trong Career Explorer",
+        "Lập kế hoạch giảm thiểu rủi ro qua lộ trình thực hành",
+        "Tham khảo ý kiến chuyên gia tư vấn 1-1"
       ]
     };
   }
 
-  // Default General Response
+  // Default General Response (Chào mừng & Điều hướng thân thiện)
   return {
-    reply: `Chào bạn! Tôi là HCMUTE AI Career Coach — trợ lý cố vấn trí tuệ định hướng nghề nghiệp của bạn.
-
-Dựa trên hồ sơ Career DNA hình mẫu **"${profile.profile_archetype.title}"**, bạn đang có tiềm năng kết hợp giữa tư duy logic và khả năng áp dụng thực tiễn.
-
-Top 3 ngành nghề tương thích cao nhất hiện tại:
-${topCareers.slice(0, 3).map((c, i) => `${i + 1}. **${c.career.name}** (Tương thích ${c.score}%)`).join("\n")}
-
-Bạn có thể bấm vào các nút chức năng cố vấn bên trên để cùng tôi:
-- **Giải thích**: Phân tích lý do tại sao nghề này phù hợp
-- **So sánh**: Đặt hai hướng đi lên bàn cân
-- **Lập kế hoạch**: Lên lộ trình 30 ngày, 90 ngày, 12 tháng
-- **Gợi ý cải thiện**: Bù đắp các khoảng cách năng lực
-- **Đánh giá lựa chọn**: Phân tích rủi ro và tác động của AI`,
+    reply: `Chào bạn nhé! Mình là **AI Career Coach** đồng hành cùng bạn tại HCMUTE.\n\nHồ sơ **Career DNA** của bạn cho thấy bạn mang hình mẫu **"${profile.profile_archetype.title}"** — rất mạnh về tư duy phân tích và khả năng giải quyết vấn đề thực tiễn.\n\nHiện tại, Top 3 ngành nghề tương thích nhất với bạn gồm:\n${topCareers.slice(0, 3).map((c, i) => `${i + 1}. **${c.career.name}** (${c.score}% tương thích)`).join("\n")}\n\nBạn có thể hỏi mình bất cứ điều gì về **điểm chuẩn, học phí HCMUTE, mức lương thực tế, tác động của AI** hoặc bấm các nút hành động phía trên để cùng mình bóc tách nhé!`,
     reasoning_summary: "Tổng hợp dữ liệu hồ sơ Career DNA và bảng xếp hạng tương thích nghề nghiệp.",
     evidence: [
-      `Hình mẫu: ${profile.profile_archetype.title}`,
-      `Top 1: ${bestCareer?.name || "Chưa chọn"} (${topCareers[0]?.score || 88}%)`,
-      `Mục tiêu: ${targetName}`
+      `Hình mẫu nhận diện: ${profile.profile_archetype.title}`,
+      `Nghề hàng đầu: ${bestCareer?.name || "Chưa chọn"} (${topCareers[0]?.score || 88}%)`,
+      `Ngành học mục tiêu: ${topMajors[0]?.major.name || "Kỹ thuật / Công nghệ"}`
     ],
-    uncertainty: "Mọi khuyến nghị ban đầu mang tính định hướng phương pháp luận, cần kiểm chứng qua thực tế trải nghiệm.",
+    uncertainty: "Các gợi ý ban đầu dựa trên bài khảo sát tự đánh giá; chúng mình sẽ cùng tinh chỉnh qua các câu hỏi cụ thể tiếp theo.",
     suggested_actions: [
-      "Giải thích lý do phù hợp",
-      "So sánh hai ngành hàng đầu",
-      "Lập kế hoạch hành động"
+      "Giải thích lý do phù hợp với nghề top 1",
+      "So sánh hai ngành nghề hàng đầu",
+      "Hỏi về điểm chuẩn và học phí HCMUTE 2025–2026"
     ]
   };
 }

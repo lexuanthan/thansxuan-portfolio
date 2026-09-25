@@ -66,35 +66,35 @@ export function AiCoachView({
       label: "Giải thích",
       shortDesc: "Lý do hồ sơ phù hợp với ngành",
       icon: IconHelpCircle,
-      promptText: (c1) => `Hãy giải thích chi tiết tại sao hồ sơ Career DNA của tôi lại phù hợp với mục tiêu ${c1}, căn cứ vào những dữ liệu nào trong bài đánh giá?`
+      promptText: (c1) => `Vì sao hồ sơ Career DNA của mình lại phù hợp với mục tiêu ${c1}, căn cứ vào những điểm mạnh nào trong bài đánh giá?`
     },
     {
       id: "compare",
       label: "So sánh",
       shortDesc: "Đối soát 2 lựa chọn hàng đầu",
       icon: IconScale,
-      promptText: (c1, c2) => `Hãy so sánh khách quan giữa ${c1} và ${c2} dựa trên điểm mạnh, điểm yếu và triển vọng sự nghiệp của tôi.`
+      promptText: (c1, c2) => `So sánh khách quan và thẳng thắn giữa ${c1} và ${c2} dựa trên điểm mạnh, điểm yếu và triển vọng thực tế giúp mình nhé.`
     },
     {
       id: "plan",
       label: "Lập kế hoạch",
       shortDesc: "Lộ trình 30 ngày & 12 tháng",
       icon: IconCalendar,
-      promptText: (c1) => `Hãy lập cho tôi một kế hoạch hành động thực tế theo các mốc 30 ngày, 90 ngày và 12 tháng tới để chuẩn bị cho mục tiêu ${c1}.`
+      promptText: (c1) => `Lập giúp mình một kế hoạch hành động thực tế theo các mốc 30 ngày, 90 ngày và 12 tháng tới thật gọn gàng để chuẩn bị cho mục tiêu ${c1}.`
     },
     {
       id: "improve",
       label: "Gợi ý cải thiện",
       shortDesc: "Bù đắp khoảng trống kỹ năng (Gap)",
       icon: IconTrendingUp,
-      promptText: () => `Dựa trên phân tích Gap Analysis, tôi đang có những khoảng trống năng lực nào lớn nhất và tôi nên bắt đầu cải thiện từ đâu trong tháng này?`
+      promptText: () => `Dựa trên Gap Analysis, mình đang có những khoảng trống kỹ năng nào lớn nhất và nên bắt đầu cải thiện từ đâu trong tháng này?`
     },
     {
       id: "evaluate",
       label: "Đánh giá lựa chọn",
       shortDesc: "Rủi ro, áp lực & tác động của AI",
       icon: IconCheckSquare,
-      promptText: (c1) => `Hãy đánh giá toàn diện các rủi ro, áp lực thực tế và tác động của AI đối với lựa chọn ${c1}. Tôi cần chuẩn bị tâm lý gì?`
+      promptText: (c1) => `Đánh giá khách quan các rủi ro, áp lực thực tế và tác động của AI đối với nghề ${c1}. Mình cần chuẩn bị tâm lý và kỹ năng gì?`
     }
   ];
 
@@ -105,23 +105,23 @@ export function AiCoachView({
       `Ngành mục tiêu hàng đầu: ${targetRoleName} (Độ tương thích: ${topCareers[0]?.score || 88}%)`,
       `Các năng lực cốt lõi: ${Object.keys(profile.capabilities).slice(0, 3).join(", ")}`
     ],
-    uncertainty: "Các khuyến nghị ban đầu dựa trên kết quả tự kê khai khảo sát; cần được kiểm chứng qua các thử nghiệm vi mô thực tế."
+    uncertainty: "Các gợi ý ban đầu dựa trên bài khảo sát tự đánh giá; chúng mình sẽ cùng tinh chỉnh qua các câu hỏi cụ thể tiếp theo."
   };
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "msg_welcome",
       sender: "coach",
-      text: `Chào bạn! Tôi là **HCMUTE AI Career Coach** — hệ thống cố vấn định hướng nghề nghiệp và trí tuệ quyết định sự nghiệp cá nhân.
+      text: `Chào bạn nhé! Mình là **AI Career Coach** đồng hành cùng bạn tại HCMUTE.
 
-Tôi đã đồng bộ toàn bộ dữ liệu **Career DNA** với hình mẫu **"${profile.profile_archetype.title}"** và mục tiêu hiện tại là **"${targetRoleName}"**.
+Mình đã đồng bộ toàn bộ dữ liệu **Career DNA** hình mẫu **"${profile.profile_archetype.title}"** và mục tiêu **"${targetRoleName}"** của bạn.
 
-**Nguyên tắc cố vấn của tôi**:
-- 🔍 **Khách quan & Dựa trên dữ liệu**: Luôn đối soát với hồ sơ năng lực, điểm số và xu hướng thị trường.
-- ⚖️ **Không võ đoán**: Đưa ra nhận định xác suất khoa học, không dùng kết luận áp đặt tuyệt đối.
-- 🎯 **Hướng đến hành động**: Mọi giải đáp đều đi kèm bước hành động vi mô cụ thể.
+**Cách mình hỗ trợ bạn**:
+- 💬 **Gần gũi & Trực diện**: Đi thẳng vào trọng tâm câu hỏi, không lý thuyết rườm rà.
+- ⚡ **Dữ liệu Realtime 2025–2026**: Cung cấp số liệu điểm chuẩn, học phí HCMUTE, dải lương và tác động của AI chính xác nhất.
+- 🎯 **Hành động thiết thực**: Luôn gợi ý 1 bước hành động vi mô để bạn làm được ngay hôm nay.
 
-Bạn có thể bấm các **nút hành động cố vấn** phía trên để giải thích, so sánh, lập kế hoạch hoặc đặt câu hỏi tự do bên dưới:`,
+Bạn có thể bấm nhanh các **nút hành động** phía trên hoặc hỏi mình bất cứ băn khoăn nào bên dưới nhé!`,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       action_type: "general",
       trust: initialTrustBlock
@@ -150,12 +150,12 @@ Bạn có thể bấm các **nút hành động cố vấn** phía trên để g
   }, [messages, loading]);
 
   const quickPrompts = [
-    `Tại sao tôi hợp với ${bestCareerName}?`,
-    `So sánh ${bestCareerName} và ${secondCareerName}`,
-    "Điểm mù lớn nhất trong hồ sơ năng lực của tôi là gì?",
-    "Lập kế hoạch hành động 30 ngày & 12 tháng",
-    "Gợi ý dự án portfolio để thu hẹp khoảng cách kỹ năng",
-    "Nghề này trong 5 năm tới có nguy cơ bị AI tự động hóa không?"
+    `Vì sao mình hợp với ${bestCareerName}?`,
+    `So sánh thực tế giữa ${bestCareerName} và ${secondCareerName}`,
+    "Học phí và điểm chuẩn năm 2026 của HCMUTE bao nhiêu?",
+    "Nghề này ra trường lương khởi điểm và sau 2-3 năm thế nào?",
+    "Kế hoạch hành động 30 ngày tới gọn gàng nhất giúp mình",
+    "Ngành này trong 3–5 năm tới có nguy cơ bị AI thay thế không?"
   ];
 
   const handleSendMessage = async (textToSend: string, actionType?: ContextualActionType) => {
@@ -250,7 +250,10 @@ Bạn có thể bấm các **nút hành động cố vấn** phía trên để g
                   <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   Sẵn sàng cố vấn
                 </span>
-                <span className="hidden sm:inline-block text-[10px] text-ink-500 font-medium border-l border-line pl-2">
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold text-brand-700 bg-brand-50 border border-brand-200 px-2 py-0.5 rounded-[4px]">
+                  <span>⚡ Dữ liệu Tuyển sinh & Việc làm 2025–2026 Realtime</span>
+                </span>
+                <span className="hidden md:inline-block text-[10px] text-ink-500 font-medium border-l border-line pl-2">
                   Nguyên tắc: Khách quan • Định lượng • Minh bạch
                 </span>
               </div>

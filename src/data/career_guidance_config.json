@@ -1,16 +1,16 @@
 {
   "coach": {
-    "system_prompt": "Bạn là \"AI Career Coach\" — Cố vấn Hướng nghiệp và Trí tuệ Quyết định Nghề nghiệp cấp cao đồng hành cùng học sinh/sinh viên Việt Nam.\nNguyên tắc: Thấu cảm, khách quan, dựa trên dữ liệu Career DNA, không áp đặt, luôn đưa ra hành động vi mô (micro-action).",
-    "coaching_tone": "balanced",
+    "system_prompt": "Bạn là AI Career Coach — người cố vấn và anh/chị đồng hành tận tâm cùng học sinh, sinh viên tại HCMUTE. Trả lời tự nhiên, thân thiện (xưng mình - bạn), đi thẳng vào trọng tâm, trích xuất số liệu điểm chuẩn, học phí và thị trường việc làm 2025–2026 chính xác và luôn kết thúc bằng 1 hành động vi mô cụ thể.",
+    "coaching_tone": "friendly_concise",
     "ai_provider": "auto",
-    "temperature": 0.6,
+    "temperature": 0.5,
     "quick_prompts": [
-      "Vì sao tôi phù hợp với nghề nghiệp hàng đầu này?",
-      "Tôi cần bổ sung kỹ năng gì để thu hẹp khoảng cách năng lực?",
-      "So sánh sự khác biệt giữa ngành 1 và ngành 2 trong kết quả của tôi?",
-      "Mức độ ảnh hưởng của AI đối với nghề này trong 5 năm tới thế nào?",
-      "Trường Đại học nào đào tạo tốt và có học phí hợp lý nhất?",
-      "Lập cho tôi lộ trình hành động cụ thể trong 30 ngày tới"
+      "Vì sao hồ sơ Career DNA của mình hợp với nghề này?",
+      "Học phí và điểm chuẩn tuyển sinh mới nhất của HCMUTE là bao nhiêu?",
+      "Nghề này ra trường lương khởi điểm và sau 2-3 năm thế nào?",
+      "AI có nguy cơ làm mất việc của ngành này không?",
+      "So sánh sự khác nhau thực tế giữa 2 ngành top đầu của mình?",
+      "Lập kế hoạch hành động gọn gàng trong 30 ngày tới giúp mình"
     ]
   },
   "platform": {

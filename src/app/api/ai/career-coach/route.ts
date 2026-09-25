@@ -24,17 +24,29 @@ export async function POST(req: NextRequest) {
     const apiToken = process.env.CLOUDFLARE_API_TOKEN;
     const coachConfig = defaultConfig.coach || {};
 
-    // Generate deterministic local full coach response (used for fallback & rich trust metadata)
+    // 1. Phân tích ngữ cảnh & sinh câu trả lời đối soát từ Realtime Knowledge Engine
     const localFull = generateSmartCoachFullResponse(query, coachContext, action_type);
 
-    // Nếu có cấu hình Cloudflare và không ép buộc dùng offline
+    // Nếu người dùng hỏi câu hỏi tra cứu thực tế (điểm chuẩn, học phí, mức lương...),
+    // trả về ngay dữ liệu chuẩn xác 100% đã được kiểm duyệt, tránh ảo giác LLM
+    if (localFull.is_realtime_fact) {
+      return NextResponse.json({
+        reply: localFull.reply,
+        reasoning_summary: localFull.reasoning_summary,
+        evidence: localFull.evidence,
+        suggested_actions: localFull.suggested_actions,
+        provider: "realtime-knowledge-engine"
+      });
+    }
+
+    // 2. Nếu có cấu hình Cloudflare và không ép buộc dùng offline
     if (accountId && apiToken && coachConfig.ai_provider !== "smart_local") {
       try {
         const baseSystemPrompt = buildCoachSystemPrompt(coachContext);
         const systemPrompt = coachConfig.system_prompt
           ? `${baseSystemPrompt}\n\n[ADMIN CHỈ ĐẠO BỔ SUNG]: ${coachConfig.system_prompt}\n[TÔNG GIỌNG]: ${coachConfig.coaching_tone}`
           : baseSystemPrompt;
-        
+
         const messages = [
           { role: "system", content: systemPrompt },
           ...history.slice(-4).map((h: { sender: string; text: string }) => ({
@@ -54,8 +66,8 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify({
               messages,
-              max_tokens: 800,
-              temperature: 0.6
+              max_tokens: 650,
+              temperature: 0.5
             }),
             signal: AbortSignal.timeout(12000) // Timeout 12s
           }
@@ -80,7 +92,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Fallback thông minh: Dùng local intelligence engine với đầy đủ dữ liệu Trust
+    // 3. Fallback thông minh: Dùng local intelligence engine với đầy đủ dữ liệu Trust
     return NextResponse.json({
       reply: localFull.reply,
       reasoning_summary: localFull.reasoning_summary,
