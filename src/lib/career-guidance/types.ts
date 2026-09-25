@@ -250,6 +250,16 @@ export interface MajorMatchResult {
   reasons: MatchScoreReason;
 }
 
+export interface UniversityFitBreakdown {
+  overall_fit: number; // 0 - 100
+  academic_fit: number; // 0 - 100
+  admission_fit: number; // 0 - 100
+  financial_fit: number; // 0 - 100
+  location_fit: number; // 0 - 100
+  career_fit: number; // 0 - 100
+  environment_fit: number; // 0 - 100
+}
+
 export interface UniversityMatchResult {
   university_id: string;
   university_name: string;
@@ -258,6 +268,7 @@ export interface UniversityMatchResult {
   region: "BAC" | "TRUNG" | "NAM";
   type: "Công lập" | "Tư thục" | "Quốc tế";
   tuition_million_year: number;
+  logo_url?: string;
   matching_majors: {
     major_name: string;
     cutoff_score: number;
@@ -267,7 +278,23 @@ export interface UniversityMatchResult {
   overall_feasibility: "Safe" | "Target" | "Reach";
   match_score: number;
   strengths: string[];
+  fit_breakdown?: UniversityFitBreakdown;
+  scholarship_info?: string;
+  admission_methods?: string[];
+  campus_environment?: string;
+  curriculum_highlight?: string;
+  career_opportunities?: string;
+  average_cutoff?: number;
 }
+
+export type GapCategory =
+  | "knowledge"
+  | "skills"
+  | "experience"
+  | "portfolio"
+  | "certification"
+  | "language"
+  | "academic";
 
 export interface SkillGapItem {
   skill_name: string;
@@ -277,6 +304,11 @@ export interface SkillGapItem {
   gap: number;
   priority: "HIGH" | "MEDIUM" | "LOW";
   actionable_recommendation: string;
+  category?: GapCategory;
+  current_text?: string;
+  target_text?: string;
+  effort?: string;
+  evidence?: string;
 }
 
 export interface CareerExperiment {
@@ -288,6 +320,8 @@ export interface CareerExperiment {
   success_criteria: string;
 }
 
+export type TaskStatus = "completed" | "in_progress" | "pending" | "locked";
+
 export interface RoadmapTask {
   id: string;
   title: string;
@@ -295,12 +329,29 @@ export interface RoadmapTask {
   category: "learn" | "practice" | "project" | "certificate" | "experience" | "network";
   estimated_effort: string;
   completed: boolean;
+  duration?: string;
+  status?: TaskStatus;
+  dependency?: string;
+  outcome?: string;
 }
 
+export type ProgressionStageId =
+  | "discover"
+  | "learn"
+  | "build"
+  | "practice"
+  | "experience"
+  | "validate"
+  | "apply";
+
+export type TimeHorizon = "30_days" | "90_days" | "6_months" | "12_months" | "1_3_years";
+
 export interface RoadmapStage {
-  stage_id: "7_days" | "30_days" | "3_months" | "6_months" | "1_year";
+  stage_id: "7_days" | "30_days" | "3_months" | "6_months" | "1_year" | string;
   title: string;
   tagline: string;
+  progression_stage?: ProgressionStageId;
+  time_horizon?: TimeHorizon;
   tasks: RoadmapTask[];
 }
 
@@ -317,10 +368,18 @@ export interface SavedItems {
   universities: string[];
 }
 
+export interface AiCoachTrustBlock {
+  reasoning_summary: string;
+  evidence: string[];
+  uncertainty?: string;
+}
+
 export interface ChatMessage {
   id: string;
   sender: "user" | "coach";
   text: string;
   timestamp: string;
+  action_type?: "explain" | "compare" | "plan" | "improve" | "evaluate" | "general";
+  trust?: AiCoachTrustBlock;
   suggested_actions?: string[];
 }

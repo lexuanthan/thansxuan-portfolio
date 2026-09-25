@@ -165,4 +165,36 @@ describe("Career Guidance Engine - Master Prompt v3.0 Specification", () => {
     expect(reply.length).toBeGreaterThan(50);
     expect(reply).toContain("Career DNA");
   });
+
+  it("should normalize URL tab parameters accurately to prevent navigation breakage", async () => {
+    const { normalizeTab } = await import("../src/components/career-guidance/CareerGuidanceApp");
+    expect(normalizeTab("assessment")).toBe("assessment");
+    expect(normalizeTab("quiz")).toBe("assessment");
+    expect(normalizeTab("coach")).toBe("coach");
+    expect(normalizeTab("chat")).toBe("coach");
+    expect(normalizeTab("careers")).toBe("career_explorer");
+    expect(normalizeTab("career_explorer")).toBe("career_explorer");
+    expect(normalizeTab("majors")).toBe("major_explorer");
+    expect(normalizeTab("skillgap")).toBe("skill_gap");
+    expect(normalizeTab("skill_gap")).toBe("skill_gap");
+    expect(normalizeTab("roadmap")).toBe("roadmap");
+    expect(normalizeTab("profile")).toBe("profile");
+    expect(normalizeTab("dna")).toBe("profile");
+    expect(normalizeTab("unknown_foo")).toBeNull();
+    expect(normalizeTab(null)).toBeNull();
+  });
+
+  it("should load valid career guidance configuration with normalized weights", async () => {
+    const { DEFAULT_CAREER_CONFIG } = await import("../src/lib/career-guidance/configManager");
+    expect(DEFAULT_CAREER_CONFIG.coach.system_prompt).toBeDefined();
+    expect(DEFAULT_CAREER_CONFIG.coach.quick_prompts.length).toBeGreaterThanOrEqual(4);
+    expect(DEFAULT_CAREER_CONFIG.curated.featured_career_ids.length).toBeGreaterThan(0);
+    const sumWeights =
+      DEFAULT_CAREER_CONFIG.platform.weights.interests +
+      DEFAULT_CAREER_CONFIG.platform.weights.capabilities +
+      DEFAULT_CAREER_CONFIG.platform.weights.values +
+      DEFAULT_CAREER_CONFIG.platform.weights.academic;
+    expect(Math.round(sumWeights * 100)).toBe(100);
+  });
 });
+

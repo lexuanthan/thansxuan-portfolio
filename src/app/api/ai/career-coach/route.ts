@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buildCoachSystemPrompt, generateSmartLocalCoachResponse, CoachContext } from "@/lib/career-guidance/coachService";
+import {
+  buildCoachSystemPrompt,
+  generateSmartCoachFullResponse,
+  CoachContext
+} from "@/lib/career-guidance/coachService";
+import defaultConfig from "@/data/career_guidance_config.json";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { query, context, history = [] } = body;
+    const { query, context, history = [], action_type } = body;
 
     if (!query || typeof query !== "string") {
       return NextResponse.json({ error: "Missing query" }, { status: 400 });
@@ -17,11 +22,18 @@ export async function POST(req: NextRequest) {
 
     const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
     const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+    const coachConfig = defaultConfig.coach || {};
 
-    // Nếu có khóa Cloudflare Workers AI thì gọi LLM
-    if (accountId && apiToken) {
+    // Generate deterministic local full coach response (used for fallback & rich trust metadata)
+    const localFull = generateSmartCoachFullResponse(query, coachContext, action_type);
+
+    // Nếu có cấu hình Cloudflare và không ép buộc dùng offline
+    if (accountId && apiToken && coachConfig.ai_provider !== "smart_local") {
       try {
-        const systemPrompt = buildCoachSystemPrompt(coachContext);
+        const baseSystemPrompt = buildCoachSystemPrompt(coachContext);
+        const systemPrompt = coachConfig.system_prompt
+          ? `${baseSystemPrompt}\n\n[ADMIN CHỈ ĐẠO BỔ SUNG]: ${coachConfig.system_prompt}\n[TÔNG GIỌNG]: ${coachConfig.coaching_tone}`
+          : baseSystemPrompt;
         
         const messages = [
           { role: "system", content: systemPrompt },
@@ -55,6 +67,10 @@ export async function POST(req: NextRequest) {
           if (responseText && responseText.trim().length > 0) {
             return NextResponse.json({
               reply: responseText.trim(),
+              reasoning_summary: localFull.reasoning_summary,
+              evidence: localFull.evidence,
+              uncertainty: localFull.uncertainty,
+              suggested_actions: localFull.suggested_actions,
               provider: "cloudflare-workers-ai"
             });
           }
@@ -64,10 +80,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Fallback thông minh: Dùng local intelligence engine
-    const localReply = generateSmartLocalCoachResponse(query, coachContext);
+    // Fallback thông minh: Dùng local intelligence engine với đầy đủ dữ liệu Trust
     return NextResponse.json({
-      reply: localReply,
+      reply: localFull.reply,
+      reasoning_summary: localFull.reasoning_summary,
+      evidence: localFull.evidence,
+      uncertainty: localFull.uncertainty,
+      suggested_actions: localFull.suggested_actions,
       provider: "smart-local-intelligence"
     });
   } catch (error) {

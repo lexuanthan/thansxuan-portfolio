@@ -3,7 +3,8 @@ import {
   CareerDNA,
   SkillGapItem,
   CareerExperiment,
-  CapabilityDimension
+  CapabilityDimension,
+  GapCategory
 } from "./types";
 
 export function analyzeSkillGaps(
@@ -30,6 +31,7 @@ export function analyzeSkillGaps(
     digital_literacy: "Làm chủ công cụ số & AI ứng dụng"
   };
 
+  // 1. Phân tích các kỹ năng cốt lõi (Category: skills & academic)
   for (const [dim, targetLevel] of Object.entries(requiredCaps)) {
     const d = dim as CapabilityDimension;
     const current = profile.capabilities[d] ?? 50;
@@ -40,25 +42,118 @@ export function analyzeSkillGaps(
     if (gap >= 25) priority = "HIGH";
     else if (gap >= 12) priority = "MEDIUM";
 
-    let recommendation = "";
-    if (gap > 0) {
-      recommendation = `Cần nâng cấp thêm ${gap} điểm qua các dự án thực tế và tài liệu chuyên sâu.`;
-    } else {
-      recommendation = "Năng lực hiện tại đã đáp ứng hoặc vượt ngưỡng kỳ vọng của vị trí này.";
-    }
+    let effort = "15 - 20 giờ học tập & thực hành";
+    if (gap >= 25) effort = "6 - 8 tuần rèn luyện liên tục";
+    else if (gap >= 12) effort = "3 - 4 tuần thực hành dự án";
+
+    const isAcademic = d === "logical_thinking" || d === "analytical_thinking";
+    const category: GapCategory = isAcademic ? "academic" : "skills";
 
     gaps.push({
       skill_name: dimensionLabels[d] || d,
       dimension: d,
       current_level: current,
       target_level: target,
+      current_text: `Mức ${current}/100 (${current >= 75 ? "Vững vàng" : current >= 55 ? "Trung bình" : "Cơ bản"})`,
+      target_text: `Mức ${target}/100 (Chuẩn tuyển dụng)`,
       gap,
       priority,
-      actionable_recommendation: recommendation
+      category,
+      effort,
+      evidence: `Căn cứ từ điểm tự đánh giá ${dimensionLabels[d]} và bài kiểm tra năng lực tư duy.`,
+      actionable_recommendation:
+        gap > 0
+          ? `Cần nâng cấp thêm ${gap} điểm qua các bài tập chuyên sâu và đồ án thực tế.`
+          : "Năng lực hiện tại đã đáp ứng tốt ngưỡng kỳ vọng của vị trí này."
     });
   }
 
-  // Sắp xếp các kỹ năng có gap lớn nhất lên đầu
+  // 2. Thêm các hạng mục Gap còn lại trong 7 nhóm tiêu chuẩn:
+  // - Knowledge (Kiến thức chuyên môn)
+  gaps.push({
+    skill_name: `Kiến thức chuyên ngành ${career.industry_name}`,
+    dimension: "technical",
+    current_level: 40,
+    target_level: 80,
+    current_text: "Mức 40/100 (Hiểu khái niệm tổng quan)",
+    target_text: "Mức 80/100 (Hiểu sâu nguyên lý & kiến trúc)",
+    gap: 40,
+    priority: "HIGH",
+    category: "knowledge",
+    effort: "2 - 3 tháng học các học phần chuyên ngành đại học",
+    evidence: "Hồ sơ chưa ghi nhận tích lũy các học phần chuyên sâu thuộc khối ngành này.",
+    actionable_recommendation: `Đăng ký môn cơ sở ngành và đọc giáo trình chuyên sâu về ${career.name}.`
+  });
+
+  // - Experience (Kinh nghiệm thực hành lab/xưởng)
+  gaps.push({
+    skill_name: "Kinh nghiệm thực hành xưởng & dự án mô phỏng",
+    dimension: "technical",
+    current_level: 30,
+    target_level: 75,
+    current_text: "Mức 30/100 (Chưa có dự án thực tế)",
+    target_text: "Mức 75/100 (Tối thiểu 2 đồ án môn học hoàn chỉnh)",
+    gap: 45,
+    priority: "HIGH",
+    category: "experience",
+    effort: "40 - 60 giờ làm việc tại phòng thí nghiệm / xưởng",
+    evidence: "Chưa tham gia đề tài nghiên cứu hoặc đồ án thực tế tại trường.",
+    actionable_recommendation: "Tham gia các kỳ thực tập doanh nghiệp hoặc Lab nghiên cứu từ năm 2 đại học."
+  });
+
+  // - Portfolio (Sản phẩm đầu tay & GitHub / Case study)
+  gaps.push({
+    skill_name: "Portfolio sản phẩm cá nhân (GitHub / Behance / Case Study)",
+    dimension: "technical",
+    current_level: 25,
+    target_level: 80,
+    current_text: "Mức 25/100 (Chưa có hồ sơ năng lực số)",
+    target_text: "Mức 80/100 (Có tối thiểu 3 sản phẩm demo hoàn chỉnh)",
+    gap: 55,
+    priority: "HIGH",
+    category: "portfolio",
+    effort: "4 tuần xây dựng và đóng gói sản phẩm",
+    evidence: "Hồ sơ số hiện tại chưa đính kèm đường dẫn sản phẩm minh chứng.",
+    actionable_recommendation: "Tự tay làm một sản phẩm từ đầu đến cuối và lưu trữ trên nền tảng trực tuyến công khai."
+  });
+
+  // - Certification (Chứng chỉ chuyên môn quốc tế)
+  gaps.push({
+    skill_name: "Chứng chỉ chuyên môn quốc tế uy tín",
+    dimension: "technical",
+    current_level: 35,
+    target_level: 70,
+    current_text: "Mức 35/100 (Chưa có chứng chỉ nghề)",
+    target_text: "Mức 70/100 (Tối thiểu 1 chứng chỉ Foundation uy tín)",
+    gap: 35,
+    priority: "MEDIUM",
+    category: "certification",
+    effort: "30 - 45 giờ học và thi chứng chỉ",
+    evidence: "Hồ sơ chưa có chứng chỉ quốc tế được công nhận trong ngành.",
+    actionable_recommendation: "Tham gia các khóa cấp chứng chỉ từ Google, IBM, Coursera hoặc Cisco."
+  });
+
+  // - Language (Tiếng Anh chuyên ngành & Giao tiếp)
+  const englishScore = profile.academic_profile?.english_score || 7.0;
+  const currentLangLevel = Math.round(englishScore * 10);
+  const targetLangLevel = 80;
+  const langGap = Math.max(0, targetLangLevel - currentLangLevel);
+  gaps.push({
+    skill_name: "Tiếng Anh chuyên ngành & Giao tiếp học thuật",
+    dimension: "communication",
+    current_level: currentLangLevel,
+    target_level: targetLangLevel,
+    current_text: `Mức ${currentLangLevel}/100 (Điểm Anh văn THPT: ${englishScore})`,
+    target_text: "Mức 80/100 (Đọc hiểu tài liệu chuyên ngành & IELTS 6.0+)",
+    gap: langGap,
+    priority: langGap >= 20 ? "HIGH" : "MEDIUM",
+    category: "language",
+    effort: "3 - 6 tháng luyện kỹ năng đọc tài liệu kỹ thuật",
+    evidence: `Căn cứ từ điểm tổng kết môn Tiếng Anh ${englishScore} trong học bạ THPT.`,
+    actionable_recommendation: "Luyện đọc tài liệu kỹ thuật tiếng Anh hàng ngày và xem bài giảng quốc tế."
+  });
+
+  // Sắp xếp gap lớn nhất lên đầu
   return gaps.sort((a, b) => b.gap - a.gap);
 }
 
@@ -106,78 +201,81 @@ export function getCareerExperiments(careerId: string): CareerExperiment[] {
     ];
   }
 
-  if (careerId.includes("software") || careerId.includes("ai_engineer")) {
+  if (careerId.includes("software") || careerId.includes("ai_engineer") || careerId.includes("dev")) {
     return [
       {
         id: "exp_dev_1",
-        title: "Tự viết và chạy chương trình đầu tiên trong 2 giờ",
+        title: "Viết ứng dụng đầu tiên trong 2 giờ với Python hoặc JavaScript",
         time_commitment: "2 giờ",
-        objective: "Kiểm tra cảm giác sửa lỗi logic (Debug) khi code báo lỗi đỏ.",
+        objective: "Trải nghiệm cảm giác chuyển hóa logic tư duy thành phần mềm hoạt động được.",
         steps: [
-          "Mở Replit hoặc Google Colab, viết một hàm Python đơn giản giải một câu đố",
-          "Cố tình để một lỗi sai cú pháp và dùng AI / Google để tìm nguyên nhân sửa lỗi"
+          "Mở Replit hoặc VS Code",
+          "Viết một chương trình đố vui hoặc quản lý chi tiêu đơn giản",
+          "Tự sửa ít nhất 2 lỗi (debug) phát sinh khi chương trình báo lỗi đỏ"
         ],
-        success_criteria: "Cảm giác sung sướng tột độ khi chương trình chạy đúng sau nhiều lần lỗi."
+        success_criteria: "Bạn cảm thấy kích thích khi tìm ra nguyên nhân gây lỗi và sửa nó thành công."
       },
       {
         id: "exp_dev_2",
-        title: "Xây dựng 1 trang Web cá nhân siêu đơn giản",
-        time_commitment: "4 giờ",
-        objective: "Hiểu cách HTML, CSS và JavaScript phối hợp tạo nên sản phẩm người dùng nhìn thấy.",
+        title: "Khám phá 1 Repository mã nguồn mở trên GitHub",
+        time_commitment: "2 giờ",
+        objective: "Quan sát cách các kỹ sư chuyên nghiệp tổ chức mã nguồn và làm việc nhóm.",
         steps: [
-          "Dùng template hoặc theo hướng dẫn dựng trang profile giới thiệu bản thân",
-          "Deploy miễn phí lên Vercel hoặc GitHub Pages và gửi link cho bạn bè"
+          "Truy cập GitHub và tìm kiếm một dự án nổi tiếng trong ngành",
+          "Đọc file README.md và cấu trúc thư mục",
+          "Xem phần 'Issues' và 'Pull Requests' để xem cách cộng đồng trao đổi kỹ thuật"
         ],
-        success_criteria: "Bạn tự hào khi sản phẩm của mình hiện diện trên internet thật."
+        success_criteria: "Bạn thấy tò mò muốn hiểu cách các dòng code phối hợp với nhau để tạo ra phần mềm lớn."
       },
       {
         id: "exp_dev_3",
-        title: "Thử tạo một chatbot AI tùy biến với API",
-        time_commitment: "3 giờ",
-        objective: "Khám phá thế giới trí tuệ nhân tạo tạo sinh.",
+        title: "Thực hành Prompt Engineering giải quyết bài toán phức tạp",
+        time_commitment: "1.5 giờ",
+        objective: "Hiểu cách kết hợp tư duy giải thuật với các mô hình AI thế hệ mới.",
         steps: [
-          "Dùng khóa API miễn phí viết một prompt system định vị tính cách cho bot",
-          "Thử nghiệm các câu hỏi khó để xem bot phản hồi ra sao"
+          "Mở ChatGPT hoặc Claude hoặc Gemini",
+          "Yêu cầu AI phân tích một bài toán thực tế và viết code giải thuật",
+          "Thử thách AI tối ưu hóa độ phức tạp thời gian từ O(N^2) xuống O(N log N)"
         ],
-        success_criteria: "Bạn đam mê muốn hiểu sâu hơn về kiến trúc bên trong của mô hình."
+        success_criteria: "Bạn có khả năng đánh giá kết quả AI đưa ra và nhận diện được điểm chưa tối ưu."
       }
     ];
   }
 
-  // Thử nghiệm mặc định cho các ngành kinh doanh / thiết kế / chung
+  // Mặc định cho các ngành kỹ thuật & kinh tế khác
   return [
     {
       id: "exp_gen_1",
-      title: "Phỏng vấn 1 chuyên gia trong nghề (Informational Interview)",
-      time_commitment: "45 phút",
-      objective: "Nhận góc nhìn chân thực không tô hồng về những khó khăn thực tế của ngành.",
+      title: "Xem video phân tích một ngày làm việc thực tế (Day in the Life)",
+      time_commitment: "1.5 giờ",
+      objective: "Nhìn thấy môi trường văn phòng, xưởng thực hành và áp lực thường nhật.",
       steps: [
-        "Tìm một anh/chị khóa trên hoặc kết nối qua LinkedIn đang làm đúng vị trí này",
-        "Chuẩn bị 3 câu hỏi: 'Điều gì áp lực nhất trong công việc?', 'Kỹ năng nào quan trọng nhất?', 'Nếu chọn lại, anh/chị có làm nghề này không?'"
+        `Tìm kiếm từ khóa 'Day in the life of ${careerId}' trên YouTube`,
+        "Ghi chú lại 3 điểm bạn thích nhất và 2 điểm bạn lo ngại nhất"
       ],
-      success_criteria: "Bạn có cái nhìn thực tế và vẫn giữ nguyên ngọn lửa muốn thử sức."
+      success_criteria: "Bạn vẫn cảm thấy hào hứng ngay cả khi nhìn thấy những phần việc lặp đi lặp lại hoặc áp lực."
     },
     {
       id: "exp_gen_2",
-      title: "Thực hiện một dự án mẫu quy mô mini (Micro-Project)",
-      time_commitment: "1 ngày cuối tuần",
-      objective: "Mô phỏng 1 sản phẩm đầu ra thực tế của vị trí này.",
+      title: "Thực hiện một bài tập nhỏ nhập môn kéo dài 3 giờ",
+      time_commitment: "3 giờ",
+      objective: "Kiểm tra mức độ thích nghi với các công cụ nền tảng của ngành.",
       steps: [
-        "Lên dàn ý một chiến dịch, vẽ một bản mockup hoặc lập kế hoạch kinh doanh 1 trang",
-        "Thu thập nhận xét từ 3 người xung quanh"
+        "Đăng ký một khóa học miễn phí trên Coursera hoặc edX",
+        "Hoàn thành trọn vẹn bài tập thực hành của tuần đầu tiên"
       ],
-      success_criteria: "Bạn tận hưởng quá trình hoàn thành dự án từ con số 0."
+      success_criteria: "Bạn không bỏ cuộc giữa chừng và hoàn thành bài tập đúng hạn."
     },
     {
       id: "exp_gen_3",
-      title: "Học thử khóa nhập môn miễn phí (Audit Course)",
-      time_commitment: "3 - 5 giờ",
-      objective: "Kiểm tra mức độ hào hứng với thuật ngữ và tư duy chuyên ngành.",
+      title: "Trò chuyện hoặc phỏng vấn 1 cựu sinh viên / người đang làm nghề",
+      time_commitment: "1 giờ",
+      objective: "Lắng nghe bức tranh chân thực về thị trường và mức lương thực tế.",
       steps: [
-        "Vào Coursera hoặc edX đăng ký học thử (audit) tuần đầu tiên của khóa học nhập môn",
-        "Ghi chép lại các khái niệm mới mẻ"
+        "Kết nối với một đàn anh/đàn chị qua LinkedIn hoặc hội sinh viên HCMUTE",
+        "Hỏi về những điều họ ước mình biết trước khi chọn ngành này"
       ],
-      success_criteria: "Bạn chủ động muốn xem tiếp video tiếp theo mà không cần ai ép buộc."
+      success_criteria: "Bạn thu thập được thông tin khách quan không có trong sách vở quảng cáo tuyển sinh."
     }
   ];
 }

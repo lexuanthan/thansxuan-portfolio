@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import SiteShell from "@/components/SiteShell";
 import { Container } from "@/components/ui";
 import CareerGuidanceApp from "@/components/career-guidance/CareerGuidanceApp";
@@ -12,8 +13,17 @@ export default function CareerGuidancePage() {
   return (
     <SiteShell>
       <Container className="py-8 sm:py-10 max-w-7xl">
-        <CareerGuidanceApp />
+        <Suspense
+          fallback={
+            <div className="py-24 text-center text-sm font-medium text-ink-500 animate-pulse">
+              Đang tải hệ thống AI Hướng nghiệp...
+            </div>
+          }
+        >
+          <CareerGuidanceApp />
+        </Suspense>
       </Container>
     </SiteShell>
   );
 }
+

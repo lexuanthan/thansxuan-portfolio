@@ -46,6 +46,7 @@ const GROUPS: { title: string | null; items: Item[] }[] = [
       { href: "/admin/categories", label: "Chuyên mục", Icon: IconFolder },
       { href: "/admin/projects", label: "Ứng dụng & Dự án", Icon: IconRocket },
       { href: "/admin/ai-tools", label: "Tool AI", Icon: IconSparkle },
+      { href: "/admin/career-guidance", label: "AI Hướng nghiệp", Icon: IconRocket },
       { href: "/admin/resources", label: "Tài nguyên", Icon: IconBook },
       { href: "/admin/services", label: "Tư vấn", Icon: IconChat },
     ],

@@ -85,6 +85,14 @@ export default function ToolsTable({ initial }: { initial: AiTool[] }) {
               >
                 {t.published ? "Ẩn" : "Hiện"}
               </button>
+              {t.link_url?.includes("career-guidance") && (
+                <Link
+                  href="/admin/career-guidance"
+                  className="rounded-md border border-brand-300 bg-brand-50 px-2.5 py-1.5 text-xs font-bold text-brand-800 transition hover:bg-brand-100"
+                >
+                  ⚙️ Quản trị chuyên sâu
+                </Link>
+              )}
               <Link
                 href={`/admin/ai-tools/${t.id}`}
                 className="rounded-md bg-brand-400 px-2.5 py-1.5 text-xs font-medium text-ink-900 transition hover:bg-brand-300"

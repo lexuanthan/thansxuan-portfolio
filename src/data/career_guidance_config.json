@@ -1,0 +1,51 @@
+{
+  "coach": {
+    "system_prompt": "Bạn là \"AI Career Coach\" — Cố vấn Hướng nghiệp và Trí tuệ Quyết định Nghề nghiệp cấp cao đồng hành cùng học sinh/sinh viên Việt Nam.\nNguyên tắc: Thấu cảm, khách quan, dựa trên dữ liệu Career DNA, không áp đặt, luôn đưa ra hành động vi mô (micro-action).",
+    "coaching_tone": "balanced",
+    "ai_provider": "auto",
+    "temperature": 0.6,
+    "quick_prompts": [
+      "Vì sao tôi phù hợp với nghề nghiệp hàng đầu này?",
+      "Tôi cần bổ sung kỹ năng gì để thu hẹp khoảng cách năng lực?",
+      "So sánh sự khác biệt giữa ngành 1 và ngành 2 trong kết quả của tôi?",
+      "Mức độ ảnh hưởng của AI đối với nghề này trong 5 năm tới thế nào?",
+      "Trường Đại học nào đào tạo tốt và có học phí hợp lý nhất?",
+      "Lập cho tôi lộ trình hành động cụ thể trong 30 ngày tới"
+    ]
+  },
+  "platform": {
+    "banner_message": "Tuyển sinh 2026: Dữ liệu điểm chuẩn và chỉ tiêu các trường ĐH đã được cập nhật mới nhất!",
+    "banner_active": true,
+    "show_ai_exposure_risk": true,
+    "weights": {
+      "interests": 0.35,
+      "capabilities": 0.30,
+      "values": 0.20,
+      "academic": 0.15
+    }
+  },
+  "curated": {
+    "featured_career_ids": [
+      "ai_prompt_engineer",
+      "data_analyst",
+      "software_engineer",
+      "product_manager",
+      "digital_marketer",
+      "cybersecurity_analyst"
+    ],
+    "priority_major_ids": [
+      "data_science",
+      "computer_science",
+      "business_analytics",
+      "ai_robotics",
+      "digital_marketing"
+    ]
+  },
+  "consultation": {
+    "enabled": true,
+    "contact_email": "lexuanthanspkt@gmail.com",
+    "hotline": "0987620732",
+    "notes": "Hỗ trợ định hướng 1-1 trực tiếp cùng Chuyên gia Lê Xuân Thân qua Google Meet hoặc Zalo."
+  },
+  "updated_at": "2026-09-25T09:00:00.000Z"
+}

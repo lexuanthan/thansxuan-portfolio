@@ -10,45 +10,61 @@
   /* ---- Font ---- */
   --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
 
-  /* ---- Vàng thương hiệu ---- */
-  --color-brand-50: #fffaeb;
-  --color-brand-100: #fff1c6;
-  --color-brand-200: #ffe288;
-  --color-brand-300: #ffcf4a;
-  --color-brand-400: #ffbc1f;
-  --color-brand-500: #f5a524;
-  --color-brand-600: #d97d06;
-  --color-brand-700: #b45c09;
-  --color-brand-800: #92460e;
-  --color-brand-900: #78390f;
+  /* ---- HCMUTE Identity: Xanh Công nghệ & Học thuật (Primary: 20-25%) ---- */
+  --color-brand-50: #f0f7ff;
+  --color-brand-100: #e0effe;
+  --color-brand-200: #bae0fd;
+  --color-brand-300: #7cc5fb;
+  --color-brand-400: #38a5f8;
+  --color-brand-500: #0056b3;
+  --color-brand-600: #004098; /* Official HCMUTE Strong Academic Blue */
+  --color-brand-700: #00337a;
+  --color-brand-800: #0a2540;
+  --color-brand-900: #06182a;
 
-  /* ---- Nền và chữ (xám ngả ấm, hợp với vàng hơn xám xanh) ---- */
-  --color-page: #fdfaf3;
+  /* ---- HCMUTE Identity: Đỏ Nhiệt huyết (Accent: 5-10%) ---- */
+  --color-accent-red-50: #fef2f2;
+  --color-accent-red-100: #fee2e2;
+  --color-accent-red-200: #fecaca;
+  --color-accent-red-300: #fca5a5;
+  --color-accent-red-400: #f87171;
+  --color-accent-red-500: #ef4444;
+  --color-accent-red-600: #d9232e; /* Official HCMUTE Energetic Red */
+  --color-accent-red-700: #b91c1c;
+  --color-accent-red-800: #991b1b;
+  --color-accent-red-900: #7f1d1d;
+
+  /* ---- Nền và chữ (65% white/light, cool academic neutral) ---- */
+  --color-page: #f8fafc;
   --color-surface: #ffffff;
-  --color-surface-soft: #fdf8ec;
-  --color-line: #f0e7d5;
-  --color-line-strong: #e4d7be;
+  --color-surface-soft: #f1f5f9;
+  --color-line: #e2e8f0;
+  --color-line-strong: #cbd5e1;
 
-  --color-ink-900: #1c1917;
-  --color-ink-700: #44403c;
-  --color-ink-500: #78716c;
-  --color-ink-400: #a8a29e;
+  --color-ink-900: #0f172a;
+  --color-ink-700: #334155;
+  --color-ink-500: #64748b;
+  --color-ink-400: #94a3b8;
 
-  /* ---- Màu phụ cho nhãn chuyên mục ---- */
-  --color-accent-sky: #0ea5e9;
-  --color-accent-violet: #8b5cf6;
-  --color-accent-emerald: #10b981;
-  --color-accent-rose: #f43f5e;
-  --color-accent-orange: #f97316;
+  /* ---- Màu bổ trợ chuyên mục ---- */
+  --color-accent-sky: #0284c7;
+  --color-accent-violet: #6366f1;
+  --color-accent-emerald: #059669;
+  --color-accent-rose: #d9232e;
+  --color-accent-orange: #ea580c;
 
-  /* ---- Bo góc ---- */
-  --radius-card: 1rem;
-  --radius-card-lg: 1.5rem;
+  /* ---- Bo góc chuẩn HCMUTE: Không bubble-style (Button 8-12px, Card 10-14px, Panel 12-16px, Hero 16-20px) ---- */
+  --radius-btn: 0.625rem; /* 10px */
+  --radius-card: 0.75rem; /* 12px */
+  --radius-card-lg: 0.875rem; /* 14px */
+  --radius-panel: 1rem; /* 16px */
+  --radius-hero: 1.25rem; /* 20px */
 
-  /* ---- Đổ bóng: rất nhẹ, ngả vàng thay vì ngả đen ---- */
-  --shadow-soft: 0 1px 2px rgb(120 83 15 / 0.04), 0 4px 12px rgb(120 83 15 / 0.05);
-  --shadow-lift: 0 2px 4px rgb(120 83 15 / 0.05), 0 12px 28px rgb(120 83 15 / 0.09);
-  --shadow-brand: 0 6px 16px rgb(245 165 36 / 0.32);
+  /* ---- Đổ bóng: Tinh tế, chuẩn học thuật công nghệ ---- */
+  --shadow-soft: 0 1px 3px 0 rgb(15 23 42 / 0.05), 0 1px 2px -1px rgb(15 23 42 / 0.05);
+  --shadow-lift: 0 4px 6px -1px rgb(15 23 42 / 0.07), 0 2px 4px -2px rgb(15 23 42 / 0.07);
+  --shadow-brand: 0 8px 20px -4px rgb(0 64 152 / 0.25);
+  --shadow-accent: 0 8px 20px -4px rgb(217 35 46 / 0.2);
 }
 
 /* =============================================================
