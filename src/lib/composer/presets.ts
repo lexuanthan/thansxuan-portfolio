@@ -7,6 +7,9 @@ export type SizePreset = {
 };
 
 export const SIZE_PRESETS: SizePreset[] = [
+  { id: "logo-square", label: "Logo vuông (HD)", group: "Logo & Biểu trưng", width: 1000, height: 1000 },
+  { id: "logo-app-icon", label: "Icon ứng dụng / Favicon", group: "Logo & Biểu trưng", width: 512, height: 512 },
+  { id: "logo-horizontal", label: "Logo ngang (Website Header)", group: "Logo & Biểu trưng", width: 1200, height: 400 },
   { id: "fb-post", label: "Facebook post", group: "Facebook", width: 1200, height: 630 },
   { id: "fb-square", label: "Facebook vuông", group: "Facebook", width: 1080, height: 1080 },
   { id: "fb-story", label: "Facebook / IG story", group: "Story", width: 1080, height: 1920 },

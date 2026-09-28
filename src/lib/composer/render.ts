@@ -103,8 +103,10 @@ export function renderDocument(
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
 
-  ctx.fillStyle = doc.backgroundColor || "#ffffff";
-  ctx.fillRect(0, 0, W, H);
+  if (doc.backgroundColor && doc.backgroundColor !== "transparent") {
+    ctx.fillStyle = doc.backgroundColor;
+    ctx.fillRect(0, 0, W, H);
+  }
 
   drawBackground(ctx, doc, images);
 
@@ -163,8 +165,45 @@ function drawImageLayer(
   const w = layer.width * canvasWidth;
   const aspect = layer.aspect > 0 ? layer.aspect : 1;
   const h = w / aspect;
+  if (w <= 0 || h <= 0) return;
+
+  const filter = layer.filter;
+  let filterStr = "";
+  if (filter) {
+    if (filter.grayscale) filterStr += " grayscale(100%)";
+    if (filter.invert) filterStr += " invert(100%)";
+    if (filter.brightness !== undefined && filter.brightness !== 1) {
+      filterStr += ` brightness(${Math.round(filter.brightness * 100)}%)`;
+    }
+    if (filter.contrast !== undefined && filter.contrast !== 1) {
+      filterStr += ` contrast(${Math.round(filter.contrast * 100)}%)`;
+    }
+  }
+
+  const prevFilter = ctx.filter;
+  if (filterStr.trim()) {
+    ctx.filter = filterStr.trim();
+  }
+
+  // Nhuộm màu toàn bộ logo (Color Overlay / Tint)
+  if (filter?.tintColor && filter.tintColor !== "transparent" && typeof document !== "undefined") {
+    const off = document.createElement("canvas");
+    off.width = Math.max(1, Math.round(w));
+    off.height = Math.max(1, Math.round(h));
+    const octx = off.getContext("2d");
+    if (octx) {
+      octx.drawImage(pickSource(img, w), 0, 0, off.width, off.height);
+      octx.globalCompositeOperation = "source-in";
+      octx.fillStyle = filter.tintColor;
+      octx.fillRect(0, 0, off.width, off.height);
+      ctx.drawImage(off, -w / 2, -h / 2, w, h);
+      if (filterStr.trim()) ctx.filter = prevFilter || "none";
+      return;
+    }
+  }
 
   ctx.drawImage(pickSource(img, w), -w / 2, -h / 2, w, h);
+  if (filterStr.trim()) ctx.filter = prevFilter || "none";
 }
 
 function drawTextLayer(
@@ -228,6 +267,19 @@ function drawTextLayer(
   }
 }
 
+const ICON_SVG_PATHS: Record<string, string> = {
+  crown: "M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7zm3 14h14v2H5v-2z",
+  shield: "M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z",
+  sparkle: "M12 2c.5 4.5 4 8 8 8.5-4 .5-7.5 4-8 8.5-.5-4.5-4-8-8-8.5 4-.5 7.5-4 8-8.5z",
+  flame: "M12 2c-.5 3-2 5-4 7-2.5 2.5-3 5.5-2 8.5 1.5 4.5 6 6.5 10 5 3-1 5-4 5-7.5 0-4-3-7-4-10-1 2-2 3.5-3.5 4 .5-2.5 0-5-1.5-7z",
+  zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
+  award: "M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm-3.8 2.2L6 22l6-3.2L18 22l-2.2-4.8a8.9 8.9 0 0 1-7.6 0z",
+  heart: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z",
+  gem: "M6 3h12l4 6-10 12L2 9l4-6zm1.5 2l-2.7 4h14.4l-2.7-4H7.5z",
+  verified: "M12 2l2.4 2.1 3.2-.4 1.4 2.9 3 .9-.2 3.2 2.1 2.4-1.4 2.9.4 3.2-3 .9-.9 3-3.2-.2-2.1 2.4-2.4-2.1-3.2.4-1.4-2.9-3-.9.2-3.2L1.7 12l1.4-2.9-.4-3.2 3-.9.9-3 3.2.2L12 2zm-1.5 13.5l6-6-1.4-1.4-4.6 4.6-2.1-2.1-1.4 1.4 3.5 3.5z",
+  ribbon: "M4 4h16v12l-4-2-4 2-4-2-4 2V4z",
+};
+
 function drawShapeLayer(
   ctx: CanvasRenderingContext2D,
   layer: ShapeLayer,
@@ -242,6 +294,25 @@ function drawShapeLayer(
     ctx.shadowColor = "rgba(0,0,0,0.35)";
     ctx.shadowBlur = Math.min(w, h) * 0.12;
     ctx.shadowOffsetY = Math.min(w, h) * 0.04;
+  }
+
+  const svgD = ICON_SVG_PATHS[layer.shapeType];
+  if (svgD && typeof Path2D !== "undefined") {
+    const p2d = new Path2D(svgD);
+    ctx.save();
+    ctx.translate(-w / 2, -h / 2);
+    ctx.scale(w / 24, h / 24);
+    if (layer.fillColor && layer.fillColor !== "transparent") {
+      ctx.fillStyle = layer.fillColor;
+      ctx.fill(p2d);
+    }
+    if (layer.strokeWidth > 0 && layer.strokeColor && layer.strokeColor !== "transparent") {
+      ctx.lineWidth = (layer.strokeWidth * canvasWidth) / (w / 24);
+      ctx.strokeStyle = layer.strokeColor;
+      ctx.stroke(p2d);
+    }
+    ctx.restore();
+    return;
   }
 
   ctx.beginPath();

@@ -236,7 +236,15 @@ export default function Stage({
       <canvas
         ref={canvasRef}
         className="absolute inset-0 h-full w-full rounded-lg border border-line shadow-lift"
-        style={{ backgroundColor: doc.backgroundColor }}
+        style={{
+          backgroundColor: doc.backgroundColor === "transparent" ? undefined : doc.backgroundColor,
+          backgroundImage:
+            doc.backgroundColor === "transparent"
+              ? "linear-gradient(45deg, #cbd5e1 25%, transparent 25%), linear-gradient(-45deg, #cbd5e1 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #cbd5e1 75%), linear-gradient(-45deg, transparent 75%, #cbd5e1 75%)"
+              : undefined,
+          backgroundSize: "20px 20px",
+          backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0",
+        }}
       />
 
       {/* Đường gióng khi hút vào giữa */}

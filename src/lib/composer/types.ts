@@ -20,6 +20,14 @@ export type LayerBase = {
   locked: boolean;
 };
 
+export type ImageFilter = {
+  tintColor?: string;
+  invert?: boolean;
+  grayscale?: boolean;
+  brightness?: number;
+  contrast?: number;
+};
+
 export type ImageLayer = LayerBase & {
   kind: "image";
   src: string;
@@ -27,6 +35,8 @@ export type ImageLayer = LayerBase & {
   width: number;
   /** Tỉ lệ khung hình gốc của ảnh (rộng / cao) — dùng để suy ra chiều cao. */
   aspect: number;
+  /** Bộ lọc màu & hiệu ứng cho ảnh/logo. */
+  filter?: ImageFilter;
 };
 
 export type TextAlign = "left" | "center" | "right";
@@ -51,7 +61,24 @@ export type TextLayer = LayerBase & {
   shadow: boolean;
 };
 
-export type ShapeKind = "rect" | "rounded-rect" | "circle" | "star" | "badge" | "triangle" | "line";
+export type ShapeKind =
+  | "rect"
+  | "rounded-rect"
+  | "circle"
+  | "star"
+  | "badge"
+  | "triangle"
+  | "line"
+  | "crown"
+  | "shield"
+  | "sparkle"
+  | "flame"
+  | "zap"
+  | "award"
+  | "heart"
+  | "gem"
+  | "verified"
+  | "ribbon";
 
 export type ShapeLayer = LayerBase & {
   kind: "shape";

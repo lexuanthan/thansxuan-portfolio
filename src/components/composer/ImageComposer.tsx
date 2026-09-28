@@ -230,11 +230,38 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
 
   function addShape(shapeType: ShapeKind = "rounded-rect") {
     const isLine = shapeType === "line";
+    const isIcon = [
+      "crown",
+      "shield",
+      "sparkle",
+      "flame",
+      "zap",
+      "award",
+      "heart",
+      "gem",
+      "verified",
+      "ribbon",
+    ].includes(shapeType);
+
+    const iconNames: Record<string, string> = {
+      crown: "Vương miện",
+      shield: "Khiên bảo vệ",
+      sparkle: "Ngôi sao lấp lánh",
+      flame: "Ngọn lửa",
+      zap: "Tia chớp",
+      award: "Huy chương",
+      heart: "Trái tim",
+      gem: "Kim cương",
+      verified: "Tích xanh xác minh",
+      ribbon: "Dải ruy băng",
+    };
+
     const layer: ShapeLayer = {
       id: createId("shp"),
       kind: "shape",
       name:
-        shapeType === "rounded-rect"
+        iconNames[shapeType] ??
+        (shapeType === "rounded-rect"
           ? "Khung bo góc"
           : shapeType === "circle"
             ? "Hình tròn"
@@ -246,19 +273,19 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
                   ? "Tam giác"
                   : shapeType === "line"
                     ? "Đường kẻ"
-                    : "Khung chữ nhật",
+                    : "Khung chữ nhật"),
       shapeType,
       x: 0.5,
       y: 0.5,
-      width: isLine ? 0.4 : 0.28,
-      height: isLine ? 0.01 : 0.28,
+      width: isLine ? 0.4 : isIcon ? 0.22 : 0.28,
+      height: isLine ? 0.01 : isIcon ? 0.22 : 0.28,
       rotation: 0,
       opacity: 1,
       visible: true,
       locked: false,
-      fillColor: isLine ? "transparent" : "#004098",
-      strokeColor: "#F59D1F",
-      strokeWidth: isLine ? 0.005 : 0.003,
+      fillColor: isLine ? "transparent" : isIcon ? "#F59D1F" : "#004098",
+      strokeColor: isIcon ? "transparent" : "#F59D1F",
+      strokeWidth: isLine ? 0.005 : isIcon ? 0 : 0.003,
       cornerRadius: 0.15,
       shadow: true,
     };
@@ -692,17 +719,97 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
             </div>
           )}
 
-          <label className="mt-3 flex items-center justify-between gap-3 text-xs text-ink-700">
-            Màu nền
-            <input
-              type="color"
-              value={doc.backgroundColor}
-              onChange={(e) =>
-                mutate((d) => ({ ...d, backgroundColor: e.target.value }))
-              }
-              className="h-8 w-14 cursor-pointer rounded border border-line bg-transparent"
-            />
-          </label>
+          <div className="mt-3 space-y-2">
+            <div className="flex items-center justify-between text-xs text-ink-700">
+              <span className="font-semibold">Màu nền Canvas:</span>
+              <span className="font-mono text-[11px] text-ink-500">
+                {doc.backgroundColor === "transparent" ? "🏁 Trong suốt" : doc.backgroundColor}
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => mutate((d) => ({ ...d, backgroundColor: "transparent" }))}
+                title="Nền trong suốt (Xuất PNG trong suốt)"
+                className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition ${
+                  doc.backgroundColor === "transparent"
+                    ? "border-brand-500 bg-brand-50 font-bold text-brand-700 shadow-sm"
+                    : "border-line bg-surface text-ink-700 hover:bg-surface-soft"
+                }`}
+              >
+                🏁 Trong suốt
+              </button>
+
+              <button
+                type="button"
+                onClick={() => mutate((d) => ({ ...d, backgroundColor: "#ffffff" }))}
+                title="Nền trắng"
+                className={`flex h-7 w-7 items-center justify-center rounded-lg border text-xs transition ${
+                  doc.backgroundColor === "#ffffff"
+                    ? "border-brand-500 ring-2 ring-brand-300"
+                    : "border-line hover:scale-105"
+                }`}
+                style={{ backgroundColor: "#ffffff" }}
+              >
+                {doc.backgroundColor === "#ffffff" ? "✓" : ""}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => mutate((d) => ({ ...d, backgroundColor: "#0b0f19" }))}
+                title="Nền tối"
+                className={`flex h-7 w-7 items-center justify-center rounded-lg border text-xs text-white transition ${
+                  doc.backgroundColor === "#0b0f19"
+                    ? "border-brand-500 ring-2 ring-brand-300"
+                    : "border-line hover:scale-105"
+                }`}
+                style={{ backgroundColor: "#0b0f19" }}
+              >
+                {doc.backgroundColor === "#0b0f19" ? "✓" : ""}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => mutate((d) => ({ ...d, backgroundColor: "#004098" }))}
+                title="Xanh HCMUTE"
+                className={`flex h-7 w-7 items-center justify-center rounded-lg border text-xs text-white transition ${
+                  doc.backgroundColor === "#004098"
+                    ? "border-brand-500 ring-2 ring-brand-300"
+                    : "border-line hover:scale-105"
+                }`}
+                style={{ backgroundColor: "#004098" }}
+              >
+                {doc.backgroundColor === "#004098" ? "✓" : ""}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => mutate((d) => ({ ...d, backgroundColor: "#F59D1F" }))}
+                title="Cam HCMUTE"
+                className={`flex h-7 w-7 items-center justify-center rounded-lg border text-xs text-white transition ${
+                  doc.backgroundColor === "#F59D1F"
+                    ? "border-brand-500 ring-2 ring-brand-300"
+                    : "border-line hover:scale-105"
+                }`}
+                style={{ backgroundColor: "#F59D1F" }}
+              >
+                {doc.backgroundColor === "#F59D1F" ? "✓" : ""}
+              </button>
+
+              <div className="ml-auto flex items-center">
+                <input
+                  type="color"
+                  title="Tuỳ chỉnh màu khác"
+                  value={doc.backgroundColor === "transparent" ? "#ffffff" : doc.backgroundColor}
+                  onChange={(e) =>
+                    mutate((d) => ({ ...d, backgroundColor: e.target.value }))
+                  }
+                  className="h-7 w-8 cursor-pointer rounded border border-line bg-transparent p-0.5"
+                />
+              </div>
+            </div>
+          </div>
         </Panel>
 
         <Panel title="Xoá đối tượng">
@@ -857,6 +964,104 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
                 title="Đường kẻ"
               >
                 — Đường kẻ
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-3">
+            <span className="mb-1.5 block text-[11px] font-semibold text-ink-500">
+              Biểu tượng & Icon (Vector):
+            </span>
+            <div className="grid grid-cols-5 gap-1.5 text-center text-xs">
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("crown")}
+                title="Vương miện (Crown)"
+              >
+                <span className="text-base leading-none">👑</span>
+                <span className="mt-1 text-[9px] text-ink-600">V.miện</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("shield")}
+                title="Khiên bảo vệ (Shield)"
+              >
+                <span className="text-base leading-none">🛡️</span>
+                <span className="mt-1 text-[9px] text-ink-600">Khiên</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("sparkle")}
+                title="Lấp lánh (Sparkle)"
+              >
+                <span className="text-base leading-none">✨</span>
+                <span className="mt-1 text-[9px] text-ink-600">Lấp lánh</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("flame")}
+                title="Ngọn lửa (Flame)"
+              >
+                <span className="text-base leading-none">🔥</span>
+                <span className="mt-1 text-[9px] text-ink-600">Lửa</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("zap")}
+                title="Tia chớp (Zap)"
+              >
+                <span className="text-base leading-none">⚡</span>
+                <span className="mt-1 text-[9px] text-ink-600">Tia chớp</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("award")}
+                title="Huy chương (Award)"
+              >
+                <span className="text-base leading-none">🏆</span>
+                <span className="mt-1 text-[9px] text-ink-600">Huy ch.</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("heart")}
+                title="Trái tim (Heart)"
+              >
+                <span className="text-base leading-none">💙</span>
+                <span className="mt-1 text-[9px] text-ink-600">Trái tim</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("gem")}
+                title="Kim cương (Gem)"
+              >
+                <span className="text-base leading-none">💎</span>
+                <span className="mt-1 text-[9px] text-ink-600">K.cương</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("verified")}
+                title="Tích xác minh (Verified badge)"
+              >
+                <span className="text-base font-bold leading-none text-sky-500">✓</span>
+                <span className="mt-1 text-[9px] text-ink-600">Tích xanh</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center rounded-lg border border-line p-1.5 transition hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("ribbon")}
+                title="Dải ruy băng (Ribbon)"
+              >
+                <span className="text-base leading-none">🎗️</span>
+                <span className="mt-1 text-[9px] text-ink-600">Ruy băng</span>
               </button>
             </div>
           </div>
@@ -1402,13 +1607,186 @@ function Inspector({
             format={(v) => `${Math.round(v * canvasWidth)}px`}
             onChange={(width) => onPatch({ width } as Partial<Layer>)}
           />
+
+          {/* Đổi màu toàn bộ Logo / Silhouette Overlay */}
+          <div className="rounded-lg border border-line p-2.5">
+            <div className="mb-2 flex items-center justify-between text-xs text-ink-700">
+              <span className="font-semibold">Nhuộm màu Logo:</span>
+              <span className="font-mono text-[11px] text-ink-500">
+                {layer.filter?.tintColor || "Màu gốc"}
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch({
+                    filter: { ...layer.filter, tintColor: undefined },
+                  } as Partial<Layer>)
+                }
+                className={`rounded border px-2 py-1 text-[11px] transition ${
+                  !layer.filter?.tintColor
+                    ? "border-brand-500 bg-brand-50 font-bold text-brand-700"
+                    : "border-line text-ink-600 hover:bg-surface-soft"
+                }`}
+              >
+                Gốc
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch({
+                    filter: { ...layer.filter, tintColor: "#ffffff" },
+                  } as Partial<Layer>)
+                }
+                title="Đổi thành logo trắng"
+                className={`flex h-6 w-6 items-center justify-center rounded border text-[10px] transition ${
+                  layer.filter?.tintColor?.toLowerCase() === "#ffffff"
+                    ? "border-brand-500 ring-2 ring-brand-300"
+                    : "border-line hover:scale-105"
+                }`}
+                style={{ backgroundColor: "#ffffff" }}
+              >
+                {layer.filter?.tintColor?.toLowerCase() === "#ffffff" ? "✓" : ""}
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch({
+                    filter: { ...layer.filter, tintColor: "#000000" },
+                  } as Partial<Layer>)
+                }
+                title="Đổi thành logo đen"
+                className={`flex h-6 w-6 items-center justify-center rounded border text-[10px] text-white transition ${
+                  layer.filter?.tintColor?.toLowerCase() === "#000000"
+                    ? "border-brand-500 ring-2 ring-brand-300"
+                    : "border-line hover:scale-105"
+                }`}
+                style={{ backgroundColor: "#000000" }}
+              >
+                {layer.filter?.tintColor?.toLowerCase() === "#000000" ? "✓" : ""}
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch({
+                    filter: { ...layer.filter, tintColor: "#004098" },
+                  } as Partial<Layer>)
+                }
+                title="Xanh HCMUTE"
+                className={`flex h-6 w-6 items-center justify-center rounded border text-[10px] text-white transition ${
+                  layer.filter?.tintColor?.toLowerCase() === "#004098"
+                    ? "border-brand-500 ring-2 ring-brand-300"
+                    : "border-line hover:scale-105"
+                }`}
+                style={{ backgroundColor: "#004098" }}
+              >
+                {layer.filter?.tintColor?.toLowerCase() === "#004098" ? "✓" : ""}
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch({
+                    filter: { ...layer.filter, tintColor: "#F59D1F" },
+                  } as Partial<Layer>)
+                }
+                title="Vàng Cam HCMUTE"
+                className={`flex h-6 w-6 items-center justify-center rounded border text-[10px] text-white transition ${
+                  layer.filter?.tintColor?.toLowerCase() === "#f59d1f"
+                    ? "border-brand-500 ring-2 ring-brand-300"
+                    : "border-line hover:scale-105"
+                }`}
+                style={{ backgroundColor: "#F59D1F" }}
+              >
+                {layer.filter?.tintColor?.toLowerCase() === "#f59d1f" ? "✓" : ""}
+              </button>
+              <div className="ml-auto flex items-center">
+                <input
+                  type="color"
+                  title="Tuỳ chọn màu bất kỳ"
+                  value={layer.filter?.tintColor || "#ffffff"}
+                  onChange={(e) =>
+                    onPatch({
+                      filter: { ...layer.filter, tintColor: e.target.value },
+                    } as Partial<Layer>)
+                  }
+                  className="h-6 w-7 cursor-pointer rounded border border-line bg-transparent p-0.5"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Hiệu ứng bộ lọc (Filters) */}
+          <div className="rounded-lg border border-line p-2.5 space-y-2">
+            <span className="block text-xs font-semibold text-ink-700">Bộ lọc ảnh:</span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch({
+                    filter: { ...layer.filter, invert: !layer.filter?.invert },
+                  } as Partial<Layer>)
+                }
+                className={`flex-1 rounded-lg border px-2 py-1 text-xs transition ${
+                  layer.filter?.invert
+                    ? "border-brand-500 bg-brand-50 font-bold text-brand-700"
+                    : "border-line text-ink-600 hover:bg-surface-soft"
+                }`}
+              >
+                {layer.filter?.invert ? "✓ Đảo màu" : "Đảo màu"}
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onPatch({
+                    filter: { ...layer.filter, grayscale: !layer.filter?.grayscale },
+                  } as Partial<Layer>)
+                }
+                className={`flex-1 rounded-lg border px-2 py-1 text-xs transition ${
+                  layer.filter?.grayscale
+                    ? "border-brand-500 bg-brand-50 font-bold text-brand-700"
+                    : "border-line text-ink-600 hover:bg-surface-soft"
+                }`}
+              >
+                {layer.filter?.grayscale ? "✓ Trắng đen" : "Trắng đen"}
+              </button>
+            </div>
+
+            <Slider
+              label="Độ sáng"
+              value={layer.filter?.brightness ?? 1}
+              min={0.2}
+              max={2}
+              step={0.05}
+              format={(v) => `${Math.round(v * 100)}%`}
+              onChange={(b) =>
+                onPatch({
+                  filter: { ...layer.filter, brightness: b },
+                } as Partial<Layer>)
+              }
+            />
+
+            <Slider
+              label="Tương phản"
+              value={layer.filter?.contrast ?? 1}
+              min={0.2}
+              max={2}
+              step={0.05}
+              format={(v) => `${Math.round(v * 100)}%`}
+              onChange={(c) =>
+                onPatch({
+                  filter: { ...layer.filter, contrast: c },
+                } as Partial<Layer>)
+              }
+            />
+          </div>
         </div>
       )}
 
       {layer.kind === "shape" && (
         <div className="space-y-3">
           <label className="block text-xs text-ink-500">
-            Hình khối
+            Hình khối & Icon
             <select
               className={`${input} mt-1`}
               value={layer.shapeType}
@@ -1416,13 +1794,27 @@ function Inspector({
                 onPatch({ shapeType: e.target.value as ShapeKind } as Partial<Layer>)
               }
             >
-              <option value="rounded-rect">Khung bo góc</option>
-              <option value="rect">Hình chữ nhật</option>
-              <option value="circle">Hình tròn / Ellipse</option>
-              <option value="star">Ngôi sao (5 cánh)</option>
-              <option value="badge">Huy hiệu (12 cánh)</option>
-              <option value="triangle">Tam giác</option>
-              <option value="line">Đường kẻ phân cách</option>
+              <optgroup label="Hình học cơ bản">
+                <option value="rounded-rect">Khung bo góc</option>
+                <option value="rect">Hình chữ nhật</option>
+                <option value="circle">Hình tròn / Ellipse</option>
+                <option value="triangle">Tam giác</option>
+                <option value="line">Đường kẻ phân cách</option>
+              </optgroup>
+              <optgroup label="Biểu tượng & Icon (Vector)">
+                <option value="star">★ Ngôi sao</option>
+                <option value="badge">⎔ Huy hiệu 12 cánh</option>
+                <option value="crown">👑 Vương miện</option>
+                <option value="shield">🛡️ Khiên bảo vệ</option>
+                <option value="sparkle">✨ Ngôi sao lấp lánh</option>
+                <option value="flame">🔥 Ngọn lửa</option>
+                <option value="zap">⚡ Tia chớp</option>
+                <option value="award">🏆 Huy chương</option>
+                <option value="heart">💙 Trái tim</option>
+                <option value="gem">💎 Kim cương</option>
+                <option value="verified">✓ Tích xanh xác minh</option>
+                <option value="ribbon">🎗️ Dải ruy băng</option>
+              </optgroup>
             </select>
           </label>
 
