@@ -23,6 +23,7 @@ type Drag =
       mode: "scale";
       id: string;
       startValue: number;
+      startHeight?: number;
       startFontSize: number;
       startPointer: Point;
       center: Point;
@@ -127,6 +128,11 @@ export default function Stage({
           onPatchLayer(drag.id, {
             width: clamp(drag.startValue * ratio, 0.02, 4),
           } as Partial<Layer>);
+        } else if (layer.kind === "shape") {
+          onPatchLayer(drag.id, {
+            width: clamp(drag.startValue * ratio, 0.02, 4),
+            height: clamp((drag.startHeight ?? drag.startValue) * ratio, 0.01, 4),
+          } as Partial<Layer>);
         } else {
           onPatchLayer(drag.id, {
             maxWidth: clamp(drag.startValue * ratio, 0.05, 2),
@@ -184,7 +190,8 @@ export default function Stage({
     dragRef.current = {
       mode: "scale",
       id: layer.id,
-      startValue: layer.kind === "image" ? layer.width : layer.maxWidth,
+      startValue: layer.kind === "text" ? layer.maxWidth : layer.width,
+      startHeight: layer.kind === "shape" ? layer.height : undefined,
       startFontSize: layer.kind === "text" ? layer.fontSize : 0,
       startPointer: toRelative(e.clientX, e.clientY, rect),
       center: { x: layer.x, y: layer.y },
@@ -209,6 +216,9 @@ export default function Stage({
       const wPx = layer.width * doc.width;
       const hPx = wPx / (layer.aspect > 0 ? layer.aspect : 1);
       return { w: (wPx / doc.width) * 100, h: (hPx / doc.height) * 100 };
+    }
+    if (layer.kind === "shape") {
+      return { w: layer.width * 100, h: layer.height * 100 };
     }
     const ctx = getMeasureContext();
     if (!ctx) return { w: layer.maxWidth * 100, h: 10 };

@@ -51,7 +51,23 @@ export type TextLayer = LayerBase & {
   shadow: boolean;
 };
 
-export type Layer = ImageLayer | TextLayer;
+export type ShapeKind = "rect" | "rounded-rect" | "circle" | "star" | "badge" | "triangle" | "line";
+
+export type ShapeLayer = LayerBase & {
+  kind: "shape";
+  shapeType: ShapeKind;
+  /** Chiều rộng hình khối theo tỉ lệ chiều rộng canvas. */
+  width: number;
+  /** Chiều cao hình khối theo tỉ lệ chiều cao canvas. */
+  height: number;
+  fillColor: string;
+  strokeColor: string;
+  strokeWidth: number;
+  cornerRadius?: number;
+  shadow: boolean;
+};
+
+export type Layer = ImageLayer | TextLayer | ShapeLayer;
 
 export type BackgroundFit = "cover" | "contain";
 

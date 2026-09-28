@@ -1,5 +1,5 @@
 import { fitContain, fitCover, wrapText } from "./geometry";
-import type { ComposerDoc, ImageLayer, TextLayer } from "./types";
+import type { ComposerDoc, ImageLayer, ShapeLayer, TextLayer } from "./types";
 
 export type ImageMap = Map<string, CanvasImageSource>;
 
@@ -117,7 +117,8 @@ export function renderDocument(
     if (layer.rotation) ctx.rotate((layer.rotation * Math.PI) / 180);
 
     if (layer.kind === "image") drawImageLayer(ctx, layer, images, W);
-    else drawTextLayer(ctx, layer, W);
+    else if (layer.kind === "text") drawTextLayer(ctx, layer, W);
+    else if (layer.kind === "shape") drawShapeLayer(ctx, layer, W, H);
 
     ctx.restore();
   }
@@ -226,6 +227,118 @@ function drawTextLayer(
     (ctx as CanvasRenderingContext2D & { letterSpacing?: string }).letterSpacing = "0px";
   }
 }
+
+function drawShapeLayer(
+  ctx: CanvasRenderingContext2D,
+  layer: ShapeLayer,
+  canvasWidth: number,
+  canvasHeight: number
+): void {
+  const w = layer.width * canvasWidth;
+  const h = layer.height * canvasHeight;
+  if (w <= 0 || h <= 0) return;
+
+  if (layer.shadow) {
+    ctx.shadowColor = "rgba(0,0,0,0.35)";
+    ctx.shadowBlur = Math.min(w, h) * 0.12;
+    ctx.shadowOffsetY = Math.min(w, h) * 0.04;
+  }
+
+  ctx.beginPath();
+  switch (layer.shapeType) {
+    case "rect":
+      ctx.rect(-w / 2, -h / 2, w, h);
+      break;
+    case "rounded-rect": {
+      const radius = Math.min(w / 2, h / 2, (layer.cornerRadius ?? 0.12) * Math.min(w, h));
+      if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(-w / 2, -h / 2, w, h, radius);
+      } else {
+        const hw = w / 2;
+        const hh = h / 2;
+        ctx.moveTo(-hw + radius, -hh);
+        ctx.lineTo(hw - radius, -hh);
+        ctx.quadraticCurveTo(hw, -hh, hw, -hh + radius);
+        ctx.lineTo(hw, hh - radius);
+        ctx.quadraticCurveTo(hw, hh, hw - radius, hh);
+        ctx.lineTo(-hw + radius, hh);
+        ctx.quadraticCurveTo(-hw, hh, -hw, hh - radius);
+        ctx.lineTo(-hw, -hh + radius);
+        ctx.quadraticCurveTo(-hw, -hh, -hw + radius, -hh);
+        ctx.closePath();
+      }
+      break;
+    }
+    case "circle":
+      ctx.ellipse(0, 0, w / 2, h / 2, 0, 0, Math.PI * 2);
+      break;
+    case "star": {
+      const spikes = 5;
+      const outerR = Math.min(w, h) / 2;
+      const innerR = outerR * 0.42;
+      for (let i = 0; i < spikes * 2; i += 1) {
+        const rad = (i * Math.PI) / spikes - Math.PI / 2;
+        const r = i % 2 === 0 ? outerR : innerR;
+        const px = Math.cos(rad) * r;
+        const py = Math.sin(rad) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      break;
+    }
+    case "badge": {
+      const points = 12;
+      const outerR = Math.min(w, h) / 2;
+      const innerR = outerR * 0.82;
+      for (let i = 0; i < points * 2; i += 1) {
+        const rad = (i * Math.PI) / points - Math.PI / 2;
+        const r = i % 2 === 0 ? outerR : innerR;
+        const px = Math.cos(rad) * r;
+        const py = Math.sin(rad) * r;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+      break;
+    }
+    case "triangle":
+      ctx.moveTo(0, -h / 2);
+      ctx.lineTo(w / 2, h / 2);
+      ctx.lineTo(-w / 2, h / 2);
+      ctx.closePath();
+      break;
+    case "line":
+      ctx.moveTo(-w / 2, 0);
+      ctx.lineTo(w / 2, 0);
+      break;
+  }
+
+  if (layer.shapeType !== "line" && layer.fillColor && layer.fillColor !== "transparent") {
+    ctx.fillStyle = layer.fillColor;
+    ctx.fill();
+  }
+
+  if (layer.strokeWidth > 0 && layer.strokeColor && layer.strokeColor !== "transparent") {
+    if (layer.shadow) {
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetY = 0;
+    }
+    ctx.lineWidth = layer.strokeWidth * canvasWidth;
+    ctx.strokeStyle = layer.strokeColor;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.stroke();
+  }
+
+  if (layer.shadow) {
+    ctx.shadowColor = "transparent";
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+  }
+}
+
 
 /**
  * Tải ảnh về dạng blob rồi tạo objectURL.

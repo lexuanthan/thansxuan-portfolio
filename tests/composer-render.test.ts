@@ -31,6 +31,16 @@ function fakeCtx() {
     drawImage: rec("drawImage"),
     fillText: rec("fillText"),
     strokeText: rec("strokeText"),
+    beginPath: rec("beginPath"),
+    closePath: rec("closePath"),
+    rect: rec("rect"),
+    roundRect: rec("roundRect"),
+    ellipse: rec("ellipse"),
+    moveTo: rec("moveTo"),
+    lineTo: rec("lineTo"),
+    quadraticCurveTo: rec("quadraticCurveTo"),
+    fill: rec("fill"),
+    stroke: rec("stroke"),
     measureText: (s: string) => ({ width: s.length * 10 }),
     globalAlpha: 1,
     fillStyle: "",
@@ -40,6 +50,7 @@ function fakeCtx() {
     textBaseline: "" as CanvasTextBaseline,
     lineWidth: 0,
     lineJoin: "" as CanvasLineJoin,
+    lineCap: "" as CanvasLineCap,
     miterLimit: 0,
     shadowColor: "",
     shadowBlur: 0,
@@ -352,3 +363,39 @@ describe("mipLevelFor — chống vỡ nét khi thu nhỏ logo", () => {
     expect(mipLevelFor(100, 1000)).toBe(0);
   });
 });
+
+describe("ShapeLayer rendering", () => {
+  it("vẽ hình chữ nhật với đúng toạ độ và màu tô", () => {
+    const ctx = fakeCtx();
+    const doc: ComposerDoc = {
+      width: 1000,
+      height: 1000,
+      backgroundColor: "#ffffff",
+      background: null,
+      layers: [
+        {
+          id: "shp1",
+          kind: "shape",
+          shapeType: "rect",
+          name: "Khung",
+          x: 0.5,
+          y: 0.5,
+          width: 0.4,
+          height: 0.2,
+          rotation: 0,
+          opacity: 1,
+          visible: true,
+          locked: false,
+          fillColor: "#004098",
+          strokeColor: "#D9232E",
+          strokeWidth: 0.005,
+          shadow: true,
+        },
+      ],
+    };
+
+    renderDocument(ctx, doc, new Map());
+    expect(ctx.calls.some((c) => c.fn === "translate" && c.args[0] === 500 && c.args[1] === 500)).toBe(true);
+  });
+});
+

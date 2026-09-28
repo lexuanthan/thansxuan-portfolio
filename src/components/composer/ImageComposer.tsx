@@ -18,12 +18,15 @@ import {
   MIN_CANVAS_SIDE,
   SIZE_PRESETS,
 } from "@/lib/composer/presets";
+import RemoveBgModal from "./RemoveBgModal";
 import {
   FONT_OPTIONS,
   WEIGHT_OPTIONS,
   type ComposerDoc,
   type ImageLayer,
   type Layer,
+  type ShapeKind,
+  type ShapeLayer,
   type TextAlign,
   type TextLayer,
 } from "@/lib/composer/types";
@@ -54,6 +57,7 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState("thiet-ke");
+  const [removeBgLayerId, setRemoveBgLayerId] = useState<string | null>(null);
 
   // Công cụ xoá đối tượng
   const [eraseMode, setEraseMode] = useState(false);
@@ -224,6 +228,76 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
     setSelectedId(layer.id);
   }
 
+  function addShape(shapeType: ShapeKind = "rounded-rect") {
+    const isLine = shapeType === "line";
+    const layer: ShapeLayer = {
+      id: createId("shp"),
+      kind: "shape",
+      name:
+        shapeType === "rounded-rect"
+          ? "Khung bo góc"
+          : shapeType === "circle"
+            ? "Hình tròn"
+            : shapeType === "star"
+              ? "Ngôi sao"
+              : shapeType === "badge"
+                ? "Huy hiệu"
+                : shapeType === "triangle"
+                  ? "Tam giác"
+                  : shapeType === "line"
+                    ? "Đường kẻ"
+                    : "Khung chữ nhật",
+      shapeType,
+      x: 0.5,
+      y: 0.5,
+      width: isLine ? 0.4 : 0.28,
+      height: isLine ? 0.01 : 0.28,
+      rotation: 0,
+      opacity: 1,
+      visible: true,
+      locked: false,
+      fillColor: isLine ? "transparent" : "#004098",
+      strokeColor: "#F59D1F",
+      strokeWidth: isLine ? 0.005 : 0.003,
+      cornerRadius: 0.15,
+      shadow: true,
+    };
+    mutate((d) => ({ ...d, layers: [...d.layers, layer] }), true);
+    setSelectedId(layer.id);
+  }
+
+  async function handleApplyRemoveBg(dataUrl: string, asNewLayer: boolean) {
+    if (!removeBgLayerId) return;
+    const targetLayer = doc.layers.find((l) => l.id === removeBgLayerId);
+    if (!targetLayer || targetLayer.kind !== "image") return;
+
+    void withBusy("Đang cập nhật ảnh đã tách nền…", async () => {
+      const img = await loadImageElement(dataUrl);
+      registerImage(dataUrl, img);
+      const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+
+      if (asNewLayer) {
+        const newLayer: ImageLayer = {
+          ...targetLayer,
+          id: createId("img"),
+          name: `${targetLayer.name} (đã tách nền)`,
+          src: dataUrl,
+          aspect,
+          x: clamp(targetLayer.x + 0.04, 0, 1),
+          y: clamp(targetLayer.y + 0.04, 0, 1),
+        };
+        mutate((d) => ({ ...d, layers: [...d.layers, newLayer] }), true);
+        setSelectedId(newLayer.id);
+      } else {
+        patchLayer(targetLayer.id, {
+          src: dataUrl,
+          aspect,
+          name: `${targetLayer.name} (đã tách nền)`,
+        } as Partial<Layer>);
+      }
+    });
+  }
+
   function removeLayer(id: string) {
     mutate((d) => ({ ...d, layers: d.layers.filter((l) => l.id !== id) }), true);
     setSelectedId(null);
@@ -235,7 +309,7 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
       if (!src) return d;
       const copy = {
         ...src,
-        id: createId(src.kind === "image" ? "img" : "txt"),
+        id: createId(src.kind === "image" ? "img" : src.kind === "text" ? "txt" : "shp"),
         name: `${src.name} (bản sao)`,
         x: clamp(src.x + 0.04, 0, 1),
         y: clamp(src.y + 0.04, 0, 1),
@@ -705,7 +779,7 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
           )}
         </Panel>
 
-        <Panel title="Logo">
+        <Panel title="Thành phần thiết kế">
           <input
             ref={logoFileRef}
             type="file"
@@ -718,8 +792,74 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
             }}
           />
           <button type="button" className={`${btn} w-full`} onClick={() => logoFileRef.current?.click()}>
-            ⬆ Tải logo của bạn
+            ⬆ Tải logo / ảnh AI của bạn
           </button>
+          <p className="mt-1 text-[10px] text-ink-400">
+            Hỗ trợ ảnh ChatGPT / Midjourney, có công cụ tách nền thông minh.
+          </p>
+
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button type="button" className={btn} onClick={addText}>
+              + Thêm chữ
+            </button>
+            <button type="button" className={btn} onClick={() => addShape("rounded-rect")}>
+              + Thêm khung
+            </button>
+          </div>
+
+          <div className="mt-3">
+            <span className="mb-1.5 block text-[11px] font-semibold text-ink-500">Hình khối nhanh:</span>
+            <div className="grid grid-cols-3 gap-1.5 text-center text-xs">
+              <button
+                type="button"
+                className="rounded-lg border border-line p-1.5 hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("rounded-rect")}
+                title="Khung bo góc"
+              >
+                ▢ Bo góc
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-line p-1.5 hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("circle")}
+                title="Hình tròn"
+              >
+                ○ Tròn
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-line p-1.5 hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("star")}
+                title="Ngôi sao"
+              >
+                ★ Sao
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-line p-1.5 hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("badge")}
+                title="Huy hiệu"
+              >
+                ⎔ Huy hiệu
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-line p-1.5 hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("triangle")}
+                title="Tam giác"
+              >
+                △ Tam giác
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-line p-1.5 hover:border-brand-400 hover:bg-brand-50"
+                onClick={() => addShape("line")}
+                title="Đường kẻ"
+              >
+                — Đường kẻ
+              </button>
+            </div>
+          </div>
 
           <p className="mt-4 mb-2 text-xs font-semibold text-ink-500">
             Logo có sẵn {presetLogos.length > 0 && `(${presetLogos.length})`}
@@ -747,69 +887,62 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
               Quản trị viên thêm ở mục <span className="text-ink-500">Logo có sẵn</span> trong admin.
             </p>
           )}
-
-          <button type="button" className={`${btn} mt-3 w-full`} onClick={addText}>
-            + Thêm chữ
-          </button>
         </Panel>
       </div>
 
       {/* ================= GIỮA ================= */}
       <div className="space-y-4">
         <div className="rounded-card border border-line bg-surface p-4 shadow-soft">
-          {hasContent ? (
-            <div className="relative">
-              <Stage
-                doc={doc}
-                images={images}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-                onPatchLayer={patchLayer}
-                onCommit={commit}
-              />
+          <div className="relative">
+            <Stage
+              doc={doc}
+              images={images}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onPatchLayer={patchLayer}
+              onCommit={commit}
+            />
 
-              {/* Lớp bôi vùng cần xoá — chỉ hiện khi bật chế độ xoá */}
-              {eraseMode && (
-                <canvas
-                  ref={maskRef}
-                  width={doc.width}
-                  height={doc.height}
-                  className="absolute inset-0 h-full w-full cursor-crosshair rounded-lg"
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    e.currentTarget.setPointerCapture(e.pointerId);
-                    paintingRef.current = true;
-                    lastPointRef.current = null;
-                    paintTo(e);
-                  }}
-                  onPointerMove={(e) => {
-                    if (paintingRef.current) paintTo(e);
-                  }}
-                  onPointerUp={() => {
-                    paintingRef.current = false;
-                    lastPointRef.current = null;
-                  }}
-                  onPointerLeave={() => {
-                    paintingRef.current = false;
-                    lastPointRef.current = null;
-                  }}
-                />
-              )}
-            </div>
-          ) : (
-            <div
-              className="flex items-center justify-center rounded-lg border-2 border-dashed border-line-strong text-center"
-              style={{ aspectRatio: `${doc.width} / ${doc.height}` }}
-            >
-              <div className="px-6">
-                <div className="mb-3 text-4xl">🖼️</div>
-                <p className="font-medium text-ink-900">Bắt đầu bằng một ảnh nền</p>
-                <p className="mt-1 text-sm text-ink-500">
-                  Chọn ảnh ở cột trái, rồi thêm logo và chữ lên trên.
-                </p>
+            {!hasContent && (
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
+                <div className="rounded-2xl border border-line bg-surface/90 px-6 py-5 text-center shadow-lg backdrop-blur-md">
+                  <div className="mb-2 text-3xl">🎨</div>
+                  <p className="text-sm font-bold text-ink-900">Bảng vẽ thiết kế sẵn sàng</p>
+                  <p className="mt-1 max-w-xs text-xs text-ink-500">
+                    Bấm các nút ở cột bên trái để tải ảnh nền, thêm logo AI, chữ hoặc hình khối.
+                  </p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Lớp bôi vùng cần xoá — chỉ hiện khi bật chế độ xoá */}
+            {eraseMode && (
+              <canvas
+                ref={maskRef}
+                width={doc.width}
+                height={doc.height}
+                className="absolute inset-0 h-full w-full cursor-crosshair rounded-lg"
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  paintingRef.current = true;
+                  lastPointRef.current = null;
+                  paintTo(e);
+                }}
+                onPointerMove={(e) => {
+                  if (paintingRef.current) paintTo(e);
+                }}
+                onPointerUp={() => {
+                  paintingRef.current = false;
+                  lastPointRef.current = null;
+                }}
+                onPointerLeave={() => {
+                  paintingRef.current = false;
+                  lastPointRef.current = null;
+                }}
+              />
+            )}
+          </div>
         </div>
 
         {(busy || error) && (
@@ -887,7 +1020,7 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
                       onClick={() => setSelectedId(layer.id)}
                       className="min-w-0 flex-1 truncate text-left text-xs text-ink-700"
                     >
-                      {layer.kind === "text" ? "T" : "🖼"} {layer.name}
+                      {layer.kind === "text" ? "T" : layer.kind === "shape" ? "❖" : "🖼"} {layer.name}
                     </button>
                     <button type="button" onClick={() => moveLayer(layer.id, 1)} title="Lên trên">
                       ↑
@@ -923,6 +1056,7 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
               layer={selected}
               onPatch={(patch) => patchLayer(selected.id, patch)}
               canvasWidth={doc.width}
+              onOpenRemoveBg={() => setRemoveBgLayerId(selected.id)}
             />
           </Panel>
         )}
@@ -936,6 +1070,24 @@ export default function ImageComposer({ presetLogos }: { presetLogos: PresetLogo
           </ul>
         </Panel>
       </div>
+
+      {/* Modal Khử nền thông minh cho ảnh AI / Logo */}
+      {removeBgLayerId && (() => {
+        const bgLayer = doc.layers.find((l) => l.id === removeBgLayerId);
+        if (!bgLayer || bgLayer.kind !== "image") return null;
+        const imgEl = images.get(bgLayer.src) as HTMLImageElement | undefined;
+        return (
+          <RemoveBgModal
+            layer={bgLayer}
+            imageElement={imgEl}
+            onClose={() => setRemoveBgLayerId(null)}
+            onApply={(dataUrl, asNewLayer) => {
+              handleApplyRemoveBg(dataUrl, asNewLayer);
+              setRemoveBgLayerId(null);
+            }}
+          />
+        );
+      })()}
     </div>
   );
 }
@@ -1013,10 +1165,12 @@ function Inspector({
   layer,
   onPatch,
   canvasWidth,
+  onOpenRemoveBg,
 }: {
   layer: Layer;
   onPatch: (patch: Partial<Layer>) => void;
   canvasWidth: number;
+  onOpenRemoveBg?: () => void;
 }) {
   return (
     <div className="space-y-3">
@@ -1039,6 +1193,74 @@ function Inspector({
               onChange={(e) => onPatch({ text: e.target.value } as Partial<Layer>)}
             />
           </label>
+
+          <div className="rounded-lg border border-line bg-surface-soft p-2.5">
+            <span className="mb-1.5 block text-[11px] font-semibold text-ink-500">
+              Phong cách chữ nhanh:
+            </span>
+            <div className="grid grid-cols-2 gap-1.5">
+              <button
+                type="button"
+                className="rounded border border-line bg-surface px-2 py-1 text-[11px] font-bold text-ink-800 hover:border-brand-400"
+                onClick={() =>
+                  onPatch({
+                    color: "#ffffff",
+                    strokeWidth: 0.08,
+                    strokeColor: "#000000",
+                    shadow: true,
+                    fontWeight: 800,
+                  } as Partial<Layer>)
+                }
+              >
+                Trắng viền đen
+              </button>
+              <button
+                type="button"
+                className="rounded border border-line bg-surface px-2 py-1 text-[11px] font-bold text-[#004098] hover:border-brand-400"
+                onClick={() =>
+                  onPatch({
+                    color: "#004098",
+                    strokeWidth: 0.06,
+                    strokeColor: "#ffffff",
+                    shadow: true,
+                    fontWeight: 800,
+                  } as Partial<Layer>)
+                }
+              >
+                HCMUTE Xanh
+              </button>
+              <button
+                type="button"
+                className="rounded border border-line bg-surface px-2 py-1 text-[11px] font-bold text-[#D9232E] hover:border-brand-400"
+                onClick={() =>
+                  onPatch({
+                    color: "#D9232E",
+                    strokeWidth: 0.05,
+                    strokeColor: "#ffffff",
+                    shadow: true,
+                    fontWeight: 900,
+                  } as Partial<Layer>)
+                }
+              >
+                Đỏ nổi bật
+              </button>
+              <button
+                type="button"
+                className="rounded border border-line bg-surface px-2 py-1 text-[11px] font-bold text-[#F59D1F] hover:border-brand-400"
+                onClick={() =>
+                  onPatch({
+                    color: "#FFD84A",
+                    strokeWidth: 0.07,
+                    strokeColor: "#8D4B00",
+                    shadow: true,
+                    fontWeight: 900,
+                  } as Partial<Layer>)
+                }
+              >
+                Vàng Gold 3D
+              </button>
+            </div>
+          </div>
 
           <label className="block text-xs text-ink-500">
             Phông chữ
@@ -1159,15 +1381,144 @@ function Inspector({
       )}
 
       {layer.kind === "image" && (
-        <Slider
-          label="Kích thước"
-          value={layer.width}
-          min={0.02}
-          max={2}
-          step={0.005}
-          format={(v) => `${Math.round(v * canvasWidth)}px`}
-          onChange={(width) => onPatch({ width } as Partial<Layer>)}
-        />
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={onOpenRemoveBg}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-3 py-2.5 text-xs font-bold text-ink-900 shadow-sm transition hover:from-amber-300 hover:to-amber-400"
+          >
+            <span>🪄</span> Khử nền AI / Tách logo trong suốt
+          </button>
+          <p className="text-[10px] text-ink-400">
+            Dành cho ảnh tạo từ ChatGPT hoặc ảnh có nền đơn sắc cần tách trong suốt.
+          </p>
+
+          <Slider
+            label="Kích thước"
+            value={layer.width}
+            min={0.02}
+            max={2}
+            step={0.005}
+            format={(v) => `${Math.round(v * canvasWidth)}px`}
+            onChange={(width) => onPatch({ width } as Partial<Layer>)}
+          />
+        </div>
+      )}
+
+      {layer.kind === "shape" && (
+        <div className="space-y-3">
+          <label className="block text-xs text-ink-500">
+            Hình khối
+            <select
+              className={`${input} mt-1`}
+              value={layer.shapeType}
+              onChange={(e) =>
+                onPatch({ shapeType: e.target.value as ShapeKind } as Partial<Layer>)
+              }
+            >
+              <option value="rounded-rect">Khung bo góc</option>
+              <option value="rect">Hình chữ nhật</option>
+              <option value="circle">Hình tròn / Ellipse</option>
+              <option value="star">Ngôi sao (5 cánh)</option>
+              <option value="badge">Huy hiệu (12 cánh)</option>
+              <option value="triangle">Tam giác</option>
+              <option value="line">Đường kẻ phân cách</option>
+            </select>
+          </label>
+
+          <div className="flex gap-2">
+            <label className="flex-1 text-xs text-ink-500">
+              Màu nền
+              <input
+                type="color"
+                className="mt-1 h-[36px] w-full cursor-pointer rounded-lg border border-line bg-transparent"
+                value={layer.fillColor === "transparent" ? "#004098" : layer.fillColor}
+                onChange={(e) => onPatch({ fillColor: e.target.value } as Partial<Layer>)}
+              />
+            </label>
+            <label className="flex-1 text-xs text-ink-500">
+              Màu viền
+              <input
+                type="color"
+                className="mt-1 h-[36px] w-full cursor-pointer rounded-lg border border-line bg-transparent"
+                value={layer.strokeColor === "transparent" ? "#F59D1F" : layer.strokeColor}
+                onChange={(e) => onPatch({ strokeColor: e.target.value } as Partial<Layer>)}
+              />
+            </label>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                onPatch({
+                  fillColor: layer.fillColor === "transparent" ? "#004098" : "transparent",
+                } as Partial<Layer>)
+              }
+              className={`rounded-lg border px-2.5 py-1 text-xs transition ${
+                layer.fillColor === "transparent"
+                  ? "border-brand-500 bg-brand-50 font-semibold text-brand-800"
+                  : "border-line text-ink-600 hover:bg-surface-soft"
+              }`}
+            >
+              {layer.fillColor === "transparent" ? "✓ Nền trong suốt" : "Tắt màu nền"}
+            </button>
+          </div>
+
+          <Slider
+            label="Chiều rộng"
+            value={layer.width}
+            min={0.02}
+            max={2}
+            step={0.005}
+            format={(v) => `${Math.round(v * canvasWidth)}px`}
+            onChange={(width) => onPatch({ width } as Partial<Layer>)}
+          />
+
+          {layer.shapeType !== "line" && (
+            <Slider
+              label="Chiều cao"
+              value={layer.height}
+              min={0.01}
+              max={2}
+              step={0.005}
+              format={(v) => `${Math.round(v * canvasWidth)}px`}
+              onChange={(height) => onPatch({ height } as Partial<Layer>)}
+            />
+          )}
+
+          <Slider
+            label="Độ dày viền"
+            value={layer.strokeWidth}
+            min={0}
+            max={0.03}
+            step={0.001}
+            format={(v) => `${Math.round(v * canvasWidth)}px`}
+            onChange={(strokeWidth) => onPatch({ strokeWidth } as Partial<Layer>)}
+          />
+
+          {layer.shapeType === "rounded-rect" && (
+            <Slider
+              label="Độ bo góc"
+              value={layer.cornerRadius ?? 0.12}
+              min={0}
+              max={0.5}
+              step={0.01}
+              format={(v) => `${Math.round(v * 100)}%`}
+              onChange={(cornerRadius) => onPatch({ cornerRadius } as Partial<Layer>)}
+            />
+          )}
+
+          <label className="flex cursor-pointer items-center justify-between text-xs text-ink-700">
+            Đổ bóng
+            <input
+              type="checkbox"
+              checked={layer.shadow}
+              onChange={(e) => onPatch({ shadow: e.target.checked } as Partial<Layer>)}
+              className="h-4 w-4 accent-brand-500"
+            />
+          </label>
+        </div>
       )}
 
       <Slider
