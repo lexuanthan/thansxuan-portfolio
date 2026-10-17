@@ -523,12 +523,13 @@ export async function POST(request: Request) {
         room.currentQuestionIndex = body.questionIndex;
         room.status = 'QUESTION_ACTIVE';
         const now = Date.now();
-        room.questionStartTime =
+        const startTime =
           typeof body.questionStartTime === 'number' ? body.questionStartTime : now - 1000;
+        room.questionStartTime = startTime;
         room.questionDeadline =
           typeof body.questionDeadline === 'number'
             ? body.questionDeadline
-            : room.questionStartTime + room.questionTimeLimitMs;
+            : startTime + room.questionTimeLimitMs;
       }
 
       const clientTimeMs =

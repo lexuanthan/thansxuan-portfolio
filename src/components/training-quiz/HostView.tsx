@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   RoomState,
+  PlayerState,
   QuizQuestion,
   LeaderboardEntry,
   FinalAwardsSummary,
