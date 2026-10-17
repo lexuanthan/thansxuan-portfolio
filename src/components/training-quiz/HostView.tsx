@@ -125,6 +125,61 @@ export const HostView: React.FC<HostViewProps> = ({
     latestStateRef.current = state;
   }, [state]);
 
+  const applyIncomingState = useCallback((incoming: RoomState) => {
+    if (!incoming || typeof incoming !== 'object') return;
+    setState((prev) => {
+      if (!prev || prev.roomCode !== incoming.roomCode) {
+        latestStateRef.current = incoming;
+        return incoming;
+      }
+
+      const statusRank: Record<string, number> = {
+        LOBBY: 0,
+        QUESTION_START: 1,
+        QUESTION_ACTIVE: 2,
+        QUESTION_REVEAL: 3,
+        LEADERBOARD: 4,
+        FINAL_RESULTS: 5,
+      };
+      const prevProg =
+        prev.status === 'FINAL_RESULTS'
+          ? 1000
+          : prev.currentQuestionIndex * 10 + (statusRank[prev.status] ?? 0);
+      const incProg =
+        incoming.status === 'FINAL_RESULTS'
+          ? 1000
+          : incoming.currentQuestionIndex * 10 + (statusRank[incoming.status] ?? 0);
+
+      // Union-merge players & answers so no player or answer is ever lost across instances
+      const mergedPlayers: Record<string, PlayerState> = { ...prev.players };
+      for (const [pid, incPlayer] of Object.entries(incoming.players || {})) {
+        const curPlayer = mergedPlayers[pid];
+        if (!curPlayer) {
+          mergedPlayers[pid] = incPlayer;
+        } else {
+          const curAnsCount = Object.keys(curPlayer.answers || {}).length;
+          const incAnsCount = Object.keys(incPlayer.answers || {}).length;
+          const basePlayer =
+            incAnsCount > curAnsCount || (incPlayer.score ?? 0) >= (curPlayer.score ?? 0)
+              ? incPlayer
+              : curPlayer;
+          mergedPlayers[pid] = {
+            ...basePlayer,
+            answers: { ...(curPlayer.answers || {}), ...(incPlayer.answers || {}) },
+          };
+        }
+      }
+
+      const baseState = incProg >= prevProg ? incoming : prev;
+      const nextState: RoomState = {
+        ...baseState,
+        players: mergedPlayers,
+      };
+      latestStateRef.current = nextState;
+      return nextState;
+    });
+  }, []);
+
   // Polling / Sync when using API
   useEffect(() => {
     if (standaloneRoom || !roomCode || !hostToken) return;
@@ -139,12 +194,13 @@ export const HostView: React.FC<HostViewProps> = ({
             op: 'state',
             roomCode,
             hostToken,
+            allowRehydrate: true,
             snapshot: latestStateRef.current,
           }),
         });
         if (res.ok && active) {
           const data = await res.json();
-          setState(data.state || data);
+          applyIncomingState(data.state || data);
         }
       } catch {
         // Ignore fetch errors during polling
@@ -158,7 +214,7 @@ export const HostView: React.FC<HostViewProps> = ({
       active = false;
       clearInterval(interval);
     };
-  }, [standaloneRoom, roomCode, hostToken]);
+  }, [standaloneRoom, roomCode, hostToken, applyIncomingState]);
 
   // Active question countdown timer
   useEffect(() => {
@@ -241,13 +297,14 @@ export const HostView: React.FC<HostViewProps> = ({
           roomCode,
           hostToken,
           action,
+          allowRehydrate: true,
           snapshot: latestStateRef.current,
         }),
       });
       if (res.ok) {
         const data = await res.json();
         if (data.state) {
-          setState(data.state);
+          applyIncomingState(data.state);
         }
       }
     } catch {

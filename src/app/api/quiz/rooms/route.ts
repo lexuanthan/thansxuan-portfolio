@@ -1,7 +1,16 @@
 import { NextResponse } from 'next/server';
 import { QuizRoomManager } from '@/lib/training-quiz/roomManager';
 import { QuizRoom } from '@/lib/training-quiz/roomEngine';
-import { HostActionType, RoomState } from '@/lib/training-quiz/types';
+import {
+  HostActionType,
+  PlayerState,
+  RoomState,
+  RoomStatus,
+} from '@/lib/training-quiz/types';
+import {
+  calculateScore,
+  getFastestPlayerInQuestion,
+} from '@/lib/training-quiz/scoringEngine';
 
 const ALLOWED_ACTIONS: readonly HostActionType[] = [
   'START',
@@ -10,60 +19,244 @@ const ALLOWED_ACTIONS: readonly HostActionType[] = [
   'END_GAME',
 ] as const;
 
+const STATUS_ORDER: Record<RoomStatus, number> = {
+  LOBBY: 0,
+  QUESTION_START: 1,
+  QUESTION_ACTIVE: 2,
+  QUESTION_REVEAL: 3,
+  LEADERBOARD: 4,
+  FINAL_RESULTS: 5,
+};
+
+type RehydratableQuizRoom = QuizRoom & {
+  isRehydratedShell?: boolean;
+};
+
+function getRoomProgress(status: RoomStatus, questionIndex: number): number {
+  if (status === 'FINAL_RESULTS') return 1000;
+  return questionIndex * 10 + (STATUS_ORDER[status] ?? 0);
+}
+
+function recomputePlayerFromAnswers(room: QuizRoom, player: PlayerState): void {
+  let score = 0;
+  let streak = 0;
+  let maxStreak = 0;
+  let correctCount = 0;
+  let totalResponseTimeMs = 0;
+
+  const answerIndices = Object.keys(player.answers || {})
+    .map((k) => Number(k))
+    .filter((n) => Number.isInteger(n) && n >= 0);
+
+  const maxQuestionIdx = Math.max(
+    room.currentQuestionIndex,
+    ...(answerIndices.length > 0 ? answerIndices : [0])
+  );
+
+  for (let q = 0; q <= maxQuestionIdx && q < room.questions.length; q++) {
+    const ans = player.answers?.[q];
+    const question = room.questions[q];
+
+    if (!ans || typeof ans.selectedIndex !== 'number' || ans.selectedIndex < 0 || ans.selectedIndex > 3) {
+      const questionFinished =
+        q < room.currentQuestionIndex ||
+        (q === room.currentQuestionIndex &&
+          room.status !== 'LOBBY' &&
+          room.status !== 'QUESTION_START' &&
+          room.status !== 'QUESTION_ACTIVE');
+      if (questionFinished) {
+        streak = 0;
+      }
+      continue;
+    }
+
+    const responseTimeMs = Math.max(0, Number(ans.responseTimeMs) || 0);
+    const isTimeout = responseTimeMs > room.questionTimeLimitMs;
+    const isCorrect = !isTimeout && ans.selectedIndex === question.correctIndex;
+    const calc = calculateScore(isCorrect, responseTimeMs, streak);
+
+    ans.isCorrect = isCorrect;
+    ans.pointsEarned = calc.points;
+    ans.responseTimeMs = responseTimeMs;
+
+    score += calc.points;
+    streak = calc.newStreak;
+    maxStreak = Math.max(maxStreak, streak);
+    if (isCorrect) {
+      correctCount++;
+    }
+    totalResponseTimeMs += responseTimeMs;
+  }
+
+  player.score = score;
+  player.streak = streak;
+  player.maxStreak = maxStreak;
+  player.correctCount = correctCount;
+  player.totalResponseTimeMs = totalResponseTimeMs;
+}
+
+function recomputeRoomAggregates(room: QuizRoom): void {
+  for (let q = 0; q <= room.currentQuestionIndex && q < room.questions.length; q++) {
+    const stats = { A: 0, B: 0, C: 0, D: 0 };
+    for (const p of Object.values(room.players)) {
+      const ans = p.answers?.[q];
+      if (ans && ans.selectedIndex >= 0 && ans.selectedIndex <= 3) {
+        const key = (['A', 'B', 'C', 'D'] as const)[ans.selectedIndex];
+        stats[key]++;
+      }
+    }
+    room.statsPerQuestion[q] = stats;
+  }
+
+  if (
+    room.status === 'QUESTION_REVEAL' ||
+    room.status === 'LEADERBOARD' ||
+    room.status === 'FINAL_RESULTS'
+  ) {
+    room.fastestPlayerInCurrentQuestion =
+      getFastestPlayerInQuestion(room.players, room.currentQuestionIndex) ?? undefined;
+  }
+}
+
+function mergePlayersIntoRoom(
+  room: QuizRoom,
+  incomingPlayers?: Record<string, PlayerState> | null
+): boolean {
+  if (!incomingPlayers || typeof incomingPlayers !== 'object') return false;
+
+  let anyModified = false;
+
+  for (const [pid, pState] of Object.entries(incomingPlayers)) {
+    if (!pid || !pState || typeof pState !== 'object') continue;
+
+    let existing = room.players[pid];
+    if (!existing) {
+      existing = {
+        id: pid,
+        nickname:
+          typeof pState.nickname === 'string' && pState.nickname.trim()
+            ? pState.nickname.trim()
+            : 'Người chơi',
+        unit:
+          typeof pState.unit === 'string' && pState.unit.trim()
+            ? pState.unit.trim()
+            : undefined,
+        score: 0,
+        streak: 0,
+        maxStreak: 0,
+        correctCount: 0,
+        totalResponseTimeMs: 0,
+        answers: {},
+        connected: pState.connected ?? true,
+        joinedAt: pState.joinedAt || Date.now(),
+      };
+      room.players[pid] = existing;
+      anyModified = true;
+    }
+
+    let playerAnswersUpdated = false;
+    if (pState.answers && typeof pState.answers === 'object') {
+      for (const [qKey, ans] of Object.entries(pState.answers)) {
+        const qIdx = Number(qKey);
+        if (
+          !Number.isInteger(qIdx) ||
+          qIdx < 0 ||
+          qIdx >= room.questions.length ||
+          !ans ||
+          typeof ans.selectedIndex !== 'number' ||
+          ans.selectedIndex < 0 ||
+          ans.selectedIndex > 3
+        ) {
+          continue;
+        }
+        const curAns = existing.answers[qIdx];
+        if (!curAns || curAns.selectedIndex < 0) {
+          existing.answers[qIdx] = {
+            selectedIndex: ans.selectedIndex,
+            responseTimeMs: Math.max(0, Number(ans.responseTimeMs) || 0),
+            isCorrect: Boolean(ans.isCorrect),
+            pointsEarned: Number(ans.pointsEarned) || 0,
+          };
+          playerAnswersUpdated = true;
+          anyModified = true;
+        }
+      }
+    }
+
+    if (playerAnswersUpdated || (existing.score === 0 && Object.keys(existing.answers).length > 0)) {
+      recomputePlayerFromAnswers(room, existing);
+    }
+  }
+
+  if (anyModified) {
+    recomputeRoomAggregates(room);
+  }
+
+  return anyModified;
+}
+
 function rehydrateRoomFromSnapshot(
   roomManager: QuizRoomManager,
   roomCode: string,
   hostToken?: string,
-  snapshot?: Partial<RoomState>
-): QuizRoom | undefined {
-  let room = roomManager.getRoom(roomCode);
+  snapshot?: Partial<RoomState>,
+  playerSnapshot?: PlayerState,
+  allowRehydrate?: boolean
+): RehydratableQuizRoom | undefined {
+  let room = roomManager.getRoom(roomCode) as RehydratableQuizRoom | undefined;
 
-  if (!room && hostToken) {
+  if (!room && (hostToken || allowRehydrate)) {
     const created = roomManager.createRoom({
       customCode: roomCode,
-      hostToken,
+      hostToken: hostToken || undefined,
     });
-    room = created.room;
+    room = created.room as RehydratableQuizRoom;
+    if (!hostToken) {
+      room.isRehydratedShell = true;
+    }
   }
 
-  if (room && snapshot && hostToken && room.hostToken === hostToken) {
-    // Merge any players from snapshot that are missing or have higher progress on a newly rehydrated instance
-    if (snapshot.players && typeof snapshot.players === 'object') {
-      for (const [pid, pState] of Object.entries(snapshot.players)) {
-        if (!pState || typeof pState !== 'object') continue;
-        const existing = room.players[pid];
-        if (!existing || (pState.score ?? 0) > (existing.score ?? 0)) {
-          room.players[pid] = {
-            ...pState,
-            answers: { ...(existing?.answers || {}), ...(pState.answers || {}) },
-          };
-        }
-      }
-    }
-    // If the server room is still at initial LOBBY Q0 while snapshot is further ahead, sync state
+  if (!room) return undefined;
+
+  // Adopt real hostToken if room was initialized as a rehydrated shell by a player request
+  if (hostToken && room.isRehydratedShell && room.hostToken !== hostToken) {
+    (room as { hostToken: string }).hostToken = hostToken;
+    room.isRehydratedShell = false;
+  }
+
+  // Host snapshot monotonic progression + player merge
+  if (snapshot && hostToken && room.hostToken === hostToken) {
     if (
-      room.status === 'LOBBY' &&
-      room.currentQuestionIndex === 0 &&
       snapshot.status &&
-      snapshot.status !== 'LOBBY'
+      typeof snapshot.currentQuestionIndex === 'number'
     ) {
-      room.status = snapshot.status;
-      if (typeof snapshot.currentQuestionIndex === 'number') {
+      const serverProgress = getRoomProgress(room.status, room.currentQuestionIndex);
+      const snapProgress = getRoomProgress(snapshot.status, snapshot.currentQuestionIndex);
+
+      if (snapProgress > serverProgress) {
         room.currentQuestionIndex = snapshot.currentQuestionIndex;
-      }
-      if (typeof snapshot.questionStartTime === 'number') {
+        room.status = snapshot.status;
         room.questionStartTime = snapshot.questionStartTime;
-      }
-      if (typeof snapshot.questionDeadline === 'number') {
         room.questionDeadline = snapshot.questionDeadline;
       }
-      if (snapshot.fastestPlayerInCurrentQuestion) {
-        room.fastestPlayerInCurrentQuestion = snapshot.fastestPlayerInCurrentQuestion;
-      }
-      if (snapshot.statsPerQuestion) {
-        room.statsPerQuestion = { ...snapshot.statsPerQuestion };
-      }
     }
+
+    if (snapshot.players && typeof snapshot.players === 'object') {
+      mergePlayersIntoRoom(room, snapshot.players);
+      for (const p of Object.values(room.players)) {
+        recomputePlayerFromAnswers(room, p);
+      }
+      recomputeRoomAggregates(room);
+    }
+  }
+
+  // Player-carried state merge
+  if (playerSnapshot && typeof playerSnapshot === 'object' && playerSnapshot.id) {
+    mergePlayersIntoRoom(room, { [playerSnapshot.id]: playerSnapshot });
+  }
+
+  if (room.status === 'QUESTION_ACTIVE') {
+    room.checkFastShortCircuit();
   }
 
   return room;
@@ -112,7 +305,7 @@ export async function POST(request: Request) {
     const op = typeof body?.op === 'string' ? body.op : 'create';
     const roomManager = QuizRoomManager.getInstance();
 
-    // 1. STATE POLL + HOST SNAPSHOT REHYDRATION
+    // 1. STATE POLL + SNAPSHOT REHYDRATION
     if (op === 'state') {
       const code = typeof body.roomCode === 'string' ? body.roomCode.trim().toUpperCase() : '';
       if (!code) {
@@ -120,10 +313,21 @@ export async function POST(request: Request) {
       }
       const hostToken = typeof body.hostToken === 'string' ? body.hostToken : undefined;
       const playerId = typeof body.playerId === 'string' ? body.playerId : undefined;
-      const room = rehydrateRoomFromSnapshot(roomManager, code, hostToken, body.snapshot);
+      const room = rehydrateRoomFromSnapshot(
+        roomManager,
+        code,
+        hostToken,
+        body.snapshot,
+        body.playerSnapshot,
+        Boolean(body.allowRehydrate)
+      );
 
       if (!room) {
         return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+      }
+
+      if (body.playersSnapshot && typeof body.playersSnapshot === 'object') {
+        mergePlayersIntoRoom(room, body.playersSnapshot);
       }
 
       const state = room.getSanitizedState({
@@ -145,7 +349,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Room code is required' }, { status: 400 });
       }
 
-      const room = roomManager.getRoom(code);
+      const room = rehydrateRoomFromSnapshot(
+        roomManager,
+        code,
+        undefined,
+        undefined,
+        undefined,
+        Boolean(body.allowRehydrate)
+      );
       if (!room) {
         return NextResponse.json({ error: 'Room not found' }, { status: 404 });
       }
@@ -162,8 +373,12 @@ export async function POST(request: Request) {
         typeof body.unit === 'string' && body.unit.trim().length > 0
           ? body.unit.trim().slice(0, 50)
           : undefined;
+      const customId =
+        typeof body.playerId === 'string' && body.playerId.trim().length > 0
+          ? body.playerId.trim()
+          : undefined;
 
-      const player = room.joinPlayer(nickname, unit);
+      const player = room.joinPlayer(nickname, unit, customId);
       const state = room.getSanitizedState({ requestingPlayerId: player.id });
 
       return NextResponse.json(
@@ -189,7 +404,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Host token is required' }, { status: 401 });
       }
 
-      const room = rehydrateRoomFromSnapshot(roomManager, code, hostToken, body.snapshot);
+      const room = rehydrateRoomFromSnapshot(
+        roomManager,
+        code,
+        hostToken,
+        body.snapshot,
+        undefined,
+        Boolean(body.allowRehydrate)
+      );
       if (!room) {
         return NextResponse.json({ error: 'Room not found' }, { status: 404 });
       }
@@ -220,6 +442,7 @@ export async function POST(request: Request) {
         );
       }
 
+      recomputeRoomAggregates(room);
       const state = room.getSanitizedState({ forHost: true });
       return NextResponse.json(
         {
@@ -238,7 +461,15 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Room code is required' }, { status: 400 });
       }
 
-      const room = roomManager.getRoom(code);
+      const allowRehydrate = Boolean(body.allowRehydrate);
+      const room = rehydrateRoomFromSnapshot(
+        roomManager,
+        code,
+        undefined,
+        undefined,
+        body.playerSnapshot,
+        allowRehydrate
+      );
       if (!room) {
         return NextResponse.json({ error: 'Room not found' }, { status: 404 });
       }
@@ -264,11 +495,40 @@ export async function POST(request: Request) {
         );
       }
 
+      // If allowRehydrate is enabled and a secondary instance does not have the player yet, restore player
+      if (!room.players[body.playerId] && allowRehydrate && typeof body.nickname === 'string') {
+        room.joinPlayer(
+          body.nickname,
+          typeof body.unit === 'string' ? body.unit : undefined,
+          body.playerId
+        );
+      }
+
       if (!room.players[body.playerId]) {
         return NextResponse.json(
           { error: 'Player not found in room' },
           { status: 404 }
         );
+      }
+
+      // If allowRehydrate is enabled and this secondary container is behind the active question
+      if (
+        allowRehydrate &&
+        body.questionIndex >= 0 &&
+        body.questionIndex < room.questions.length &&
+        (room.currentQuestionIndex < body.questionIndex ||
+          (room.currentQuestionIndex === body.questionIndex &&
+            (room.status === 'LOBBY' || room.status === 'QUESTION_START')))
+      ) {
+        room.currentQuestionIndex = body.questionIndex;
+        room.status = 'QUESTION_ACTIVE';
+        const now = Date.now();
+        room.questionStartTime =
+          typeof body.questionStartTime === 'number' ? body.questionStartTime : now - 1000;
+        room.questionDeadline =
+          typeof body.questionDeadline === 'number'
+            ? body.questionDeadline
+            : room.questionStartTime + room.questionTimeLimitMs;
       }
 
       const clientTimeMs =
@@ -299,6 +559,7 @@ export async function POST(request: Request) {
         {
           success: true,
           result,
+          player: room.players[body.playerId],
           state: playerState,
           roomState: playerState,
         },

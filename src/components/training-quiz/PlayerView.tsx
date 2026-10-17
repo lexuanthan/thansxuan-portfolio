@@ -63,18 +63,40 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
     };
   }, [standaloneRoom, playerId]);
 
+  const myPlayerRef = useRef<PlayerState | null>(null);
+
   // Polling state when using API
   useEffect(() => {
     if (standaloneRoom || !joined || !roomCode || !playerId) return;
 
     const interval = setInterval(async () => {
       try {
-        const res = await fetch(
-          `/api/quiz/rooms?roomCode=${encodeURIComponent(roomCode)}&playerId=${encodeURIComponent(playerId)}`
-        );
+        const res = await fetch('/api/quiz/rooms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            op: 'state',
+            roomCode,
+            playerId,
+            allowRehydrate: true,
+            playerSnapshot: myPlayerRef.current,
+          }),
+        });
         if (res.ok) {
           const data = await res.json();
-          setState(data.state || data);
+          const nextState: RoomState = data.state || data;
+          if (nextState?.players?.[playerId]) {
+            const srvP = nextState.players[playerId];
+            if (myPlayerRef.current) {
+              myPlayerRef.current = {
+                ...srvP,
+                answers: { ...(myPlayerRef.current.answers || {}), ...(srvP.answers || {}) },
+              };
+            } else {
+              myPlayerRef.current = srvP;
+            }
+          }
+          setState(nextState);
         }
       } catch {
         // Ignore polling errors
@@ -156,11 +178,15 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           roomCode: trimmedCode,
           nickname: trimmedNick,
           unit: unit.trim(),
+          allowRehydrate: true,
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
+        if (data.player) {
+          myPlayerRef.current = data.player;
+        }
         setPlayerId(data.playerId);
         setJoined(true);
         setState(data.state);
@@ -205,13 +231,22 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           op: 'answer',
           roomCode,
           playerId,
+          nickname: nickname.trim(),
+          unit: unit.trim() || undefined,
           questionIndex,
           selectedIndex: optionIndex,
           clientTimeMs,
+          questionStartTime: state.questionStartTime,
+          questionDeadline: state.questionDeadline,
+          allowRehydrate: true,
+          playerSnapshot: myPlayerRef.current,
         }),
       });
       if (res.ok) {
         const data = await res.json();
+        if (data.player) {
+          myPlayerRef.current = data.player;
+        }
         if (data.state) {
           setState(data.state);
         }
