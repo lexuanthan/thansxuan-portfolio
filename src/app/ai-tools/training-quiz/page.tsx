@@ -11,6 +11,7 @@ function TrainingQuizContainer() {
   const searchParams = useSearchParams();
   const modeParam = searchParams.get('mode');
   const roomParam = searchParams.get('room') || '';
+  const hostTokenParam = searchParams.get('hostToken') || '';
 
   const [mode, setMode] = useState<'select' | 'host' | 'player'>('select');
 
@@ -24,7 +25,13 @@ function TrainingQuizContainer() {
 
   // If in Host mode, show full-screen Host view
   if (mode === 'host') {
-    return <HostView onExit={() => setMode('select')} />;
+    return (
+      <HostView
+        initialRoomCode={roomParam || undefined}
+        initialHostToken={hostTokenParam || undefined}
+        onExit={() => setMode('select')}
+      />
+    );
   }
 
   // If in Player mode, show mobile-optimized Player view

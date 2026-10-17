@@ -244,13 +244,15 @@ describe('4. HostView Component Lifecycle & State Rendering', () => {
     expect(screen.getByTestId('advance-next-btn')).toBeDefined();
   });
 
-  it('transitions to FINAL_RESULTS and displays Podium, Lightning Award, and Class Analytics', () => {
+  it('transitions to FINAL_RESULTS and displays Podium Top 3, Remaining Players (#4+), Lightning Award, and Full Leaderboard Table by default', () => {
     render(React.createElement(HostView, { standaloneRoom: room }));
 
     act(() => {
       const p1 = room.joinPlayer('Nguyễn Văn A', 'Chi đoàn 1');
       const p2 = room.joinPlayer('Trần Thị B', 'Chi đoàn 2');
       const p3 = room.joinPlayer('Lê Văn C', 'Chi đoàn 3');
+      const p4 = room.joinPlayer('Phạm Thị D', 'Chi đoàn 4');
+      const p5 = room.joinPlayer('Hoàng Văn E', 'Chi đoàn 5');
 
       p1.score = 14500;
       p1.correctCount = 14;
@@ -258,14 +260,30 @@ describe('4. HostView Component Lifecycle & State Rendering', () => {
       p2.correctCount = 12;
       p3.score = 10500;
       p3.correctCount = 10;
+      p4.score = 8900;
+      p4.correctCount = 9;
+      p5.score = 7200;
+      p5.correctCount = 7;
 
       room.endGame(room.hostToken);
     });
 
     expect(screen.getByTestId('final-results-view')).toBeDefined();
     expect(screen.getByTestId('podium-section')).toBeDefined();
+    expect(screen.getByTestId('podium-rank-1').textContent).toContain('Nguyễn Văn A');
+    expect(screen.getByTestId('podium-rank-1').textContent).toContain('14');
+    expect(screen.getByTestId('podium-rank-2').textContent).toContain('Trần Thị B');
+    expect(screen.getByTestId('podium-rank-3').textContent).toContain('Lê Văn C');
+
+    // Remaining players (#4 and #5) shown directly below podium
+    const remainingSection = screen.getByTestId('remaining-players-section');
+    expect(remainingSection).toBeDefined();
+    expect(screen.getByTestId('remaining-player-rank-4').textContent).toContain('Phạm Thị D');
+    expect(screen.getByTestId('remaining-player-rank-5').textContent).toContain('Hoàng Văn E');
+
+    // Full leaderboard table visible by default
+    expect(screen.getByTestId('full-leaderboard-table')).toBeDefined();
     expect(screen.getByTestId('class-analytics')).toBeDefined();
-    expect(screen.getByText(/Quán quân/i)).toBeDefined();
   });
 });
 

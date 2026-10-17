@@ -10,6 +10,7 @@ import {
 } from '@/lib/training-quiz/types';
 import { TRAINING_QUIZ_QUESTIONS } from '@/lib/training-quiz/questionsData';
 import { QuizRoom } from '@/lib/training-quiz/roomEngine';
+import { getFinalAwards } from '@/lib/training-quiz/scoringEngine';
 import { SHAPE_THEMES, QuizShapeIcon } from './common/QuizShapes';
 import { QuizQrCode } from './QuizQrCode';
 import { QuizConfetti } from './QuizConfetti';
@@ -38,7 +39,7 @@ export const HostView: React.FC<HostViewProps> = ({
   const [previewSeconds, setPreviewSeconds] = useState<number>(3);
   const [isMuted, setIsMuted] = useState<boolean>(quizSound.isMuted());
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
-  const [showFullLeaderboard, setShowFullLeaderboard] = useState<boolean>(false);
+  const [showFullLeaderboard, setShowFullLeaderboard] = useState<boolean>(true);
 
   // Timer intervals
   const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -128,7 +129,8 @@ export const HostView: React.FC<HostViewProps> = ({
   useEffect(() => {
     if (standaloneRoom || !roomCode || !hostToken) return;
 
-    const interval = setInterval(async () => {
+    let active = true;
+    const syncState = async () => {
       try {
         const res = await fetch('/api/quiz/rooms', {
           method: 'POST',
@@ -140,16 +142,22 @@ export const HostView: React.FC<HostViewProps> = ({
             snapshot: latestStateRef.current,
           }),
         });
-        if (res.ok) {
+        if (res.ok && active) {
           const data = await res.json();
           setState(data.state || data);
         }
       } catch {
         // Ignore fetch errors during polling
       }
-    }, 600);
+    };
 
-    return () => clearInterval(interval);
+    syncState();
+    const interval = setInterval(syncState, 600);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, [standaloneRoom, roomCode, hostToken]);
 
   // Active question countdown timer
@@ -286,9 +294,12 @@ export const HostView: React.FC<HostViewProps> = ({
     };
 
   const finalAwards: FinalAwardsSummary | null =
-    room && state?.status === 'FINAL_RESULTS'
-      ? room.getFinalAwards()
+    state?.status === 'FINAL_RESULTS'
+      ? getFinalAwards(state.players || {}, TRAINING_QUIZ_QUESTIONS)
       : null;
+
+  const remainingLeaderboard: LeaderboardEntry[] =
+    finalAwards?.fullLeaderboard ? finalAwards.fullLeaderboard.slice(3) : [];
 
   return (
     <div
@@ -832,13 +843,24 @@ export const HostView: React.FC<HostViewProps> = ({
             {/* Podium Top 3 */}
             <div className="flex items-end justify-center gap-4 sm:gap-6 pt-10 pb-4" data-testid="podium-section">
               {/* Rank 2 (Silver) */}
-              <div className="flex flex-col items-center w-28 sm:w-36 text-center">
-                <span className="text-3xl sm:text-4xl mb-2">🥈</span>
-                <span className="text-xs sm:text-sm font-bold text-slate-200 truncate max-w-full">
-                  {finalAwards?.podium[1]?.nickname || 'Hạng 2'}
+              <div className="flex flex-col items-center w-32 sm:w-44 text-center" data-testid="podium-rank-2">
+                <span className="text-3xl sm:text-4xl mb-1">🥈</span>
+                <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+                  Á quân (Hạng 2)
                 </span>
-                <span className="text-xs text-slate-400 font-mono mb-2">
-                  {finalAwards?.podium[1]?.score.toLocaleString() || '0'} đ
+                <span className="text-sm sm:text-base font-black text-white truncate max-w-full mt-0.5">
+                  {finalAwards?.podium[1]?.nickname || 'Chưa có'}
+                </span>
+                {finalAwards?.podium[1]?.unit && (
+                  <span className="text-[11px] text-slate-400 truncate max-w-full">
+                    {finalAwards.podium[1].unit}
+                  </span>
+                )}
+                <span className="text-xs sm:text-sm text-slate-200 font-mono font-bold mt-1">
+                  {finalAwards?.podium[1] ? `${finalAwards.podium[1].score.toLocaleString()} đ` : '—'}
+                </span>
+                <span className="text-[11px] text-emerald-400 font-semibold mb-2">
+                  {finalAwards?.podium[1] ? `${finalAwards.podium[1].correctCount}/15 câu đúng` : ''}
                 </span>
                 <div className="w-full h-32 sm:h-40 rounded-t-2xl bg-gradient-to-t from-slate-700 to-slate-500 border-t-4 border-slate-300 flex items-center justify-center text-2xl font-black text-slate-900 shadow-xl">
                   2
@@ -846,16 +868,24 @@ export const HostView: React.FC<HostViewProps> = ({
               </div>
 
               {/* Rank 1 (Gold - Winner) */}
-              <div className="flex flex-col items-center w-32 sm:w-44 text-center">
-                <span className="text-5xl sm:text-6xl mb-2 animate-bounce">👑</span>
-                <span className="text-[11px] font-black text-amber-400 uppercase tracking-widest block">
-                  Quán quân
+              <div className="flex flex-col items-center w-36 sm:w-52 text-center" data-testid="podium-rank-1">
+                <span className="text-5xl sm:text-6xl mb-1 animate-bounce">👑</span>
+                <span className="text-xs font-black text-amber-400 uppercase tracking-widest block">
+                  Quán quân (Hạng 1)
                 </span>
-                <span className="text-sm sm:text-base font-black text-amber-300 truncate max-w-full">
-                  {finalAwards?.podium[0]?.nickname || 'Quán quân'}
+                <span className="text-base sm:text-lg font-black text-amber-300 truncate max-w-full mt-0.5">
+                  {finalAwards?.podium[0]?.nickname || 'Chưa có'}
                 </span>
-                <span className="text-xs sm:text-sm text-amber-400 font-mono font-bold mb-2">
-                  {finalAwards?.podium[0]?.score.toLocaleString() || '0'} đ
+                {finalAwards?.podium[0]?.unit && (
+                  <span className="text-xs text-amber-200/80 truncate max-w-full">
+                    {finalAwards.podium[0].unit}
+                  </span>
+                )}
+                <span className="text-sm sm:text-base text-amber-400 font-mono font-black mt-1">
+                  {finalAwards?.podium[0] ? `${finalAwards.podium[0].score.toLocaleString()} đ` : '0 đ'}
+                </span>
+                <span className="text-xs text-emerald-400 font-bold mb-2">
+                  {finalAwards?.podium[0] ? `${finalAwards.podium[0].correctCount}/15 câu đúng` : ''}
                 </span>
                 <div className="w-full h-44 sm:h-56 rounded-t-2xl bg-gradient-to-t from-amber-600 to-yellow-400 border-t-4 border-yellow-200 flex items-center justify-center text-3xl font-black text-amber-950 shadow-2xl">
                   1
@@ -863,19 +893,86 @@ export const HostView: React.FC<HostViewProps> = ({
               </div>
 
               {/* Rank 3 (Bronze) */}
-              <div className="flex flex-col items-center w-28 sm:w-36 text-center">
-                <span className="text-3xl sm:text-4xl mb-2">🥉</span>
-                <span className="text-xs sm:text-sm font-bold text-slate-200 truncate max-w-full">
-                  {finalAwards?.podium[2]?.nickname || 'Hạng 3'}
+              <div className="flex flex-col items-center w-32 sm:w-44 text-center" data-testid="podium-rank-3">
+                <span className="text-3xl sm:text-4xl mb-1">🥉</span>
+                <span className="text-[11px] font-bold text-amber-500 uppercase tracking-wider">
+                  Quý quân (Hạng 3)
                 </span>
-                <span className="text-xs text-slate-400 font-mono mb-2">
-                  {finalAwards?.podium[2]?.score.toLocaleString() || '0'} đ
+                <span className="text-sm sm:text-base font-black text-white truncate max-w-full mt-0.5">
+                  {finalAwards?.podium[2]?.nickname || 'Chưa có'}
+                </span>
+                {finalAwards?.podium[2]?.unit && (
+                  <span className="text-[11px] text-slate-400 truncate max-w-full">
+                    {finalAwards.podium[2].unit}
+                  </span>
+                )}
+                <span className="text-xs sm:text-sm text-amber-300 font-mono font-bold mt-1">
+                  {finalAwards?.podium[2] ? `${finalAwards.podium[2].score.toLocaleString()} đ` : '—'}
+                </span>
+                <span className="text-[11px] text-emerald-400 font-semibold mb-2">
+                  {finalAwards?.podium[2] ? `${finalAwards.podium[2].correctCount}/15 câu đúng` : ''}
                 </span>
                 <div className="w-full h-24 sm:h-28 rounded-t-2xl bg-gradient-to-t from-amber-900 to-amber-700 border-t-4 border-amber-600 flex items-center justify-center text-2xl font-black text-amber-200 shadow-xl">
                   3
                 </div>
               </div>
             </div>
+
+            {/* Danh sách điểm những học viên còn lại (Hạng 4 trở đi) */}
+            {remainingLeaderboard.length > 0 && (
+              <div
+                className="w-full max-w-5xl mx-auto bg-slate-900/95 rounded-2xl p-6 border border-slate-800 space-y-4 shadow-xl"
+                data-testid="remaining-players-section"
+              >
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    <span>📋</span>
+                    <span>Danh sách điểm các học viên tiếp theo (Hạng 4 — Hạng {finalAwards?.fullLeaderboard.length})</span>
+                  </h3>
+                  <span className="text-xs font-semibold text-slate-400">
+                    {remainingLeaderboard.length} học viên
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {remainingLeaderboard.map((entry) => (
+                    <div
+                      key={entry.playerId}
+                      className="p-3.5 rounded-xl bg-slate-800/70 border border-slate-700/80 flex items-center justify-between gap-3"
+                      data-testid={`remaining-player-rank-${entry.rank}`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="w-9 h-9 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center font-mono font-black text-sm text-slate-300 shrink-0">
+                          #{entry.rank}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-white truncate">
+                            {entry.nickname}
+                          </p>
+                          <p className="text-xs text-slate-400 truncate">
+                            {entry.unit || 'Học viên tập huấn'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="text-right shrink-0">
+                        <span className="text-base font-black text-amber-400 font-mono block">
+                          {entry.score.toLocaleString()} đ
+                        </span>
+                        <span className="text-[11px] text-emerald-400 font-semibold">
+                          {entry.correctCount}/15 đúng
+                        </span>
+                        {isFinite(entry.averageResponseTimeMs) && (
+                          <span className="text-[11px] text-slate-400 font-mono ml-2">
+                            • {(entry.averageResponseTimeMs / 1000).toFixed(2)}s
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Special Lightning Award Card */}
             {finalAwards?.lightningAward && (
@@ -906,11 +1003,11 @@ export const HostView: React.FC<HostViewProps> = ({
               </div>
             )}
 
-            {/* Class Analytics Section */}
+            {/* Class Analytics & Full Leaderboard Table Section */}
             {finalAwards?.classAnalytics && (
-              <div className="w-full bg-slate-900 rounded-2xl p-6 border border-slate-800 space-y-4" data-testid="class-analytics">
-                <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  📊 Thống kê kết quả toàn lớp
+              <div className="w-full max-w-5xl mx-auto bg-slate-900 rounded-2xl p-6 border border-slate-800 space-y-6" data-testid="class-analytics">
+                <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                  📊 Thống kê kết quả & Bảng điểm toàn lớp
                 </h3>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -923,7 +1020,7 @@ export const HostView: React.FC<HostViewProps> = ({
                   <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700">
                     <span className="text-xs text-slate-400 block">Điểm trung bình</span>
                     <span className="text-xl font-black text-amber-400 font-mono">
-                      {finalAwards.classAnalytics.averageScore}
+                      {finalAwards.classAnalytics.averageScore.toLocaleString()}
                     </span>
                   </div>
                   <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700">
@@ -944,42 +1041,82 @@ export const HostView: React.FC<HostViewProps> = ({
                   </div>
                 </div>
 
-                {/* Toggle full leaderboard table */}
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setShowFullLeaderboard(!showFullLeaderboard)}
-                    className="text-xs font-bold text-brand-400 hover:text-brand-300 underline cursor-pointer"
-                  >
-                    {showFullLeaderboard
-                      ? 'Ẩn bảng xếp hạng đầy đủ'
-                      : 'Xem toàn bộ bảng xếp hạng lớp'}
-                  </button>
+                {/* Full Leaderboard Table Always Shown by Default */}
+                <div className="pt-2 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider">
+                      🏆 Bảng tổng sắp điểm toàn bộ học viên ({finalAwards.fullLeaderboard.length} học viên)
+                    </h4>
+                    <button
+                      type="button"
+                      onClick={() => setShowFullLeaderboard(!showFullLeaderboard)}
+                      className="text-xs font-bold text-brand-400 hover:text-brand-300 underline cursor-pointer"
+                    >
+                      {showFullLeaderboard
+                        ? 'Thu gọn bảng chi tiết'
+                        : 'Hiện bảng chi tiết'}
+                    </button>
+                  </div>
 
                   {showFullLeaderboard && finalAwards.fullLeaderboard && (
-                    <div className="mt-3 overflow-x-auto">
-                      <table className="w-full text-left text-xs text-slate-300">
-                        <thead className="bg-slate-800 text-slate-400 uppercase font-mono">
+                    <div className="overflow-x-auto rounded-xl border border-slate-800" data-testid="full-leaderboard-table">
+                      <table className="w-full text-left text-xs sm:text-sm text-slate-200">
+                        <thead className="bg-slate-800/90 text-slate-300 uppercase font-mono text-xs">
                           <tr>
-                            <th className="py-2 px-3">Hạng</th>
-                            <th className="py-2 px-3">Học viên</th>
-                            <th className="py-2 px-3">Đơn vị</th>
-                            <th className="py-2 px-3 text-right">Số câu đúng</th>
-                            <th className="py-2 px-3 text-right">Tổng điểm</th>
+                            <th className="py-3 px-4">Hạng</th>
+                            <th className="py-3 px-4">Học viên</th>
+                            <th className="py-3 px-4">Đơn vị / Chi đoàn</th>
+                            <th className="py-3 px-4 text-center">Số câu đúng</th>
+                            <th className="py-3 px-4 text-center">Chuỗi đúng</th>
+                            <th className="py-3 px-4 text-right">Phản xạ TB</th>
+                            <th className="py-3 px-4 text-right">Tổng điểm</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800">
-                          {finalAwards.fullLeaderboard.map((entry) => (
-                            <tr key={entry.playerId} className="hover:bg-slate-800/50">
-                              <td className="py-2 px-3 font-bold font-mono">#{entry.rank}</td>
-                              <td className="py-2 px-3 font-semibold text-white">{entry.nickname}</td>
-                              <td className="py-2 px-3 text-slate-400">{entry.unit || '-'}</td>
-                              <td className="py-2 px-3 text-right">{entry.correctCount}/15</td>
-                              <td className="py-2 px-3 text-right font-bold text-amber-400 font-mono">
-                                {entry.score.toLocaleString()}
-                              </td>
-                            </tr>
-                          ))}
+                        <tbody className="divide-y divide-slate-800 bg-slate-950/50">
+                          {finalAwards.fullLeaderboard.map((entry) => {
+                            const medal =
+                              entry.rank === 1
+                                ? '🥇 #1'
+                                : entry.rank === 2
+                                ? '🥈 #2'
+                                : entry.rank === 3
+                                ? '🥉 #3'
+                                : `#${entry.rank}`;
+                            return (
+                              <tr
+                                key={entry.playerId}
+                                className={`transition-colors ${
+                                  entry.rank <= 3
+                                    ? 'bg-amber-950/20 hover:bg-amber-950/30'
+                                    : 'hover:bg-slate-800/50'
+                                }`}
+                              >
+                                <td className="py-3 px-4 font-black font-mono text-white">
+                                  {medal}
+                                </td>
+                                <td className="py-3 px-4 font-bold text-white">
+                                  {entry.nickname}
+                                </td>
+                                <td className="py-3 px-4 text-slate-400">
+                                  {entry.unit || '-'}
+                                </td>
+                                <td className="py-3 px-4 text-center font-semibold text-emerald-400">
+                                  {entry.correctCount}/15
+                                </td>
+                                <td className="py-3 px-4 text-center font-mono text-orange-300">
+                                  x{entry.maxStreak}
+                                </td>
+                                <td className="py-3 px-4 text-right font-mono text-slate-300">
+                                  {isFinite(entry.averageResponseTimeMs)
+                                    ? `${(entry.averageResponseTimeMs / 1000).toFixed(2)}s`
+                                    : '-'}
+                                </td>
+                                <td className="py-3 px-4 text-right font-black text-amber-400 font-mono text-base">
+                                  {entry.score.toLocaleString()} đ
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>

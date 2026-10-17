@@ -27,13 +27,15 @@ function rehydrateRoomFromSnapshot(
   }
 
   if (room && snapshot && hostToken && room.hostToken === hostToken) {
-    // Merge any players from snapshot that are missing on a newly rehydrated instance
+    // Merge any players from snapshot that are missing or have higher progress on a newly rehydrated instance
     if (snapshot.players && typeof snapshot.players === 'object') {
       for (const [pid, pState] of Object.entries(snapshot.players)) {
-        if (!room.players[pid] && pState && typeof pState === 'object') {
+        if (!pState || typeof pState !== 'object') continue;
+        const existing = room.players[pid];
+        if (!existing || (pState.score ?? 0) > (existing.score ?? 0)) {
           room.players[pid] = {
             ...pState,
-            answers: { ...(pState.answers || {}) },
+            answers: { ...(existing?.answers || {}), ...(pState.answers || {}) },
           };
         }
       }
