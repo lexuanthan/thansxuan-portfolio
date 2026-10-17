@@ -512,13 +512,13 @@ export async function POST(request: Request) {
       }
 
       // If allowRehydrate is enabled and this secondary container is behind the active question
+      // or prematurely short-circuited to QUESTION_REVEAL on a partial player subset
       if (
         allowRehydrate &&
         body.questionIndex >= 0 &&
         body.questionIndex < room.questions.length &&
-        (room.currentQuestionIndex < body.questionIndex ||
-          (room.currentQuestionIndex === body.questionIndex &&
-            (room.status === 'LOBBY' || room.status === 'QUESTION_START')))
+        room.players[body.playerId]?.answers?.[body.questionIndex] === undefined &&
+        (room.currentQuestionIndex !== body.questionIndex || room.status !== 'QUESTION_ACTIVE')
       ) {
         room.currentQuestionIndex = body.questionIndex;
         room.status = 'QUESTION_ACTIVE';
@@ -526,10 +526,12 @@ export async function POST(request: Request) {
         const startTime =
           typeof body.questionStartTime === 'number' ? body.questionStartTime : now - 1000;
         room.questionStartTime = startTime;
-        room.questionDeadline =
+        room.questionDeadline = Math.max(
+          now + 5000,
           typeof body.questionDeadline === 'number'
             ? body.questionDeadline
-            : startTime + room.questionTimeLimitMs;
+            : startTime + room.questionTimeLimitMs
+        );
       }
 
       const clientTimeMs =
