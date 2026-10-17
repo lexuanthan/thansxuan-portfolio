@@ -962,9 +962,9 @@ export const HostView: React.FC<HostViewProps> = ({
                         <span className="text-[11px] text-emerald-400 font-semibold">
                           {entry.correctCount}/15 đúng
                         </span>
-                        {isFinite(entry.averageResponseTimeMs) && (
+                        {entry.totalResponseTimeMs > 0 && (
                           <span className="text-[11px] text-slate-400 font-mono ml-2">
-                            • {(entry.averageResponseTimeMs / 1000).toFixed(2)}s
+                            • {(entry.totalResponseTimeMs / 1000).toFixed(1)}s
                           </span>
                         )}
                       </div>
@@ -1104,11 +1104,11 @@ export const HostView: React.FC<HostViewProps> = ({
                                   {entry.correctCount}/15
                                 </td>
                                 <td className="py-3 px-4 text-center font-mono text-orange-300">
-                                  x{entry.maxStreak}
+                                  x{state?.players?.[entry.playerId]?.maxStreak ?? entry.streak}
                                 </td>
                                 <td className="py-3 px-4 text-right font-mono text-slate-300">
-                                  {isFinite(entry.averageResponseTimeMs)
-                                    ? `${(entry.averageResponseTimeMs / 1000).toFixed(2)}s`
+                                  {entry.totalResponseTimeMs > 0
+                                    ? `${(entry.totalResponseTimeMs / 1000).toFixed(1)}s`
                                     : '-'}
                                 </td>
                                 <td className="py-3 px-4 text-right font-black text-amber-400 font-mono text-base">
