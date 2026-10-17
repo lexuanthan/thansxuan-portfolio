@@ -114,6 +114,17 @@ function tool(
 
 export const FALLBACK_AI_TOOLS: AiTool[] = [
   tool(
+    "training-quiz",
+    "Live Training Quiz Game (Đoàn - Hội)",
+    "Trò chơi tương tác trực tiếp kiểu Kahoot phục vụ tập huấn kỹ năng xây dựng kế hoạch và tổ chức hoạt động Đoàn - Hội",
+    "⚡",
+    "from-orange-100 to-red-100",
+    0,
+    "HOT",
+    "red",
+    "/ai-tools/training-quiz"
+  ),
+  tool(
     "career-guidance-v3",
     "Trợ lý AI Hướng nghiệp & Ra Quyết định",
     "Hệ thống trí tuệ hướng nghiệp toàn diện: Đánh giá thích ứng, so khớp tất định 80+ nghề & 60+ ngành, phân tích khoảng trống kỹ năng, lộ trình 5 chặng và AI Coach đồng hành.",

@@ -38,6 +38,7 @@ import type { SocialLinks } from "@/lib/types";
 export const revalidate = 60;
 
 const QUICK_LINKS = [
+  { href: "/ai-tools/training-quiz", label: "Game Tập huấn", Icon: IconSparkle },
   { href: "/ai-tools/career-guidance", label: "AI Hướng nghiệp", Icon: IconSparkle },
   { href: "/bai-viet", label: "Bài viết", Icon: IconFile },
   { href: "/ai-tools", label: "AI Tools", Icon: IconGrid },
