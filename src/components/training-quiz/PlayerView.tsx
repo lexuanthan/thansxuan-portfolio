@@ -160,6 +160,13 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
         setIsJoining(false);
         return;
       }
+      if (standaloneRoom.status !== 'LOBBY') {
+        setJoinError(
+          'Trò chơi đã bắt đầu! Hệ thống đã khóa phòng, không cho phép người dùng khác truy cập vào thêm.'
+        );
+        setIsJoining(false);
+        return;
+      }
       const player = standaloneRoom.joinPlayer(trimmedNick, unit.trim());
       setPlayerId(player.id);
       setJoined(true);
@@ -205,6 +212,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
   const handleSelectOption = async (optionIndex: number) => {
     if (selectedOption !== null) return; // Locked on first tap!
     if (state?.status !== 'QUESTION_ACTIVE') return;
+    if (state.questionDeadline && Date.now() >= state.questionDeadline) return; // Locked after 15s!
 
     handleUserGesture();
     const questionIndex = state.currentQuestionIndex;
@@ -480,6 +488,20 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                   Đang đợi hết giờ hoặc tất cả học viên nộp bài...
                 </div>
               </div>
+            ) : remainingSeconds <= 0 ? (
+              <div className="py-12 px-6 rounded-3xl bg-red-950/80 border-2 border-red-600 text-center space-y-4 shadow-2xl" data-testid="timeout-locked-banner">
+                <div className="w-16 h-16 rounded-2xl bg-red-600/30 border border-red-500 text-red-300 mx-auto flex items-center justify-center text-3xl">
+                  🔒
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white">
+                    Đã hết 15 giây đếm ngược!
+                  </h3>
+                  <p className="text-xs text-red-200 mt-1">
+                    Hệ thống đã khóa câu trả lời và đang mở đáp án (không trả lời được tính là sai).
+                  </p>
+                </div>
+              </div>
             ) : (
               /* 4 Giant Touch Buttons */
               <div className="grid grid-cols-2 gap-3.5 w-full pt-2" data-testid="touch-options-grid">
@@ -535,13 +557,17 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 </div>
                 <div>
                   <span className="px-3 py-1 rounded-full text-xs font-black bg-red-900 text-red-200 uppercase">
-                    CHƯA CHÍNH XÁC
+                    {!myAnswer || myAnswer.selectedIndex < 0
+                      ? 'HẾT 15 GIÂY — KHÔNG TRẢ LỜI (TÍNH SAI)'
+                      : 'CHƯA CHÍNH XÁC'}
                   </span>
                   <h3 className="text-2xl font-black text-white mt-2">
                     +0 ĐIỂM
                   </h3>
                   <p className="text-xs text-red-300 mt-1">
-                    Chuỗi đúng đã được thiết lập lại về 0. Hãy bứt phá ở câu sau!
+                    {!myAnswer || myAnswer.selectedIndex < 0
+                      ? 'Hết 15 giây đếm ngược bạn không chọn đáp án nên được tính là trả lời sai. Chuỗi đúng đã về 0!'
+                      : 'Chuỗi đúng đã được thiết lập lại về 0. Hãy bứt phá ở câu sau!'}
                   </p>
                 </div>
               </div>

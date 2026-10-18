@@ -12,11 +12,18 @@ import {
   getFastestPlayerInQuestion,
 } from '@/lib/training-quiz/scoringEngine';
 
-const ALLOWED_ACTIONS: readonly HostActionType[] = [
+type ExtendedHostAction =
+  | HostActionType
+  | 'ACTIVATE_QUESTION'
+  | 'TIMEOUT_QUESTION';
+
+const ALLOWED_ACTIONS: readonly ExtendedHostAction[] = [
   'START',
   'NEXT_QUESTION',
   'SHOW_LEADERBOARD',
   'END_GAME',
+  'ACTIVATE_QUESTION',
+  'TIMEOUT_QUESTION',
 ] as const;
 
 const STATUS_ORDER: Record<RoomStatus, number> = {
@@ -30,6 +37,7 @@ const STATUS_ORDER: Record<RoomStatus, number> = {
 
 type RehydratableQuizRoom = QuizRoom & {
   isRehydratedShell?: boolean;
+  timedOutQuestions?: Set<number>;
 };
 
 function getRoomProgress(status: RoomStatus, questionIndex: number): number {
@@ -57,7 +65,12 @@ function recomputePlayerFromAnswers(room: QuizRoom, player: PlayerState): void {
     const ans = player.answers?.[q];
     const question = room.questions[q];
 
-    if (!ans || typeof ans.selectedIndex !== 'number' || ans.selectedIndex < 0 || ans.selectedIndex > 3) {
+    if (
+      !ans ||
+      typeof ans.selectedIndex !== 'number' ||
+      ans.selectedIndex < 0 ||
+      ans.selectedIndex > 3
+    ) {
       const questionFinished =
         q < room.currentQuestionIndex ||
         (q === room.currentQuestionIndex &&
@@ -71,7 +84,7 @@ function recomputePlayerFromAnswers(room: QuizRoom, player: PlayerState): void {
     }
 
     const responseTimeMs = Math.max(0, Number(ans.responseTimeMs) || 0);
-    const isTimeout = responseTimeMs > room.questionTimeLimitMs;
+    const isTimeout = responseTimeMs >= room.questionTimeLimitMs;
     const isCorrect = !isTimeout && ans.selectedIndex === question.correctIndex;
     const calc = calculateScore(isCorrect, responseTimeMs, streak);
 
@@ -120,7 +133,8 @@ function recomputeRoomAggregates(room: QuizRoom): void {
 
 function mergePlayersIntoRoom(
   room: QuizRoom,
-  incomingPlayers?: Record<string, PlayerState> | null
+  incomingPlayers?: Record<string, PlayerState> | null,
+  allowNewPlayers = true
 ): boolean {
   if (!incomingPlayers || typeof incomingPlayers !== 'object') return false;
 
@@ -131,6 +145,7 @@ function mergePlayersIntoRoom(
 
     let existing = room.players[pid];
     if (!existing) {
+      if (!allowNewPlayers) continue;
       existing = {
         id: pid,
         nickname:
@@ -195,6 +210,24 @@ function mergePlayersIntoRoom(
   return anyModified;
 }
 
+function enforceActiveQuestionTimeout(room: RehydratableQuizRoom): void {
+  if (
+    room.status === 'QUESTION_ACTIVE' &&
+    typeof room.questionDeadline === 'number' &&
+    Date.now() >= room.questionDeadline
+  ) {
+    if (!room.timedOutQuestions) {
+      room.timedOutQuestions = new Set<number>();
+    }
+    room.timedOutQuestions.add(room.currentQuestionIndex);
+    room.handleQuestionTimeout();
+    for (const p of Object.values(room.players)) {
+      recomputePlayerFromAnswers(room, p);
+    }
+    recomputeRoomAggregates(room);
+  }
+}
+
 function rehydrateRoomFromSnapshot(
   roomManager: QuizRoomManager,
   roomCode: string,
@@ -211,12 +244,16 @@ function rehydrateRoomFromSnapshot(
       hostToken: hostToken || undefined,
     });
     room = created.room as RehydratableQuizRoom;
+    room.timedOutQuestions = new Set<number>();
     if (!hostToken) {
       room.isRehydratedShell = true;
     }
   }
 
   if (!room) return undefined;
+  if (!room.timedOutQuestions) {
+    room.timedOutQuestions = new Set<number>();
+  }
 
   // Adopt real hostToken if room was initialized as a rehydrated shell by a player request
   if (hostToken && room.isRehydratedShell && room.hostToken !== hostToken) {
@@ -226,10 +263,7 @@ function rehydrateRoomFromSnapshot(
 
   // Host snapshot monotonic progression + player merge
   if (snapshot && hostToken && room.hostToken === hostToken) {
-    if (
-      snapshot.status &&
-      typeof snapshot.currentQuestionIndex === 'number'
-    ) {
+    if (snapshot.status && typeof snapshot.currentQuestionIndex === 'number') {
       const serverProgress = getRoomProgress(room.status, room.currentQuestionIndex);
       const snapProgress = getRoomProgress(snapshot.status, snapshot.currentQuestionIndex);
 
@@ -242,7 +276,7 @@ function rehydrateRoomFromSnapshot(
     }
 
     if (snapshot.players && typeof snapshot.players === 'object') {
-      mergePlayersIntoRoom(room, snapshot.players);
+      mergePlayersIntoRoom(room, snapshot.players, true);
       for (const p of Object.values(room.players)) {
         recomputePlayerFromAnswers(room, p);
       }
@@ -250,10 +284,17 @@ function rehydrateRoomFromSnapshot(
     }
   }
 
-  // Player-carried state merge
+  // Player-carried state merge (only allow if room is in LOBBY, or player already exists / joined in LOBBY)
   if (playerSnapshot && typeof playerSnapshot === 'object' && playerSnapshot.id) {
-    mergePlayersIntoRoom(room, { [playerSnapshot.id]: playerSnapshot });
+    const canMergePlayer =
+      room.status === 'LOBBY' ||
+      Boolean(room.players[playerSnapshot.id]) ||
+      Boolean(room.isRehydratedShell && typeof playerSnapshot.joinedAt === 'number');
+    mergePlayersIntoRoom(room, { [playerSnapshot.id]: playerSnapshot }, canMergePlayer);
   }
+
+  // Enforce 15s deadline timeout before returning state
+  enforceActiveQuestionTimeout(room);
 
   if (room.status === 'QUESTION_ACTIVE') {
     room.checkFastShortCircuit();
@@ -327,8 +368,10 @@ export async function POST(request: Request) {
       }
 
       if (body.playersSnapshot && typeof body.playersSnapshot === 'object') {
-        mergePlayersIntoRoom(room, body.playersSnapshot);
+        mergePlayersIntoRoom(room, body.playersSnapshot, true);
       }
+
+      enforceActiveQuestionTimeout(room);
 
       const state = room.getSanitizedState({
         hostToken,
@@ -342,7 +385,7 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. PLAYER JOIN
+    // 2. PLAYER JOIN (ONLY ALLOWED IN LOBBY BEFORE GAME STARTS)
     if (op === 'join') {
       const code = typeof body.roomCode === 'string' ? body.roomCode.trim().toUpperCase() : '';
       if (!code) {
@@ -359,6 +402,18 @@ export async function POST(request: Request) {
       );
       if (!room) {
         return NextResponse.json({ error: 'Room not found' }, { status: 404 });
+      }
+
+      // Lock room once game has started!
+      if (room.status !== 'LOBBY') {
+        return NextResponse.json(
+          {
+            error:
+              'Trò chơi đã bắt đầu! Hệ thống đã khóa phòng, không cho phép người dùng khác truy cập vào thêm.',
+            roomLocked: true,
+          },
+          { status: 403 }
+        );
       }
 
       if (typeof body.nickname !== 'string' || !body.nickname.trim()) {
@@ -420,7 +475,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized host token' }, { status: 401 });
       }
 
-      const action = body.action as HostActionType;
+      const action = body.action as ExtendedHostAction;
       if (!action || !ALLOWED_ACTIONS.includes(action)) {
         return NextResponse.json(
           { error: `Invalid action. Allowed: ${ALLOWED_ACTIONS.join(', ')}` },
@@ -428,10 +483,34 @@ export async function POST(request: Request) {
         );
       }
 
-      const success = room.handleHostAction({
-        hostToken,
-        action,
-      });
+      let success = false;
+      if (action === 'ACTIVATE_QUESTION') {
+        if (room.status === 'QUESTION_START') {
+          room.transitionToQuestionActive();
+        }
+        success = true;
+      } else if (action === 'TIMEOUT_QUESTION') {
+        if (!room.timedOutQuestions) {
+          room.timedOutQuestions = new Set<number>();
+        }
+        room.timedOutQuestions.add(room.currentQuestionIndex);
+        if (room.status === 'QUESTION_ACTIVE' || room.status === 'QUESTION_START') {
+          if (room.status === 'QUESTION_START') {
+            room.transitionToQuestionActive();
+          }
+          room.handleQuestionTimeout();
+        }
+        for (const p of Object.values(room.players)) {
+          recomputePlayerFromAnswers(room, p);
+        }
+        recomputeRoomAggregates(room);
+        success = true;
+      } else {
+        success = room.handleHostAction({
+          hostToken,
+          action,
+        });
+      }
 
       if (!success) {
         return NextResponse.json(
@@ -495,8 +574,13 @@ export async function POST(request: Request) {
         );
       }
 
-      // If allowRehydrate is enabled and a secondary instance does not have the player yet, restore player
-      if (!room.players[body.playerId] && allowRehydrate && typeof body.nickname === 'string') {
+      // Only restore a player on a secondary instance if they already joined in LOBBY (have playerSnapshot)
+      if (
+        !room.players[body.playerId] &&
+        allowRehydrate &&
+        body.playerSnapshot &&
+        typeof body.nickname === 'string'
+      ) {
         room.joinPlayer(
           body.nickname,
           typeof body.unit === 'string' ? body.unit : undefined,
@@ -511,8 +595,27 @@ export async function POST(request: Request) {
         );
       }
 
+      const now = Date.now();
+      const effectiveDeadline =
+        typeof body.questionDeadline === 'number'
+          ? body.questionDeadline
+          : room.questionDeadline;
+      const isQuestionTimedOut =
+        Boolean(room.timedOutQuestions?.has(body.questionIndex)) ||
+        (typeof effectiveDeadline === 'number' && now >= effectiveDeadline);
+
+      if (isQuestionTimedOut) {
+        enforceActiveQuestionTimeout(room);
+        return NextResponse.json(
+          {
+            error: 'Đã hết 15 giây đếm ngược! Hệ thống đã khóa câu trả lời.',
+          },
+          { status: 400 }
+        );
+      }
+
       // If allowRehydrate is enabled and this secondary container is behind the active question
-      // or prematurely short-circuited to QUESTION_REVEAL on a partial player subset
+      // or prematurely short-circuited on a partial player subset WHILE still within the 15s deadline
       if (
         allowRehydrate &&
         body.questionIndex >= 0 &&
@@ -522,20 +625,17 @@ export async function POST(request: Request) {
       ) {
         room.currentQuestionIndex = body.questionIndex;
         room.status = 'QUESTION_ACTIVE';
-        const now = Date.now();
         const startTime =
           typeof body.questionStartTime === 'number' ? body.questionStartTime : now - 1000;
         room.questionStartTime = startTime;
-        room.questionDeadline = Math.max(
-          now + 5000,
+        room.questionDeadline =
           typeof body.questionDeadline === 'number'
             ? body.questionDeadline
-            : startTime + room.questionTimeLimitMs
-        );
+            : startTime + room.questionTimeLimitMs;
       }
 
       const clientTimeMs =
-        typeof body.clientTimeMs === 'number' ? body.clientTimeMs : Date.now();
+        typeof body.clientTimeMs === 'number' ? body.clientTimeMs : now;
 
       const result = room.submitAnswer({
         playerId: body.playerId,

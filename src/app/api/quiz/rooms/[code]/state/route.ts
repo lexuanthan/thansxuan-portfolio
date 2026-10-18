@@ -19,6 +19,14 @@ export async function GET(request: Request, context: RouteContext) {
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
+    if (
+      room.status === 'QUESTION_ACTIVE' &&
+      typeof room.questionDeadline === 'number' &&
+      Date.now() >= room.questionDeadline
+    ) {
+      room.handleQuestionTimeout();
+    }
+
     const url = new URL(request.url);
     const hostToken = url.searchParams.get('hostToken') || undefined;
     const playerId = url.searchParams.get('playerId') || undefined;

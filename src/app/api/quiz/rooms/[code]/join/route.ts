@@ -19,6 +19,17 @@ export async function POST(request: Request, context: RouteContext) {
       return NextResponse.json({ error: 'Room not found' }, { status: 404 });
     }
 
+    if (room.status !== 'LOBBY') {
+      return NextResponse.json(
+        {
+          error:
+            'Trò chơi đã bắt đầu! Hệ thống đã khóa phòng, không cho phép người dùng khác truy cập vào thêm.',
+          roomLocked: true,
+        },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json().catch(() => null);
     if (!body || typeof body.nickname !== 'string' || !body.nickname.trim()) {
       return NextResponse.json(

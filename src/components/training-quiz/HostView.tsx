@@ -217,7 +217,62 @@ export const HostView: React.FC<HostViewProps> = ({
     };
   }, [standaloneRoom, roomCode, hostToken, applyIncomingState]);
 
-  // Active question countdown timer
+  // Dispatch Host Action
+  const dispatchAction = useCallback(
+    async (
+      action:
+        | 'START'
+        | 'NEXT_QUESTION'
+        | 'SHOW_LEADERBOARD'
+        | 'END_GAME'
+        | 'ACTIVATE_QUESTION'
+        | 'TIMEOUT_QUESTION'
+    ) => {
+      handleUserGesture();
+
+      if (room) {
+        if (action === 'ACTIVATE_QUESTION') {
+          if (room.status === 'QUESTION_START') {
+            room.transitionToQuestionActive();
+          }
+        } else if (action === 'TIMEOUT_QUESTION') {
+          if (room.status === 'QUESTION_ACTIVE') {
+            room.handleQuestionTimeout();
+          }
+        } else {
+          room.handleHostAction({ hostToken, action });
+        }
+        setState(room.getState());
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/quiz/rooms', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            op: 'action',
+            roomCode,
+            hostToken,
+            action,
+            allowRehydrate: true,
+            snapshot: latestStateRef.current,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.state) {
+            applyIncomingState(data.state);
+          }
+        }
+      } catch {
+        // Ignore network errors
+      }
+    },
+    [room, roomCode, hostToken, handleUserGesture, applyIncomingState]
+  );
+
+  // Active question countdown timer & automatic 15s timeout reveal
   useEffect(() => {
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
@@ -238,15 +293,40 @@ export const HostView: React.FC<HostViewProps> = ({
         });
       }, 1000);
 
-      return () => clearInterval(previewInterval);
+      // Fallback for serverless environments where server-side setTimeout may pause
+      const activateTimeout = !standaloneRoom
+        ? setTimeout(() => {
+            if (latestStateRef.current?.status === 'QUESTION_START') {
+              dispatchAction('ACTIVATE_QUESTION');
+            }
+          }, 3100)
+        : null;
+
+      return () => {
+        clearInterval(previewInterval);
+        if (activateTimeout) clearTimeout(activateTimeout);
+      };
     }
 
     if (state?.status === 'QUESTION_ACTIVE' && state.questionDeadline) {
+      let timeoutTriggered = false;
       const updateTimer = () => {
         const now = Date.now();
         const diffMs = (state.questionDeadline || now) - now;
         const secs = Math.max(0, Math.ceil(diffMs / 1000));
         setRemainingSeconds(secs);
+
+        if (diffMs <= 0 && !timeoutTriggered) {
+          timeoutTriggered = true;
+          if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current);
+            timerIntervalRef.current = null;
+          }
+          if (!standaloneRoom) {
+            dispatchAction('TIMEOUT_QUESTION');
+          }
+          return;
+        }
 
         if (secs > 0) {
           if (secs <= 3) {
@@ -258,7 +338,7 @@ export const HostView: React.FC<HostViewProps> = ({
       };
 
       updateTimer();
-      timerIntervalRef.current = setInterval(updateTimer, 1000);
+      timerIntervalRef.current = setInterval(updateTimer, 500);
 
       return () => {
         if (timerIntervalRef.current) {
@@ -275,43 +355,7 @@ export const HostView: React.FC<HostViewProps> = ({
     if (state?.status === 'FINAL_RESULTS') {
       quizSound.playPodium();
     }
-  }, [state?.status, state?.questionDeadline, state?.currentQuestionIndex]);
-
-  // Dispatch Host Action
-  const dispatchAction = async (
-    action: 'START' | 'NEXT_QUESTION' | 'SHOW_LEADERBOARD' | 'END_GAME'
-  ) => {
-    handleUserGesture();
-
-    if (room) {
-      room.handleHostAction({ hostToken, action });
-      setState(room.getState());
-      return;
-    }
-
-    try {
-      const res = await fetch('/api/quiz/rooms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          op: 'action',
-          roomCode,
-          hostToken,
-          action,
-          allowRehydrate: true,
-          snapshot: latestStateRef.current,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.state) {
-          applyIncomingState(data.state);
-        }
-      }
-    } catch {
-      // Ignore network errors
-    }
-  };
+  }, [state?.status, state?.questionDeadline, state?.currentQuestionIndex, standaloneRoom, dispatchAction]);
 
   const toggleSound = () => {
     handleUserGesture();
@@ -340,8 +384,11 @@ export const HostView: React.FC<HostViewProps> = ({
 
   const playersList = Object.values(state?.players || {});
   const answeredCount = playersList.filter(
-    (p) => p.answers[state?.currentQuestionIndex ?? 0] !== undefined
+    (p) =>
+      p.answers[state?.currentQuestionIndex ?? 0] !== undefined &&
+      p.answers[state?.currentQuestionIndex ?? 0].selectedIndex >= 0
   ).length;
+  const unansweredCount = Math.max(0, playersList.length - answeredCount);
 
   const currentStats =
     state?.statsPerQuestion?.[state?.currentQuestionIndex ?? 0] || {
@@ -392,6 +439,17 @@ export const HostView: React.FC<HostViewProps> = ({
               <span className="text-base font-black tracking-wider text-amber-400 font-mono" data-testid="room-pin">
                 {roomCode}
               </span>
+            </div>
+          )}
+
+          {/* Room Lock Badge once game starts */}
+          {state && state.status !== 'LOBBY' && (
+            <div
+              className="hidden md:flex px-3 py-1.5 rounded-xl bg-red-950/70 border border-red-800/80 text-xs font-bold text-red-300 items-center gap-1.5"
+              data-testid="room-locked-badge"
+            >
+              <span>🔒</span>
+              <span>Đã khóa phòng</span>
             </div>
           )}
 
@@ -657,14 +715,22 @@ export const HostView: React.FC<HostViewProps> = ({
         {state?.status === 'QUESTION_REVEAL' && (
           <section className="w-full flex flex-col space-y-6 animate-fadeIn" data-testid="question-reveal">
             {/* Top Bar with Next Action */}
-            <div className="flex items-center justify-between bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
+              <div className="flex flex-wrap items-center gap-3">
                 <span className="px-3.5 py-1.5 rounded-xl bg-emerald-950 border border-emerald-700/60 text-emerald-300 font-black text-sm">
                   KẾT QUẢ CÂU {state.currentQuestionIndex + 1}
                 </span>
                 <span className="text-xs text-slate-400">
                   {currentQuestion.level}
                 </span>
+                {unansweredCount > 0 && (
+                  <span
+                    className="px-3 py-1 rounded-xl bg-red-950/80 border border-red-800 text-red-300 text-xs font-bold"
+                    data-testid="unanswered-wrong-badge"
+                  >
+                    ⏰ Không trả lời / Tính sai: {unansweredCount} học viên
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center gap-3">
