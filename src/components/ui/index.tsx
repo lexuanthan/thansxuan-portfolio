@@ -130,15 +130,15 @@ type ButtonTone = "primary" | "outline" | "soft" | "ghost";
 
 const BUTTON_TONES: Record<ButtonTone, string> = {
   primary:
-    "bg-brand-400 text-ink-900 shadow-brand hover:bg-brand-300 active:bg-brand-500",
+    "bg-brand-500 text-white shadow-brand hover:bg-brand-600 active:bg-brand-700",
   outline:
-    "border border-line-strong bg-surface text-ink-700 hover:border-brand-300 hover:text-brand-700",
-  soft: "bg-brand-50 text-brand-700 hover:bg-brand-100",
-  ghost: "text-ink-500 hover:bg-brand-50 hover:text-brand-700",
+    "border border-line-strong bg-surface text-ink-700 hover:border-brand-400 hover:text-brand-600",
+  soft: "bg-brand-50 text-brand-600 hover:bg-brand-100",
+  ghost: "text-ink-700 hover:bg-brand-50 hover:text-brand-600",
 };
 
 const BUTTON_BASE =
-  "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-55";
+  "inline-flex items-center justify-center gap-2 rounded-btn px-4 py-2.5 text-sm font-semibold transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-55";
 
 export function Button({
   children,
@@ -324,10 +324,8 @@ export function Container({
   children: ReactNode;
   className?: string;
 }) {
-  // 1440px thay vì max-w-7xl (1280): bố cục ba cột cần chỗ, bó ở 1280 thì
-  // cột giữa chỉ còn ~590px và ba thẻ bài viết bị ép lại quá hẹp.
   return (
-    <div className={cx("mx-auto w-full max-w-[1440px] px-4 sm:px-6", className)}>
+    <div className={cx("mx-auto w-full max-w-[1200px] px-4 sm:px-6", className)}>
       {children}
     </div>
   );

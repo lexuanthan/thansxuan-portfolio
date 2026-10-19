@@ -10,61 +10,93 @@
   /* ---- Font ---- */
   --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
 
-  /* ---- HCMUTE Identity: Xanh Công nghệ & Học thuật (Primary: 20-25%) ---- */
-  --color-brand-50: #f0f7ff;
-  --color-brand-100: #e0effe;
-  --color-brand-200: #bae0fd;
-  --color-brand-300: #7cc5fb;
-  --color-brand-400: #38a5f8;
-  --color-brand-500: #0056b3;
-  --color-brand-600: #004098; /* Official HCMUTE Strong Academic Blue */
-  --color-brand-700: #00337a;
-  --color-brand-800: #0a2540;
-  --color-brand-900: #06182a;
+  /* ---- LXT Studio Identity: Cobalt #2864FF & Navy #17243A ---- */
+  --color-brand-50: #f0f5ff;
+  --color-brand-100: #e0ebff;
+  --color-brand-200: #c2d6ff;
+  --color-brand-300: #8ab2ff;
+  --color-brand-400: #4d82ff;
+  --color-brand-500: #2864ff; /* Primary Action Cobalt */
+  --color-brand-600: #1d52e8;
+  --color-brand-700: #153ec2;
+  --color-brand-800: #112e8f;
+  --color-brand-900: #17243a;
 
-  /* ---- HCMUTE Identity: Đỏ Nhiệt huyết (Accent: 5-10%) ---- */
+  /* ---- Điểm nhấn Vàng ấm (#F6C445) ---- */
+  --color-accent-gold: #f6c445;
+  --color-accent-gold-soft: #fef7e0;
+
+  /* ---- Tương thích ngược cho module chuyên sâu (Career / Quiz) ---- */
   --color-accent-red-50: #fef2f2;
   --color-accent-red-100: #fee2e2;
   --color-accent-red-200: #fecaca;
   --color-accent-red-300: #fca5a5;
   --color-accent-red-400: #f87171;
   --color-accent-red-500: #ef4444;
-  --color-accent-red-600: #d9232e; /* Official HCMUTE Energetic Red */
+  --color-accent-red-600: #d9232e;
   --color-accent-red-700: #b91c1c;
   --color-accent-red-800: #991b1b;
   --color-accent-red-900: #7f1d1d;
 
-  /* ---- Nền và chữ (65% white/light, cool academic neutral) ---- */
-  --color-page: #f8fafc;
+  /* ---- Nền sáng #FAFAF7, surface trắng & chữ navy #17243A ---- */
+  --color-page: #fafaf7;
   --color-surface: #ffffff;
-  --color-surface-soft: #f1f5f9;
-  --color-line: #e2e8f0;
-  --color-line-strong: #cbd5e1;
+  --color-surface-soft: #f2f6ff;
+  --color-line: #e4e9f2;
+  --color-line-strong: #cdd6e5;
 
-  --color-ink-900: #0f172a;
-  --color-ink-700: #334155;
-  --color-ink-500: #64748b;
-  --color-ink-400: #94a3b8;
+  --color-ink-900: #17243a;
+  --color-ink-700: #2c3e5a;
+  --color-ink-500: #5a6b85;
+  --color-ink-400: #8796ad;
 
-  /* ---- Màu bổ trợ chuyên mục ---- */
+  /* ---- Màu bổ trợ chuyên mục & trạng thái ---- */
   --color-accent-sky: #0284c7;
-  --color-accent-violet: #6366f1;
+  --color-accent-violet: #4f46e5;
   --color-accent-emerald: #059669;
-  --color-accent-rose: #d9232e;
-  --color-accent-orange: #ea580c;
+  --color-accent-rose: #e11d48;
+  --color-accent-orange: #d97706;
 
-  /* ---- Bo góc chuẩn HCMUTE: Không bubble-style (Button 8-12px, Card 10-14px, Panel 12-16px, Hero 16-20px) ---- */
-  --radius-btn: 0.625rem; /* 10px */
-  --radius-card: 0.75rem; /* 12px */
-  --radius-card-lg: 0.875rem; /* 14px */
-  --radius-panel: 1rem; /* 16px */
-  --radius-hero: 1.25rem; /* 20px */
+  /* ---- Bo góc chuẩn 8–10px (Nút 8px, Thẻ 10px, Khung 12px) ---- */
+  --radius-btn: 0.5rem; /* 8px */
+  --radius-card: 0.625rem; /* 10px */
+  --radius-card-lg: 0.75rem; /* 12px */
+  --radius-panel: 0.875rem; /* 14px */
+  --radius-hero: 1rem; /* 16px */
 
-  /* ---- Đổ bóng: Tinh tế, chuẩn học thuật công nghệ ---- */
-  --shadow-soft: 0 1px 3px 0 rgb(15 23 42 / 0.05), 0 1px 2px -1px rgb(15 23 42 / 0.05);
-  --shadow-lift: 0 4px 6px -1px rgb(15 23 42 / 0.07), 0 2px 4px -2px rgb(15 23 42 / 0.07);
-  --shadow-brand: 0 8px 20px -4px rgb(0 64 152 / 0.25);
+  /* ---- Đổ bóng mềm chuẩn studio ban ngày ---- */
+  --shadow-soft: 0 2px 8px -2px rgb(23 36 58 / 0.05), 0 1px 3px -1px rgb(23 36 58 / 0.04);
+  --shadow-lift: 0 10px 24px -6px rgb(23 36 58 / 0.09), 0 4px 10px -3px rgb(23 36 58 / 0.05);
+  --shadow-brand: 0 8px 20px -4px rgb(40 100 255 / 0.28);
   --shadow-accent: 0 8px 20px -4px rgb(217 35 46 / 0.2);
+}
+
+@keyframes lxt-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes lxt-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-lxt-float {
+  animation: lxt-float 7s ease-in-out infinite;
+}
+
+.animate-lxt-reveal {
+  animation: lxt-reveal 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* =============================================================
@@ -87,7 +119,7 @@ body {
 
 /* Tiêu đề tiếng Việt có dấu chồng lên nhau nếu để mặc định quá chật */
 h1, h2, h3, h4 {
-  line-height: 1.25;
+  line-height: 1.22;
   text-wrap: balance;
 }
 

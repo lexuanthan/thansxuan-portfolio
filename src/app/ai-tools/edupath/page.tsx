@@ -370,12 +370,28 @@ export default function EduPathGamePage() {
         
         {/* HEADER */}
         <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-2xl border border-stone-200 shadow-sm">
-          <Link
-            href="/ai-tools"
-            className="text-xs font-bold text-stone-600 hover:text-amber-600 transition flex items-center gap-1.5"
-          >
-            ← Danh mục AI Tools
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/ai-tools"
+              className="text-xs font-bold text-stone-600 hover:text-amber-600 transition flex items-center gap-1.5"
+            >
+              ← Kho tiện ích
+            </Link>
+            <span className="text-stone-300">|</span>
+            <Link
+              href="/ai-tools/career-guidance"
+              className="text-xs font-semibold text-[#2864FF] hover:underline"
+            >
+              Trợ lý Hướng nghiệp 360°
+            </Link>
+            <span className="text-stone-300">|</span>
+            <Link
+              href="/ai-tools/tra-cuu-dai-hoc"
+              className="text-xs font-semibold text-stone-600 hover:text-[#2864FF]"
+            >
+              Tra cứu điểm chuẩn
+            </Link>
+          </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xl">🛡️</span>

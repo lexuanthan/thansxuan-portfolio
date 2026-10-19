@@ -519,6 +519,30 @@ export default function CareerGuidanceApp() {
         </div>
       </header>
 
+      {/* Demo Profile Indicator */}
+      {profile?.profile_id === "demo_profile_2026" && (
+        <div
+          data-testid="career-demo-profile-banner"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-amber-300 bg-amber-50/90 px-4 py-2.5 text-xs text-amber-950"
+        >
+          <div className="flex items-center gap-2">
+            <span className="rounded-[6px] bg-amber-500 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white">
+              Hồ sơ mẫu (Demo)
+            </span>
+            <span>
+              Dữ liệu hiện tại là hồ sơ minh họa để bạn khám phá tính năng. Hãy làm bài đánh giá để nhận phân tích cá nhân hóa.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => handleSwitchView("assessment")}
+            className="rounded-[8px] bg-[#2864FF] px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-[#1E54E6] cursor-pointer"
+          >
+            Làm bài đánh giá của riêng tôi →
+          </button>
+        </div>
+      )}
+
       {/* Global Search Modal */}
       {searchOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4">

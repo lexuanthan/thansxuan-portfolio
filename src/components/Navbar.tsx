@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, type FormEvent, type ReactElement } from "react";
+import { useState, useRef, useEffect, type FormEvent, type ReactElement } from "react";
 import {
   BrandMark,
+  IconArrowUpRight,
   IconBook,
   IconChat,
+  IconChevronDown,
   IconClose,
   IconFile,
   IconHome,
@@ -24,37 +26,59 @@ type NavLink = {
   Icon: (p: { className?: string }) => ReactElement;
 };
 
-const LINKS: NavLink[] = [
+const PRIMARY_LINKS: NavLink[] = [
+  { href: "/gioi-thieu", label: "Giới thiệu", Icon: IconUser },
+  { href: "/du-an", label: "Dự án", Icon: IconRocket },
+  { href: "/bai-viet", label: "Bài viết", Icon: IconFile },
+  { href: "/ai-tools", label: "Tiện ích", Icon: IconSparkle },
+];
+
+const EXPLORE_LINKS: (NavLink & { desc: string })[] = [
+  {
+    href: "/ai-tools/tra-cuu-dai-hoc",
+    label: "Tra cứu đại học",
+    desc: "Điểm chuẩn, học phí & ngành đào tạo 200+ trường",
+    Icon: IconBook,
+  },
+  {
+    href: "/tai-nguyen",
+    label: "Tài nguyên",
+    desc: "Bộ sưu tập mẫu tài liệu, liên kết & học liệu",
+    Icon: IconBook,
+  },
+  {
+    href: "/tu-van",
+    label: "Tư vấn & Hỗ trợ",
+    desc: "Đồng hành chiến lược thương hiệu, AI & hệ thống",
+    Icon: IconChat,
+  },
+  {
+    href: "/lien-he",
+    label: "Liên hệ",
+    desc: "Gửi lời nhắn và kết nối trực tiếp",
+    Icon: IconMail,
+  },
+];
+
+const MOBILE_LINKS: NavLink[] = [
   { href: "/", label: "Trang chủ", Icon: IconHome },
   { href: "/gioi-thieu", label: "Giới thiệu", Icon: IconUser },
-  { href: "/bai-viet", label: "Bài viết", Icon: IconFile },
-  { href: "/ai-tools", label: "AI Tools", Icon: IconSparkle },
   { href: "/du-an", label: "Dự án", Icon: IconRocket },
+  { href: "/bai-viet", label: "Bài viết", Icon: IconFile },
+  { href: "/ai-tools", label: "Tiện ích", Icon: IconSparkle },
+  { href: "/ai-tools/tra-cuu-dai-hoc", label: "Tra cứu đại học", Icon: IconBook },
   { href: "/tai-nguyen", label: "Tài nguyên", Icon: IconBook },
   { href: "/tu-van", label: "Tư vấn", Icon: IconChat },
   { href: "/lien-he", label: "Liên hệ", Icon: IconMail },
 ];
 
-/**
- * Mục đang xem được tô nổi. Trang chủ phải so khớp tuyệt đối, còn lại so
- * theo tiền tố để trang chi tiết (ví dụ /bai-viet/abc) vẫn sáng mục cha.
- */
 function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-/**
- * whitespace-nowrap là bắt buộc: tám mục menu tiếng Việt đều là hai chữ, hễ
- * thiếu vài pixel là "Trang chủ" tụt thành hai dòng và cả thanh cao gấp đôi.
- * Thà để menu tràn ngang rồi thu về nút hamburger còn hơn để chữ gãy dòng.
- */
-const NAV_BASE =
-  "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-2 text-[13px] transition-colors";
-
 export default function Navbar({
   brandName = "Lê Xuân Thân",
-  tagline = "Content Creator & Tech Builder",
 }: {
   brandName?: string;
   tagline?: string;
@@ -62,35 +86,51 @@ export default function Navbar({
   const pathname = usePathname() || "/";
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [exploreOpen, setExploreOpen] = useState(false);
   const [term, setTerm] = useState("");
+  const exploreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (exploreRef.current && !exploreRef.current.contains(event.target as Node)) {
+        setExploreOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   function submitSearch(event: FormEvent) {
     event.preventDefault();
     const q = term.trim();
     router.push(q ? `/bai-viet?q=${encodeURIComponent(q)}` : "/bai-viet");
     setOpen(false);
+    setSearchOpen(false);
   }
 
+  const exploreActive = EXPLORE_LINKS.some((l) => isActive(pathname, l.href));
+
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center gap-3 px-4 sm:px-6">
-        {/* Thương hiệu */}
-        <Link href="/" className="flex shrink-0 items-center gap-2.5">
-          <BrandMark className="h-9 w-9" />
-          <span className="hidden leading-tight sm:block">
-            <span className="block whitespace-nowrap text-[15px] font-extrabold text-ink-900">
-              {brandName}
-            </span>
-            {/* Dòng nghề nghiệp rộng hơn cả tên nên chỉ hiện khi màn hình đủ rộng */}
-            <span className="hidden whitespace-nowrap text-[11px] font-medium text-ink-400 2xl:block">
-              {tagline}
-            </span>
+    <header className="sticky top-0 z-50 border-b border-line/80 bg-page/90 backdrop-blur-md">
+      <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between gap-4 px-4 sm:px-6">
+        {/* Logo LXT + Tên thương hiệu */}
+        <Link
+          href="/"
+          className="flex shrink-0 items-center gap-2.5 text-ink-900 transition-opacity hover:opacity-90"
+        >
+          <BrandMark className="h-7 w-auto" />
+          <span className="whitespace-nowrap text-base font-extrabold tracking-tight text-ink-900">
+            {brandName}
           </span>
         </Link>
 
-        {/* Menu chính */}
-        <nav className="hidden flex-1 items-center justify-center xl:flex">
-          {LINKS.map(({ href, label, Icon }) => {
+        {/* Menu chính Desktop */}
+        <nav
+          aria-label="Điều hướng chính"
+          className="hidden items-center gap-1 lg:flex"
+        >
+          {PRIMARY_LINKS.map(({ href, label }) => {
             const active = isActive(pathname, href);
             return (
               <Link
@@ -99,52 +139,90 @@ export default function Navbar({
                 aria-current={active ? "page" : undefined}
                 className={
                   active
-                    ? `${NAV_BASE} bg-brand-300 font-semibold text-ink-900`
-                    : `${NAV_BASE} font-medium text-ink-500 hover:bg-brand-50 hover:text-brand-700`
+                    ? "whitespace-nowrap rounded-btn bg-brand-50 px-3.5 py-2 text-sm font-bold text-brand-600 transition-colors"
+                    : "whitespace-nowrap rounded-btn px-3.5 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-surface hover:text-brand-600"
                 }
               >
-                <Icon className="h-4 w-4 shrink-0" />
                 {label}
               </Link>
             );
           })}
+
+          {/* Dropdown Khám phá (Tra cứu ĐH, Tài nguyên, Tư vấn, Liên hệ) */}
+          <div ref={exploreRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setExploreOpen((v) => !v)}
+              aria-expanded={exploreOpen}
+              className={
+                exploreActive || exploreOpen
+                  ? "inline-flex items-center gap-1 whitespace-nowrap rounded-btn bg-brand-50 px-3.5 py-2 text-sm font-bold text-brand-600 transition-colors"
+                  : "inline-flex items-center gap-1 whitespace-nowrap rounded-btn px-3.5 py-2 text-sm font-medium text-ink-700 transition-colors hover:bg-surface hover:text-brand-600"
+              }
+            >
+              <span>Khám phá</span>
+              <IconChevronDown className="h-3.5 w-3.5" />
+            </button>
+
+            {exploreOpen && (
+              <div className="absolute left-0 top-full mt-2 w-72 rounded-card-lg border border-line bg-surface p-2 shadow-lift">
+                {EXPLORE_LINKS.map(({ href, label, desc, Icon }) => {
+                  const active = isActive(pathname, href);
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={() => setExploreOpen(false)}
+                      className={`flex items-start gap-3 rounded-card p-2.5 transition-colors ${
+                        active ? "bg-brand-50 text-brand-700" : "hover:bg-surface-soft"
+                      }`}
+                    >
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-bold text-ink-900">
+                          {label}
+                        </span>
+                        <span className="block text-xs leading-snug text-ink-500">
+                          {desc}
+                        </span>
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </nav>
 
-        {/* Tìm kiếm + đăng nhập */}
-        <div className="ml-auto flex shrink-0 items-center gap-2 xl:ml-0">
-          {/* Ô tìm kiếm đầy đủ chỉ đủ chỗ từ 1536px trở lên */}
-          <form onSubmit={submitSearch} className="hidden 2xl:block" role="search">
-            <label className="sr-only" htmlFor="site-search">
-              Tìm bài viết
-            </label>
-            <div className="flex items-center gap-2 rounded-full border border-line bg-surface-soft px-3 py-2 focus-within:border-brand-300">
-              <IconSearch className="h-4 w-4 shrink-0 text-ink-400" />
-              <input
-                id="site-search"
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-                placeholder="Tìm bài viết, công cụ…"
-                className="w-44 bg-transparent text-sm text-ink-700 outline-none placeholder:text-ink-400"
-              />
-            </div>
-          </form>
-
-          {/* Hẹp hơn thì thu về một nút, bấm ra bảng có ô tìm kiếm */}
+        {/* Cụm hành động phải: Tìm kiếm + Quản trị + CTA Kết nối */}
+        <div className="flex shrink-0 items-center gap-2">
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
+            onClick={() => setSearchOpen((v) => !v)}
             aria-label="Tìm kiếm"
-            className="hidden h-10 w-10 items-center justify-center rounded-xl border border-line text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700 xl:inline-flex 2xl:hidden"
+            title="Tìm kiếm bài viết và công cụ"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-btn border border-line bg-surface text-ink-700 transition-colors hover:border-brand-300 hover:text-brand-600"
           >
             <IconSearch className="h-4 w-4" />
           </button>
 
           <Link
             href="/login"
-            className="hidden items-center gap-1.5 whitespace-nowrap rounded-xl bg-brand-400 px-3.5 py-2.5 text-sm font-semibold text-ink-900 shadow-brand transition-colors hover:bg-brand-300 sm:inline-flex"
+            aria-label="Khu vực quản trị"
+            title="Khu vực quản trị"
+            className="hidden h-9 w-9 items-center justify-center rounded-btn border border-line bg-surface text-ink-700 transition-colors hover:border-brand-300 hover:text-brand-600 sm:inline-flex"
           >
-            <IconUser className="h-4 w-4 shrink-0" />
-            Đăng nhập
+            <IconUser className="h-4 w-4" />
+          </Link>
+
+          <Link
+            href="/lien-he"
+            className="hidden items-center gap-1.5 whitespace-nowrap rounded-btn bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-brand transition-all duration-200 hover:bg-brand-600 sm:inline-flex"
+          >
+            <span>Kết nối</span>
+            <IconArrowUpRight className="h-4 w-4" />
           </Link>
 
           <button
@@ -152,33 +230,62 @@ export default function Navbar({
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label={open ? "Đóng menu" : "Mở menu"}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line text-ink-700 xl:hidden"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-btn border border-line bg-surface text-ink-700 lg:hidden"
           >
             {open ? <IconClose className="h-5 w-5" /> : <IconMenu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Bảng thu gọn: dưới 1280px là toàn bộ menu, trên đó chỉ còn ô tìm kiếm */}
-      {open && (
+      {/* Thanh tìm kiếm mở rộng */}
+      {searchOpen && (
         <div className="border-t border-line bg-surface">
-          <div className="mx-auto w-full max-w-[1440px] px-4 py-4 sm:px-6">
-            <form onSubmit={submitSearch} className="mb-3 2xl:hidden" role="search">
-              <div className="flex items-center gap-2 rounded-xl border border-line bg-surface-soft px-3 py-2.5">
+          <div className="mx-auto w-full max-w-[1200px] px-4 py-3 sm:px-6">
+            <form onSubmit={submitSearch} className="flex items-center gap-2" role="search">
+              <label className="sr-only" htmlFor="site-search-bar">
+                Tìm bài viết, công cụ
+              </label>
+              <div className="flex flex-1 items-center gap-2 rounded-btn border border-line bg-surface-soft px-3.5 py-2 focus-within:border-brand-400">
+                <IconSearch className="h-4 w-4 shrink-0 text-ink-400" />
+                <input
+                  id="site-search-bar"
+                  value={term}
+                  onChange={(e) => setTerm(e.target.value)}
+                  placeholder="Nhập từ khoá bài viết, chủ đề…"
+                  autoFocus
+                  className="w-full bg-transparent text-sm text-ink-900 outline-none placeholder:text-ink-400"
+                />
+              </div>
+              <button
+                type="submit"
+                className="rounded-btn bg-brand-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-600"
+              >
+                Tìm
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Menu Mobile đầy đủ mọi đường dẫn */}
+      {open && (
+        <div className="border-t border-line bg-surface lg:hidden">
+          <div className="mx-auto w-full max-w-[1200px] px-4 py-4 sm:px-6">
+            <form onSubmit={submitSearch} className="mb-3" role="search">
+              <div className="flex items-center gap-2 rounded-btn border border-line bg-surface-soft px-3 py-2.5">
                 <IconSearch className="h-4 w-4 shrink-0 text-ink-400" />
                 <input
                   value={term}
                   onChange={(e) => setTerm(e.target.value)}
                   placeholder="Tìm bài viết, công cụ…"
                   aria-label="Tìm bài viết"
-                  autoFocus
-                  className="w-full bg-transparent text-sm text-ink-700 outline-none placeholder:text-ink-400"
+                  className="w-full bg-transparent text-sm text-ink-900 outline-none placeholder:text-ink-400"
                 />
               </div>
             </form>
 
-            <nav className="grid gap-1 sm:grid-cols-2 lg:grid-cols-4 xl:hidden">
-              {LINKS.map(({ href, label, Icon }) => {
+            <nav aria-label="Menu di động" className="grid gap-1 sm:grid-cols-2">
+              {MOBILE_LINKS.map(({ href, label, Icon }) => {
                 const active = isActive(pathname, href);
                 return (
                   <Link
@@ -187,8 +294,8 @@ export default function Navbar({
                     onClick={() => setOpen(false)}
                     className={
                       active
-                        ? "flex items-center gap-2.5 whitespace-nowrap rounded-xl bg-brand-100 px-3 py-2.5 text-sm font-semibold text-brand-800"
-                        : "flex items-center gap-2.5 whitespace-nowrap rounded-xl px-3 py-2.5 text-sm font-medium text-ink-700 hover:bg-brand-50"
+                        ? "flex items-center gap-2.5 whitespace-nowrap rounded-btn bg-brand-50 px-3 py-2.5 text-sm font-bold text-brand-600"
+                        : "flex items-center gap-2.5 whitespace-nowrap rounded-btn px-3 py-2.5 text-sm font-medium text-ink-700 hover:bg-surface-soft"
                     }
                   >
                     <Icon className="h-4 w-4 shrink-0" />
@@ -198,14 +305,24 @@ export default function Navbar({
               })}
             </nav>
 
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="mt-3 flex items-center justify-center gap-2 rounded-xl bg-brand-400 px-4 py-2.5 text-sm font-semibold text-ink-900 sm:hidden"
-            >
-              <IconUser className="h-4 w-4" />
-              Đăng nhập
-            </Link>
+            <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-3">
+              <Link
+                href="/lien-he"
+                onClick={() => setOpen(false)}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-btn bg-brand-500 px-4 py-2.5 text-sm font-semibold text-white shadow-brand"
+              >
+                <span>Kết nối</span>
+                <IconArrowUpRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center gap-1.5 rounded-btn border border-line bg-surface-soft px-4 py-2.5 text-sm font-semibold text-ink-700"
+              >
+                <IconUser className="h-4 w-4" />
+                <span>Quản trị</span>
+              </Link>
+            </div>
           </div>
         </div>
       )}

@@ -40,31 +40,36 @@ const GROUPS: { title: string | null; items: Item[] }[] = [
     items: [{ href: "/admin", label: "Tổng quan", Icon: IconHome, exact: true }],
   },
   {
-    title: "Nội dung",
+    title: "Trang chủ & Thương hiệu",
+    items: [
+      { href: "/admin/settings", label: "Trang chủ & Cài đặt", Icon: IconSettings },
+      { href: "/admin/about", label: "Trang giới thiệu", Icon: IconUser },
+    ],
+  },
+  {
+    title: "Sản phẩm & Tiện ích số",
+    items: [
+      { href: "/admin/ai-tools", label: "Kho tiện ích (AI Tools)", Icon: IconSparkle },
+      { href: "/admin/projects", label: "Ứng dụng & Dự án", Icon: IconRocket },
+      { href: "/admin/career-guidance", label: "Quản trị Hướng nghiệp", Icon: IconRocket },
+      { href: "/admin/logos", label: "Logo Studio (Canvas)", Icon: IconGrid },
+    ],
+  },
+  {
+    title: "Nội dung & Dịch vụ",
     items: [
       { href: "/admin/posts", label: "Bài viết", Icon: IconFile },
       { href: "/admin/categories", label: "Chuyên mục", Icon: IconFolder },
-      { href: "/admin/projects", label: "Ứng dụng & Dự án", Icon: IconRocket },
-      { href: "/admin/ai-tools", label: "Tool AI", Icon: IconSparkle },
-      { href: "/admin/career-guidance", label: "AI Hướng nghiệp", Icon: IconRocket },
       { href: "/admin/resources", label: "Tài nguyên", Icon: IconBook },
-      { href: "/admin/services", label: "Tư vấn", Icon: IconChat },
+      { href: "/admin/services", label: "Tư vấn & Hỗ trợ", Icon: IconChat },
     ],
   },
   {
-    title: "Thư viện",
+    title: "Tương tác & Thư viện",
     items: [
-      { href: "/admin/media", label: "Hình ảnh & Media", Icon: IconImage },
-      { href: "/admin/logos", label: "Logo có sẵn", Icon: IconGrid },
-    ],
-  },
-  {
-    title: "Hệ thống",
-    items: [
-      { href: "/admin/messages", label: "Lời nhắn", Icon: IconMail },
-      { href: "/admin/stats", label: "Thống kê", Icon: IconChart },
-      { href: "/admin/about", label: "Trang giới thiệu", Icon: IconUser },
-      { href: "/admin/settings", label: "Cài đặt chung", Icon: IconSettings },
+      { href: "/admin/messages", label: "Lời nhắn liên hệ", Icon: IconMail },
+      { href: "/admin/media", label: "Thư viện Media", Icon: IconImage },
+      { href: "/admin/stats", label: "Thống kê truy cập", Icon: IconChart },
     ],
   },
 ];

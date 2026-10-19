@@ -103,8 +103,24 @@ export default async function TaiNguyenPage() {
         ) : (
           <EmptyState
             icon="📚"
-            title="Kho tài nguyên còn trống"
-            hint="Vào Quản trị → Tài nguyên để thêm mục đầu tiên."
+            title="Kho tài nguyên chọn lọc đang được cập nhật"
+            hint="Bộ sưu tập biểu mẫu, tài liệu hướng dẫn và công cụ số đang được phân loại để chia sẻ miễn phí. Bạn có thể sử dụng ngay các công cụ trực tuyến trong Kho tiện ích."
+            action={
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <a
+                  href="/ai-tools"
+                  className="inline-flex items-center rounded-[8px] bg-[#2864FF] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1E54E6]"
+                >
+                  Mở Kho tiện ích
+                </a>
+                <a
+                  href="/ai-tools/tra-cuu-dai-hoc"
+                  className="inline-flex items-center rounded-[8px] border border-[#DCE3EE] bg-white px-4 py-2.5 text-sm font-semibold text-[#17243A] hover:border-[#2864FF] hover:text-[#2864FF]"
+                >
+                  Tra cứu điểm chuẩn đại học
+                </a>
+              </div>
+            }
           />
         )}
       </Container>

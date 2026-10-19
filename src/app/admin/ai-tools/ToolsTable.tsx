@@ -74,10 +74,39 @@ export default function ToolsTable({ initial }: { initial: AiTool[] }) {
               {t.description || "—"}
             </p>
 
+            <div className="mt-3 flex flex-wrap items-center gap-1.5 text-[11px]">
+              <span className="rounded bg-slate-100 px-2 py-0.5 font-mono text-slate-700">
+                ID: {t.id}
+              </span>
+              <span className="rounded bg-blue-50 px-2 py-0.5 font-medium text-[#2864FF]">
+                Route: {t.link_url || "(Chưa gán route)"}
+              </span>
+              {["career-guidance-v3", "logo-composer", "training-quiz"].includes(
+                t.id
+              ) && (
+                <span className="rounded bg-amber-100 px-2 py-0.5 font-bold text-amber-900">
+                  ★ Thẻ nổi bật Trang chủ
+                </span>
+              )}
+            </div>
+
             <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-4">
               <span className="mr-auto text-xs text-ink-400">
                 #{t.sort_order} · {t.published ? "Hiển thị" : "Nháp"}
               </span>
+              {t.link_url && (
+                <Link
+                  href={
+                    t.link_url === "#tra-cuu-dai-hoc"
+                      ? "/ai-tools/tra-cuu-dai-hoc"
+                      : t.link_url
+                  }
+                  target="_blank"
+                  className="rounded-md border border-line bg-surface-soft px-2.5 py-1.5 text-xs font-medium text-ink-700 transition hover:border-[#2864FF] hover:text-[#2864FF]"
+                >
+                  Mở trang ↗
+                </Link>
+              )}
               <button
                 onClick={() => togglePublished(t)}
                 disabled={busy === t.id}

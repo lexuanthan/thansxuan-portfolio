@@ -1,3 +1,4 @@
+import Link from "next/link";
 import SiteShell from "@/components/SiteShell";
 import { Card, Container, PageHeading } from "@/components/ui";
 import SurveyWizard from "@/components/huongnghiep/SurveyWizard";
@@ -12,8 +13,32 @@ export default function HuongNghiepPage() {
   return (
     <SiteShell>
       <Container className="py-10">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-[10px] border border-[#E5EAF2] bg-white px-4 py-2.5 text-xs">
+          <Link
+            href="/ai-tools"
+            className="font-bold text-[#17243A] hover:text-[#2864FF]"
+          >
+            ← Quay lại Kho tiện ích
+          </Link>
+          <div className="flex flex-wrap items-center gap-3 text-[#4F5D73]">
+            <Link
+              href="/ai-tools/career-guidance"
+              className="font-semibold text-[#2864FF] hover:underline"
+            >
+              Mở Trợ lý AI Hướng nghiệp 360° →
+            </Link>
+            <span>·</span>
+            <Link
+              href="/ai-tools/tra-cuu-dai-hoc"
+              className="font-semibold hover:text-[#2864FF]"
+            >
+              Tra cứu điểm chuẩn
+            </Link>
+          </div>
+        </div>
+
         <PageHeading
-          eyebrow="AI Tools"
+          eyebrow="Kho tiện ích · Khảo sát RIASEC 62 câu"
           title="Hồ sơ xu hướng học tập & nghề nghiệp"
           description="62 câu hỏi dựng nên hồ sơ của bạn, rồi đối chiếu với đặc trưng của ngành đào tạo. Kết quả là một góc nhìn dựa trên dữ liệu, không phải lời khuyên nên chọn ngành nào."
         />

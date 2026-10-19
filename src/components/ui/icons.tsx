@@ -201,32 +201,62 @@ export const IconCopy = (p: IconProps) => (
   </Svg>
 );
 
+export const IconArrowUpRight = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M7 17 17 7M9 7h8v8" />
+  </Svg>
+);
+
+export const IconChevronDown = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="m6 9 6 6 6-6" />
+  </Svg>
+);
+
 /* -------------------------------------------------------------
-   Logo mặt trời — dấu nhận diện của thương hiệu, vẽ đặc thay vì
-   dùng nét để nổi bật hơn phần còn lại của giao diện.
+   Logo LXT — Dấu nhận diện kiến trúc chữ LXT xanh Cobalt (#2864FF),
+   thanh chéo trắng satin và điểm nhấn vàng ấm (#F6C445).
    ------------------------------------------------------------- */
 
-export function BrandMark({ className = "h-10 w-10" }: { className?: string }) {
+export function BrandMark({ className = "h-9 w-auto" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
+    <svg
+      viewBox="0 0 68 36"
+      className={className}
+      aria-hidden="true"
+      fill="none"
+    >
       <defs>
-        <linearGradient id="brandmark-sun" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#FFD84A" />
-          <stop offset="100%" stopColor="#F59D1F" />
+        <linearGradient id="lxt-cobalt" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#3B76FF" />
+          <stop offset="100%" stopColor="#1D52E8" />
         </linearGradient>
       </defs>
-      <rect width="40" height="40" rx="12" fill="#FFF6DA" />
-      <circle cx="20" cy="20.5" r="7" fill="url(#brandmark-sun)" />
-      <g stroke="#F5A524" strokeWidth="2.4" strokeLinecap="round">
-        <path d="M20 6.5v3" />
-        <path d="M20 31.5v3" />
-        <path d="M6.5 20.5h3" />
-        <path d="M30.5 20.5h3" />
-        <path d="m10.8 11.3 2.1 2.1" />
-        <path d="m27.1 27.6 2.1 2.1" />
-        <path d="m29.2 11.3-2.1 2.1" />
-        <path d="m12.9 27.6-2.1 2.1" />
-      </g>
+      {/* Chữ L */}
+      <path
+        d="M4 6h6.5v17.5H20V29H4V6Z"
+        fill="url(#lxt-cobalt)"
+      />
+      {/* Chữ X - nét chéo phải sang trái (Cobalt) */}
+      <path
+        d="M39.5 6h7L31.5 29h-7L39.5 6Z"
+        fill="url(#lxt-cobalt)"
+      />
+      {/* Chữ X - nét chéo trái sang phải (Trắng viền xanh sáng tạo khối 3D) */}
+      <path
+        d="M23.5 6h7.2L46 29h-7.2L23.5 6Z"
+        fill="#EAF1FF"
+        stroke="#2864FF"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      {/* Chữ T */}
+      <path
+        d="M46.5 6H64v5.5h-5.5V29H52V11.5h-5.5V6Z"
+        fill="url(#lxt-cobalt)"
+      />
+      {/* Điểm nhấn hạt vàng ấm #F6C445 */}
+      <circle cx="62.5" cy="26.5" r="3" fill="#F6C445" />
     </svg>
   );
 }

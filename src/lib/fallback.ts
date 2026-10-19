@@ -64,7 +64,7 @@ export const FALLBACK_PROJECTS: Project[] = [
     ["Data Search", "University", "Interactive"],
     "from-green-100 to-emerald-100",
     4,
-    "/#tra-cuu-dai-hoc"
+    "/ai-tools/tra-cuu-dai-hoc"
   ),
   project(
     "brand-strategy-analyzer",

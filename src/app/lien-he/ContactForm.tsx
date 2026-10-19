@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui";
 import { IconArrow, IconCheck } from "@/components/ui/icons";
 
@@ -14,6 +14,16 @@ export default function ContactForm() {
   const [sent, setSent] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [subjectValue, setSubjectValue] = useState("");
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const topic = (params.get("chu-de") || params.get("subject") || "").trim();
+    if (topic) {
+      setSubjectValue(topic);
+    }
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -125,6 +135,8 @@ export default function ContactForm() {
         <input
           id="subject"
           name="subject"
+          value={subjectValue}
+          onChange={(e) => setSubjectValue(e.target.value)}
           placeholder="Ví dụ: hợp tác nội dung, hỏi về công cụ…"
           className={FIELD}
         />

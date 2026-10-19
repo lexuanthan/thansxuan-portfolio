@@ -741,23 +741,49 @@ export default function CareerGuidanceAdminClient({
                 <div className="flex items-center gap-2">
                   <span className="text-base">🔗</span>
                   <div>
-                    <strong className="block text-ink-900">Liên thông Trang chủ</strong>
-                    <span className="text-ink-500">Hero Section, CTA Buttons, Tab query params</span>
+                    <strong className="block text-ink-900">Liên thông Trang chủ &amp; Kho tiện ích</strong>
+                    <span className="text-ink-500">
+                      Thẻ nổi bật Section B (`/`), Kho tiện ích (`/ai-tools`), Tab query params
+                    </span>
                   </div>
                 </div>
                 <span className="text-emerald-700 font-bold bg-emerald-100 px-2.5 py-1 rounded-md">
                   Đã liên thông chuẩn xác
                 </span>
               </div>
+
+              <div className="flex items-center justify-between p-3 rounded-xl border border-line bg-surface-soft">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">🏛️</span>
+                  <div>
+                    <strong className="block text-ink-900">
+                      Cổng Tra cứu Điểm chuẩn Đại học (`/ai-tools/tra-cuu-dai-hoc`)
+                    </strong>
+                    <span className="text-ink-500">
+                      136 trường · Tự động gắn nhãn Thang 30 / Thang 40 / Thang 100 / Thang 1200 (ĐGNL) &amp; cảnh báo vùng miền cần xác minh
+                    </span>
+                  </div>
+                </div>
+                <span className="text-emerald-700 font-bold bg-emerald-100 px-2.5 py-1 rounded-md">
+                  Đã tách route riêng
+                </span>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3 pt-3 border-t border-line">
+            <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-line">
               <Link
                 href="/ai-tools/career-guidance"
                 target="_blank"
                 className="rounded-xl border border-line px-4 py-2.5 text-xs font-semibold text-ink-700 hover:bg-surface-soft transition inline-flex items-center gap-1.5"
               >
-                Mở giao diện người dùng công khai ↗
+                Mở Trợ lý Hướng nghiệp 360° ↗
+              </Link>
+              <Link
+                href="/ai-tools/tra-cuu-dai-hoc"
+                target="_blank"
+                className="rounded-xl border border-line px-4 py-2.5 text-xs font-semibold text-[#2864FF] hover:bg-blue-50 transition inline-flex items-center gap-1.5"
+              >
+                Mở Cổng Tra cứu Đại học ↗
               </Link>
             </div>
           </Card>

@@ -96,8 +96,24 @@ export default async function BaiVietPage({
         ) : posts.length === 0 ? (
           <EmptyState
             icon="✍️"
-            title="Chưa có bài viết nào"
-            hint="Vào Quản trị → Bài viết để đăng bài đầu tiên."
+            title="Chuyên mục bài viết đang được biên tập"
+            hint="Các ghi chép chuyên sâu về công nghệ, AI ứng dụng và thiết kế truyền thông đang được chuẩn bị. Trong lúc chờ đợi, bạn có thể trải nghiệm các công cụ số đang mở miễn phí."
+            action={
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <Link
+                  href="/ai-tools"
+                  className="inline-flex items-center rounded-[8px] bg-[#2864FF] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1E54E6]"
+                >
+                  Khám phá Kho tiện ích
+                </Link>
+                <Link
+                  href="/du-an"
+                  className="inline-flex items-center rounded-[8px] border border-[#DCE3EE] bg-white px-4 py-2.5 text-sm font-semibold text-[#17243A] hover:border-[#2864FF] hover:text-[#2864FF]"
+                >
+                  Xem dự án nổi bật
+                </Link>
+              </div>
+            }
           />
         ) : (
           <EmptyState
