@@ -77,12 +77,16 @@ export function getStreakTier(streak: number): StreakBonusTier {
 export function calculateScore(
   isCorrect: boolean,
   responseTimeMs: number,
-  currentStreak = 0
+  currentStreak = 0,
+  timeLimitMs: number = QUESTION_TIME_LIMIT_MS,
+  baseMaxPoints: number = BASE_MAX_POINTS
 ): ScoringResult {
   const clampedTime = Math.max(0, responseTimeMs);
+  const effectiveTimeLimit = timeLimitMs > 0 ? timeLimitMs : QUESTION_TIME_LIMIT_MS;
+  const effectiveBasePoints = baseMaxPoints > 0 ? baseMaxPoints : BASE_MAX_POINTS;
 
   // If wrong answer or timeout
-  if (!isCorrect || clampedTime >= QUESTION_TIME_LIMIT_MS) {
+  if (!isCorrect || clampedTime >= effectiveTimeLimit) {
     return {
       isCorrect: false,
       baseScore: 0,
@@ -94,8 +98,8 @@ export function calculateScore(
     };
   }
 
-  const remainingTimeMs = Math.max(0, QUESTION_TIME_LIMIT_MS - clampedTime);
-  const speedBonus = Math.round(BASE_MAX_POINTS * (remainingTimeMs / QUESTION_TIME_LIMIT_MS));
+  const remainingTimeMs = Math.max(0, effectiveTimeLimit - clampedTime);
+  const speedBonus = Math.round(effectiveBasePoints * (remainingTimeMs / effectiveTimeLimit));
   const newStreak = currentStreak + 1;
   const streakBonus = getStreakBonus(newStreak);
   const totalPoints = speedBonus + streakBonus;

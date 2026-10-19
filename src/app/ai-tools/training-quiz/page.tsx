@@ -1,11 +1,17 @@
 'use client';
 
 import React, { Suspense, useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import SiteShell from '@/components/SiteShell';
 import { Container } from '@/components/ui';
 import HostView from '@/components/training-quiz/HostView';
 import PlayerView from '@/components/training-quiz/PlayerView';
+import {
+  DEFAULT_TRAINING_QUIZ_CONFIG,
+  TrainingQuizSystemConfig,
+  buildRoomQuestionsFromConfig,
+} from '@/lib/training-quiz/configManager';
 
 function TrainingQuizContainer() {
   const searchParams = useSearchParams();
@@ -14,6 +20,9 @@ function TrainingQuizContainer() {
   const hostTokenParam = searchParams.get('hostToken') || '';
 
   const [mode, setMode] = useState<'select' | 'host' | 'player'>('select');
+  const [quizConfig, setQuizConfig] = useState<TrainingQuizSystemConfig>(
+    DEFAULT_TRAINING_QUIZ_CONFIG
+  );
 
   useEffect(() => {
     if (modeParam === 'host') {
@@ -22,6 +31,23 @@ function TrainingQuizContainer() {
       setMode('player');
     }
   }, [modeParam, roomParam]);
+
+  useEffect(() => {
+    let active = true;
+    fetch('/api/quiz/config')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (active && data?.config) {
+          setQuizConfig(data.config);
+        }
+      })
+      .catch(() => {
+        // Keep default config on error
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   // If in Host mode, show full-screen Host view
   if (mode === 'host') {
@@ -44,6 +70,10 @@ function TrainingQuizContainer() {
     );
   }
 
+  const activeQuestionCount = buildRoomQuestionsFromConfig(quizConfig).length;
+  const general = quizConfig.general || DEFAULT_TRAINING_QUIZ_CONFIG.general;
+  const settings = quizConfig.settings || DEFAULT_TRAINING_QUIZ_CONFIG.settings;
+
   // Welcome / Selection Screen
   return (
     <SiteShell>
@@ -52,17 +82,34 @@ function TrainingQuizContainer() {
           {/* Hero Banner */}
           <div className="text-center space-y-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-50 border border-brand-200 text-brand-700 text-xs font-bold uppercase tracking-wider">
-              <span>⚡</span> Trò chơi tương tác trực tiếp
+              <span>⚡</span> {general.badgeText}
             </div>
             <h1 className="text-3xl sm:text-5xl font-black text-ink-900 tracking-tight">
-              Đấu Trí Đoàn - Hội HCMUTE
+              {general.title}
             </h1>
             <p className="text-base sm:text-lg text-ink-600 max-w-2xl mx-auto leading-relaxed">
-              Trò chơi tương tác phong cách Kahoot phục vụ chương trình tập huấn{' '}
+              {general.description}{' '}
               <strong className="text-brand-600">
-                &ldquo;Công tác xây dựng kế hoạch và tổ chức hoạt động Đoàn - Hội&rdquo;
+                &ldquo;{general.topicHighlight}&rdquo;
               </strong>.
             </p>
+            <div className="pt-1 flex flex-wrap items-center justify-center gap-2 text-xs text-ink-500">
+              <span className="px-2.5 py-1 rounded-full bg-surface-soft border border-line font-medium">
+                📚 {activeQuestionCount} câu hỏi / lượt thi
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-surface-soft border border-line font-medium">
+                ⏱️ {settings.questionTimeLimitSeconds} giây đếm ngược / câu
+              </span>
+              <span className="px-2.5 py-1 rounded-full bg-surface-soft border border-line font-medium">
+                🎯 Điểm gốc tối đa: {settings.baseMaxPoints} điểm
+              </span>
+              <Link
+                href="/admin/training-quiz"
+                className="px-3 py-1 rounded-full bg-brand-50 hover:bg-brand-100 text-brand-700 border border-brand-200 font-semibold transition inline-flex items-center gap-1"
+              >
+                <span>⚙️ Quản trị & Tùy chỉnh câu hỏi</span>
+              </Link>
+            </div>
           </div>
 
           {/* Dual Mode Selection Cards */}
@@ -81,12 +128,11 @@ function TrainingQuizContainer() {
                     Dành cho Giảng viên / Ban tổ chức
                   </span>
                   <h2 className="text-2xl font-black text-ink-900 mt-1">
-                    Màn hình Giảng viên (Host)
+                    {general.hostCardTitle}
                   </h2>
                 </div>
                 <p className="text-sm text-ink-600 leading-relaxed">
-                  Tạo phòng chơi mới, chiếu mã PIN và mã QR Code lên máy chiếu màn hình lớn,
-                  điều khiển chuyển câu hỏi, xem biểu đồ phân bổ đáp án và tổng kết bục vinh danh.
+                  {general.hostCardDesc}
                 </p>
               </div>
 
@@ -117,12 +163,11 @@ function TrainingQuizContainer() {
                     Dành cho Học viên / Người tham gia
                   </span>
                   <h2 className="text-2xl font-black text-ink-900 mt-1">
-                    Màn hình Học viên (Player)
+                    {general.playerCardTitle}
                   </h2>
                 </div>
                 <p className="text-sm text-ink-600 leading-relaxed">
-                  Gia nhập phòng thi đấu trên điện thoại bằng mã PIN, trả lời 15 câu hỏi với 4
-                  nút màu hình học trực quan, nhận điểm thưởng tốc độ và chuỗi đúng liên tiếp.
+                  {general.playerCardDesc}
                 </p>
               </div>
 
@@ -142,15 +187,23 @@ function TrainingQuizContainer() {
 
           {/* Training Program Features */}
           <div className="p-6 sm:p-8 rounded-3xl bg-surface-soft border border-line">
-            <h3 className="text-base font-bold text-ink-900 mb-4 flex items-center gap-2">
-              <span>🌟</span>
-              <span>Đặc trưng nổi bật của hệ thống trò chơi</span>
-            </h3>
+            <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <h3 className="text-base font-bold text-ink-900 flex items-center gap-2">
+                <span>🌟</span>
+                <span>Đặc trưng nổi bật của hệ thống trò chơi</span>
+              </h3>
+              <Link
+                href="/admin/training-quiz"
+                className="text-xs font-semibold text-brand-600 hover:text-brand-700 underline"
+              >
+                Tùy chỉnh câu hỏi, đếm ngược & nhập Excel tại trang Admin →
+              </Link>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-ink-600">
               <div className="p-4 rounded-2xl bg-white border border-line/60">
                 <div className="text-lg font-bold text-ink-900 mb-1">
-                  📚 15 Câu hỏi chuẩn hóa
+                  📚 {activeQuestionCount} Câu hỏi chuẩn hóa
                 </div>
                 <p className="text-xs leading-relaxed">
                   Trích xuất nguyên bản từ tài liệu bài giảng BTV Đoàn trường ĐH Sư phạm Kỹ thuật
@@ -160,7 +213,7 @@ function TrainingQuizContainer() {
 
               <div className="p-4 rounded-2xl bg-white border border-line/60">
                 <div className="text-lg font-bold text-ink-900 mb-1">
-                  ⏱️ Tính điểm phản xạ ms
+                  ⏱️ Tính điểm phản xạ ({settings.questionTimeLimitSeconds}s)
                 </div>
                 <p className="text-xs leading-relaxed">
                   Công thức điểm tốc độ kết hợp thưởng chuỗi đúng (Streak bonus) chính xác tới từng
@@ -198,3 +251,4 @@ export default function TrainingQuizPage() {
     </Suspense>
   );
 }
+

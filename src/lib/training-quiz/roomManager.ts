@@ -14,6 +14,10 @@
 
 import { QuizQuestion } from './types';
 import { QuizRoom, QuizRoomOptions } from './roomEngine';
+import {
+  buildRoomQuestionsFromConfig,
+  getActiveQuizConfig,
+} from './configManager';
 
 export const ROOM_MAX_INACTIVE_AGE_MS = 2 * 60 * 60 * 1000; // 2 hours
 
@@ -76,6 +80,11 @@ export class QuizRoomManager {
     questions?: QuizQuestion[];
     previewDurationMs?: number;
     questionTimeLimitMs?: number;
+    fastShortCircuit?: boolean;
+    baseMaxPoints?: number;
+    allowPerQuestionTimeLimit?: boolean;
+    programTitle?: string;
+    programSubtitle?: string;
   }): { room: QuizRoom; roomCode: string; hostToken: string } {
     const roomCode = options?.customCode
       ? options.customCode.trim().toUpperCase()
@@ -86,12 +95,32 @@ export class QuizRoomManager {
       this.store.get(roomCode)?.dispose();
     }
 
+    const activeConfig = getActiveQuizConfig();
+    const configuredQuestions =
+      options?.questions && options.questions.length > 0
+        ? options.questions
+        : buildRoomQuestionsFromConfig(activeConfig);
+
     const roomOptions: QuizRoomOptions = {
       roomCode,
       hostToken: options?.hostToken,
-      questions: options?.questions,
-      previewDurationMs: options?.previewDurationMs,
-      questionTimeLimitMs: options?.questionTimeLimitMs,
+      questions: configuredQuestions,
+      previewDurationMs:
+        options?.previewDurationMs ??
+        activeConfig.gameplay.previewDurationSeconds * 1000,
+      questionTimeLimitMs:
+        options?.questionTimeLimitMs ??
+        activeConfig.gameplay.questionTimeLimitSeconds * 1000,
+      fastShortCircuit:
+        options?.fastShortCircuit ?? activeConfig.gameplay.fastShortCircuit,
+      baseMaxPoints:
+        options?.baseMaxPoints ?? activeConfig.gameplay.baseMaxPoints,
+      allowPerQuestionTimeLimit:
+        options?.allowPerQuestionTimeLimit ??
+        activeConfig.gameplay.allowPerQuestionTimeLimit,
+      programTitle: options?.programTitle ?? activeConfig.general.title,
+      programSubtitle:
+        options?.programSubtitle ?? activeConfig.general.topicHighlight,
     };
 
     const room = new QuizRoom(roomOptions);

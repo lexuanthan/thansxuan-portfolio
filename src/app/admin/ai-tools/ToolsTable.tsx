@@ -122,6 +122,14 @@ export default function ToolsTable({ initial }: { initial: AiTool[] }) {
                   ⚙️ Quản trị chuyên sâu
                 </Link>
               )}
+              {(t.id === "training-quiz" || t.link_url?.includes("training-quiz")) && (
+                <Link
+                  href="/admin/training-quiz"
+                  className="rounded-md border border-brand-300 bg-brand-50 px-2.5 py-1.5 text-xs font-bold text-brand-800 transition hover:bg-brand-100"
+                >
+                  ⚙️ Quản trị câu hỏi & Excel
+                </Link>
+              )}
               <Link
                 href={`/admin/ai-tools/${t.id}`}
                 className="rounded-md bg-brand-400 px-2.5 py-1.5 text-xs font-medium text-ink-900 transition hover:bg-brand-300"

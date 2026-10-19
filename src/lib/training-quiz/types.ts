@@ -4,15 +4,18 @@
  */
 
 export type CognitiveLevel = 'Nhận biết' | 'Thông hiểu' | 'Tình huống thực tế';
+export type QuestionLevel = CognitiveLevel;
 
 export interface QuizQuestion {
-  id: number; // 1 to 15
+  id: number; // 1 to N
   question: string;
   level: CognitiveLevel;
-  timeLimit: number; // 15 seconds
+  timeLimit: number; // seconds (default 15)
+  timeLimitSeconds?: number; // alias for timeLimit
   options: [string, string, string, string]; // exactly 4 options
   correctIndex: number; // 0, 1, 2, or 3
   explanation: string;
+  active?: boolean; // default true
 }
 
 export interface PlayerAnswer {
@@ -63,12 +66,18 @@ export interface RoomState {
   roomCode: string;
   hostToken: string;
   status: RoomStatus;
-  currentQuestionIndex: number; // 0 to 14 (15 questions)
+  currentQuestionIndex: number; // 0 to N-1
   questionStartTime?: number; // server timestamp ms
-  questionDeadline?: number; // questionStartTime + 15000
+  questionDeadline?: number; // questionStartTime + questionTimeLimitMs
   players: Record<string, PlayerState>;
   fastestPlayerInCurrentQuestion?: FastestPlayerInfo;
   statsPerQuestion?: Record<number, QuestionAnswerStats>;
+  questions?: QuizQuestion[];
+  totalQuestions?: number;
+  questionTimeLimitSeconds?: number;
+  previewDurationSeconds?: number;
+  programTitle?: string;
+  programSubtitle?: string;
 }
 
 export interface ScoringResult {

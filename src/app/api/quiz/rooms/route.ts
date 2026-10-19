@@ -11,6 +11,7 @@ import {
   calculateScore,
   getFastestPlayerInQuestion,
 } from '@/lib/training-quiz/scoringEngine';
+import { loadPersistedQuizConfig } from '@/lib/training-quiz/configStorage';
 
 type ExtendedHostAction =
   | HostActionType
@@ -83,10 +84,21 @@ function recomputePlayerFromAnswers(room: QuizRoom, player: PlayerState): void {
       continue;
     }
 
+    const qTimeLimitMs =
+      room.allowPerQuestionTimeLimit && question.timeLimit && question.timeLimit > 0
+        ? question.timeLimit * 1000
+        : room.questionTimeLimitMs;
+
     const responseTimeMs = Math.max(0, Number(ans.responseTimeMs) || 0);
-    const isTimeout = responseTimeMs >= room.questionTimeLimitMs;
+    const isTimeout = responseTimeMs >= qTimeLimitMs;
     const isCorrect = !isTimeout && ans.selectedIndex === question.correctIndex;
-    const calc = calculateScore(isCorrect, responseTimeMs, streak);
+    const calc = calculateScore(
+      isCorrect,
+      responseTimeMs,
+      streak,
+      qTimeLimitMs,
+      room.baseMaxPoints
+    );
 
     ans.isCorrect = isCorrect;
     ans.pointsEarned = calc.points;
@@ -242,6 +254,10 @@ function rehydrateRoomFromSnapshot(
     const created = roomManager.createRoom({
       customCode: roomCode,
       hostToken: hostToken || undefined,
+      questions:
+        snapshot?.questions && Array.isArray(snapshot.questions) && snapshot.questions.length > 0
+          ? snapshot.questions
+          : undefined,
     });
     room = created.room as RehydratableQuizRoom;
     room.timedOutQuestions = new Set<number>();
@@ -263,6 +279,15 @@ function rehydrateRoomFromSnapshot(
 
   // Host snapshot monotonic progression + player merge
   if (snapshot && hostToken && room.hostToken === hostToken) {
+    if (
+      snapshot.questions &&
+      Array.isArray(snapshot.questions) &&
+      snapshot.questions.length > 0 &&
+      snapshot.questions[0].correctIndex >= 0
+    ) {
+      (room as { questions: typeof snapshot.questions }).questions = snapshot.questions;
+    }
+
     if (snapshot.status && typeof snapshot.currentQuestionIndex === 'number') {
       const serverProgress = getRoomProgress(room.status, room.currentQuestionIndex);
       const snapProgress = getRoomProgress(snapshot.status, snapshot.currentQuestionIndex);
@@ -293,10 +318,10 @@ function rehydrateRoomFromSnapshot(
     mergePlayersIntoRoom(room, { [playerSnapshot.id]: playerSnapshot }, canMergePlayer);
   }
 
-  // Enforce 15s deadline timeout before returning state
+  // Enforce deadline timeout before returning state
   enforceActiveQuestionTimeout(room);
 
-  if (room.status === 'QUESTION_ACTIVE') {
+  if (room.status === 'QUESTION_ACTIVE' && room.fastShortCircuit) {
     room.checkFastShortCircuit();
   }
 
@@ -305,6 +330,7 @@ function rehydrateRoomFromSnapshot(
 
 export async function GET(request: Request) {
   try {
+    await loadPersistedQuizConfig();
     const url = new URL(request.url);
     const code = (url.searchParams.get('roomCode') || url.searchParams.get('code') || '')
       .trim()
@@ -342,6 +368,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    await loadPersistedQuizConfig();
     const body = await request.json().catch(() => ({}));
     const op = typeof body?.op === 'string' ? body.op : 'create';
     const roomManager = QuizRoomManager.getInstance();

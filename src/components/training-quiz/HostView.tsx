@@ -272,7 +272,22 @@ export const HostView: React.FC<HostViewProps> = ({
     [room, roomCode, hostToken, handleUserGesture, applyIncomingState]
   );
 
-  // Active question countdown timer & automatic 15s timeout reveal
+  const activeQuestions: QuizQuestion[] =
+    state?.questions && state.questions.length > 0
+      ? state.questions
+      : room?.questions && room.questions.length > 0
+      ? room.questions
+      : TRAINING_QUIZ_QUESTIONS;
+
+  const totalQuestions = state?.totalQuestions || activeQuestions.length || 15;
+  const currentQuestion: QuizQuestion =
+    activeQuestions[state?.currentQuestionIndex ?? 0] || activeQuestions[0];
+
+  const activeTimeLimitSec =
+    state?.questionTimeLimitSeconds || currentQuestion?.timeLimit || 15;
+  const activePreviewSec = state?.previewDurationSeconds || 3;
+
+  // Active question countdown timer & automatic timeout reveal
   useEffect(() => {
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
@@ -280,7 +295,7 @@ export const HostView: React.FC<HostViewProps> = ({
     }
 
     if (state?.status === 'QUESTION_START') {
-      setPreviewSeconds(3);
+      setPreviewSeconds(activePreviewSec);
       quizSound.playQuestionStart();
 
       const previewInterval = setInterval(() => {
@@ -299,7 +314,7 @@ export const HostView: React.FC<HostViewProps> = ({
             if (latestStateRef.current?.status === 'QUESTION_START') {
               dispatchAction('ACTIVATE_QUESTION');
             }
-          }, 3100)
+          }, activePreviewSec * 1000 + 100)
         : null;
 
       return () => {
@@ -355,7 +370,14 @@ export const HostView: React.FC<HostViewProps> = ({
     if (state?.status === 'FINAL_RESULTS') {
       quizSound.playPodium();
     }
-  }, [state?.status, state?.questionDeadline, state?.currentQuestionIndex, standaloneRoom, dispatchAction]);
+  }, [
+    state?.status,
+    state?.questionDeadline,
+    state?.currentQuestionIndex,
+    activePreviewSec,
+    standaloneRoom,
+    dispatchAction,
+  ]);
 
   const toggleSound = () => {
     handleUserGesture();
@@ -378,10 +400,6 @@ export const HostView: React.FC<HostViewProps> = ({
     }
   };
 
-  const currentQuestion: QuizQuestion =
-    TRAINING_QUIZ_QUESTIONS[state?.currentQuestionIndex ?? 0] ||
-    TRAINING_QUIZ_QUESTIONS[0];
-
   const playersList = Object.values(state?.players || {});
   const answeredCount = playersList.filter(
     (p) =>
@@ -400,7 +418,7 @@ export const HostView: React.FC<HostViewProps> = ({
 
   const finalAwards: FinalAwardsSummary | null =
     state?.status === 'FINAL_RESULTS'
-      ? getFinalAwards(state.players || {}, TRAINING_QUIZ_QUESTIONS)
+      ? getFinalAwards(state.players || {}, activeQuestions)
       : null;
 
   const remainingLeaderboard: LeaderboardEntry[] =
@@ -420,13 +438,14 @@ export const HostView: React.FC<HostViewProps> = ({
           </div>
           <div>
             <h1 className="text-lg font-extrabold tracking-tight text-white flex items-center gap-2">
-              ĐẤU TRÍ ĐOÀN - HỘI HCMUTE
+              {state?.programTitle || 'ĐẤU TRÍ ĐOÀN - HỘI HCMUTE'}
               <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-900/80 text-brand-300 border border-brand-700/50">
                 Màn hình Giảng viên
               </span>
             </h1>
             <p className="text-xs text-slate-400">
-              Tập huấn kỹ năng xây dựng kế hoạch & tổ chức hoạt động
+              {state?.programSubtitle ||
+                'Tập huấn kỹ năng xây dựng kế hoạch & tổ chức hoạt động'}
             </p>
           </div>
         </div>
@@ -600,7 +619,7 @@ export const HostView: React.FC<HostViewProps> = ({
         {state?.status === 'QUESTION_START' && (
           <section className="w-full max-w-4xl flex flex-col items-center text-center space-y-6 animate-fadeIn" data-testid="question-start">
             <span className="px-4 py-1.5 rounded-full text-sm font-bold bg-brand-900/80 text-brand-300 border border-brand-700/60 uppercase tracking-widest">
-              Câu {state.currentQuestionIndex + 1} / {TRAINING_QUIZ_QUESTIONS.length}
+              Câu {state.currentQuestionIndex + 1} / {totalQuestions}
             </span>
 
             <div className="text-6xl sm:text-7xl font-black text-amber-400 animate-bounce">
@@ -618,14 +637,14 @@ export const HostView: React.FC<HostViewProps> = ({
           </section>
         )}
 
-        {/* 3. QUESTION_ACTIVE (15s Countdown + 4 Cards) */}
+        {/* 3. QUESTION_ACTIVE (Countdown + 4 Cards) */}
         {state?.status === 'QUESTION_ACTIVE' && (
           <section className="w-full flex flex-col space-y-6 animate-fadeIn" data-testid="question-active">
             {/* Top Bar: Question Info + Countdown + Answered Counter */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
               <div className="flex items-center gap-3">
                 <span className="px-3.5 py-1.5 rounded-xl bg-brand-950 border border-brand-700/60 text-brand-300 font-black text-sm">
-                  CÂU {state.currentQuestionIndex + 1} / 15
+                  CÂU {state.currentQuestionIndex + 1} / {totalQuestions}
                 </span>
                 <span className="px-3 py-1 rounded-xl bg-slate-800 border border-slate-700 text-slate-300 text-xs font-semibold">
                   {currentQuestion.level}
@@ -650,7 +669,7 @@ export const HostView: React.FC<HostViewProps> = ({
                   <span className="text-xs text-slate-400 font-semibold block uppercase">
                     Thời gian còn lại
                   </span>
-                  <span className="text-xs text-slate-300 font-mono">15 giây</span>
+                  <span className="text-xs text-slate-300 font-mono">{activeTimeLimitSec} giây</span>
                 </div>
               </div>
 
@@ -673,7 +692,7 @@ export const HostView: React.FC<HostViewProps> = ({
                     ? 'bg-amber-400'
                     : 'bg-brand-500'
                 }`}
-                style={{ width: `${(remainingSeconds / 15) * 100}%` }}
+                style={{ width: `${Math.min(100, (remainingSeconds / Math.max(1, activeTimeLimitSec)) * 100)}%` }}
               />
             </div>
 
@@ -880,7 +899,7 @@ export const HostView: React.FC<HostViewProps> = ({
                   🏆 BẢNG XẾP HẠNG TẠM THỜI
                 </h2>
                 <p className="text-xs text-slate-400">
-                  Sau câu {state.currentQuestionIndex + 1} / 15
+                  Sau câu {state.currentQuestionIndex + 1} / {totalQuestions}
                 </p>
               </div>
 
@@ -890,7 +909,7 @@ export const HostView: React.FC<HostViewProps> = ({
                 className="px-6 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-extrabold text-sm shadow-md transition transform active:scale-95 cursor-pointer"
                 data-testid="advance-next-btn"
               >
-                {state.currentQuestionIndex + 1 >= TRAINING_QUIZ_QUESTIONS.length
+                {state.currentQuestionIndex + 1 >= totalQuestions
                   ? '🏁 Xem Tổng Kết Chung Cuộc'
                   : 'Câu tiếp theo ➔'}
               </button>
@@ -937,7 +956,7 @@ export const HostView: React.FC<HostViewProps> = ({
                           {p.score.toLocaleString()}
                         </span>
                         <span className="text-xs text-slate-400 block">
-                          {p.correctCount}/15 câu đúng
+                          {p.correctCount}/{totalQuestions} câu đúng
                         </span>
                       </div>
                     </div>
@@ -954,13 +973,13 @@ export const HostView: React.FC<HostViewProps> = ({
 
             <div className="text-center space-y-2">
               <span className="px-4 py-1 rounded-full text-xs font-black bg-amber-900/60 text-amber-300 border border-amber-700/60 uppercase tracking-widest">
-                ĐẤU TRÍ ĐOÀN - HỘI HCMUTE
+                {state?.programTitle || 'ĐẤU TRÍ ĐOÀN - HỘI HCMUTE'}
               </span>
               <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
                 TỔNG KẾT & BỤC VINH DANH CHUNG CUỘC
               </h2>
               <p className="text-slate-400 text-sm">
-                Hoàn thành xuất sắc 15 câu hỏi tập huấn xây dựng kế hoạch và tổ chức hoạt động
+                Hoàn thành xuất sắc {totalQuestions} câu hỏi tập huấn xây dựng kế hoạch và tổ chức hoạt động
               </p>
             </div>
 
@@ -984,7 +1003,7 @@ export const HostView: React.FC<HostViewProps> = ({
                   {finalAwards?.podium[1] ? `${finalAwards.podium[1].score.toLocaleString()} đ` : '—'}
                 </span>
                 <span className="text-[11px] text-emerald-400 font-semibold mb-2">
-                  {finalAwards?.podium[1] ? `${finalAwards.podium[1].correctCount}/15 câu đúng` : ''}
+                  {finalAwards?.podium[1] ? `${finalAwards.podium[1].correctCount}/${totalQuestions} câu đúng` : ''}
                 </span>
                 <div className="w-full h-32 sm:h-40 rounded-t-2xl bg-gradient-to-t from-slate-700 to-slate-500 border-t-4 border-slate-300 flex items-center justify-center text-2xl font-black text-slate-900 shadow-xl">
                   2
@@ -1009,7 +1028,7 @@ export const HostView: React.FC<HostViewProps> = ({
                   {finalAwards?.podium[0] ? `${finalAwards.podium[0].score.toLocaleString()} đ` : '0 đ'}
                 </span>
                 <span className="text-xs text-emerald-400 font-bold mb-2">
-                  {finalAwards?.podium[0] ? `${finalAwards.podium[0].correctCount}/15 câu đúng` : ''}
+                  {finalAwards?.podium[0] ? `${finalAwards.podium[0].correctCount}/${totalQuestions} câu đúng` : ''}
                 </span>
                 <div className="w-full h-44 sm:h-56 rounded-t-2xl bg-gradient-to-t from-amber-600 to-yellow-400 border-t-4 border-yellow-200 flex items-center justify-center text-3xl font-black text-amber-950 shadow-2xl">
                   1
@@ -1034,7 +1053,7 @@ export const HostView: React.FC<HostViewProps> = ({
                   {finalAwards?.podium[2] ? `${finalAwards.podium[2].score.toLocaleString()} đ` : '—'}
                 </span>
                 <span className="text-[11px] text-emerald-400 font-semibold mb-2">
-                  {finalAwards?.podium[2] ? `${finalAwards.podium[2].correctCount}/15 câu đúng` : ''}
+                  {finalAwards?.podium[2] ? `${finalAwards.podium[2].correctCount}/${totalQuestions} câu đúng` : ''}
                 </span>
                 <div className="w-full h-24 sm:h-28 rounded-t-2xl bg-gradient-to-t from-amber-900 to-amber-700 border-t-4 border-amber-600 flex items-center justify-center text-2xl font-black text-amber-200 shadow-xl">
                   3
@@ -1084,7 +1103,7 @@ export const HostView: React.FC<HostViewProps> = ({
                           {entry.score.toLocaleString()} đ
                         </span>
                         <span className="text-[11px] text-emerald-400 font-semibold">
-                          {entry.correctCount}/15 đúng
+                          {entry.correctCount}/{totalQuestions} đúng
                         </span>
                         {entry.totalResponseTimeMs > 0 && (
                           <span className="text-[11px] text-slate-400 font-mono ml-2">
@@ -1225,7 +1244,7 @@ export const HostView: React.FC<HostViewProps> = ({
                                   {entry.unit || '-'}
                                 </td>
                                 <td className="py-3 px-4 text-center font-semibold text-emerald-400">
-                                  {entry.correctCount}/15
+                                  {entry.correctCount}/{totalQuestions}
                                 </td>
                                 <td className="py-3 px-4 text-center font-mono text-orange-300">
                                   x{state?.players?.[entry.playerId]?.maxStreak ?? entry.streak}

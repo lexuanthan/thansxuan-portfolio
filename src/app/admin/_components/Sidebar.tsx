@@ -50,8 +50,9 @@ const GROUPS: { title: string | null; items: Item[] }[] = [
     title: "Sản phẩm & Tiện ích số",
     items: [
       { href: "/admin/ai-tools", label: "Kho tiện ích (AI Tools)", Icon: IconSparkle },
-      { href: "/admin/projects", label: "Ứng dụng & Dự án", Icon: IconRocket },
+      { href: "/admin/training-quiz", label: "Quản trị Game Tập huấn", Icon: IconSparkle },
       { href: "/admin/career-guidance", label: "Quản trị Hướng nghiệp", Icon: IconRocket },
+      { href: "/admin/projects", label: "Ứng dụng & Dự án", Icon: IconRocket },
       { href: "/admin/logos", label: "Logo Studio (Canvas)", Icon: IconGrid },
     ],
   },

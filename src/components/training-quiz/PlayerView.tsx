@@ -266,6 +266,19 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
 
   const myPlayer: PlayerState | undefined = playerId ? state?.players?.[playerId] : undefined;
   const myAnswer = myPlayer?.answers?.[state?.currentQuestionIndex ?? 0];
+  const totalQuestions =
+    state?.totalQuestions ||
+    state?.questions?.length ||
+    standaloneRoom?.questions.length ||
+    TRAINING_QUIZ_QUESTIONS.length;
+  const activeTimeLimitSec =
+    state?.questionTimeLimitSeconds ||
+    standaloneRoom?.questionTimeLimitSeconds ||
+    15;
+  const activePreviewSec =
+    state?.previewDurationSeconds ||
+    standaloneRoom?.previewDurationSeconds ||
+    3;
 
   // Calculate my rank
   const allPlayers = Object.values(state?.players || {}).sort(
@@ -286,7 +299,9 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             ⚡
           </span>
           <div>
-            <h1 className="text-sm font-extrabold text-white">ĐẤU TRÍ ĐOÀN - HỘI</h1>
+            <h1 className="text-sm font-extrabold text-white">
+              {state?.programTitle || 'ĐẤU TRÍ ĐOÀN - HỘI'}
+            </h1>
             {joined && (
               <p className="text-xs text-slate-400 font-mono">Phòng: {roomCode}</p>
             )}
@@ -427,17 +442,17 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
           </div>
         )}
 
-        {/* 3. QUESTION_START (3s Preview) */}
+        {/* 3. QUESTION_START (Preview) */}
         {joined && state?.status === 'QUESTION_START' && (
           <div className="w-full text-center space-y-6 animate-fadeIn" data-testid="player-question-start">
             <span className="px-3.5 py-1 rounded-full text-xs font-bold bg-brand-900 text-brand-300 uppercase">
-              Câu {state.currentQuestionIndex + 1} / 15
+              Câu {state.currentQuestionIndex + 1} / {totalQuestions}
             </span>
             <h2 className="text-2xl font-black text-white">
               Chuẩn bị bấm câu trả lời!
             </h2>
             <div className="w-16 h-16 rounded-2xl bg-amber-500 text-slate-950 font-black text-3xl mx-auto flex items-center justify-center animate-bounce shadow-xl">
-              3
+              {activePreviewSec}
             </div>
             <p className="text-xs text-slate-400">
               Quan sát câu hỏi và các phương án trên màn hình máy chiếu!
@@ -451,7 +466,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
             {/* Countdown Header */}
             <div className="flex items-center justify-between bg-slate-900 px-4 py-2.5 rounded-xl border border-slate-800">
               <span className="text-xs font-black text-brand-400">
-                CÂU {state.currentQuestionIndex + 1} / 15
+                CÂU {state.currentQuestionIndex + 1} / {totalQuestions}
               </span>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-slate-400">Còn lại:</span>
@@ -495,7 +510,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 </div>
                 <div>
                   <h3 className="text-xl font-black text-white">
-                    Đã hết 15 giây đếm ngược!
+                    Đã hết {activeTimeLimitSec} giây đếm ngược!
                   </h3>
                   <p className="text-xs text-red-200 mt-1">
                     Hệ thống đã khóa câu trả lời và đang mở đáp án (không trả lời được tính là sai).
@@ -558,7 +573,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 <div>
                   <span className="px-3 py-1 rounded-full text-xs font-black bg-red-900 text-red-200 uppercase">
                     {!myAnswer || myAnswer.selectedIndex < 0
-                      ? 'HẾT 15 GIÂY — KHÔNG TRẢ LỜI (TÍNH SAI)'
+                      ? `HẾT ${activeTimeLimitSec} GIÂY — KHÔNG TRẢ LỜI (TÍNH SAI)`
                       : 'CHƯA CHÍNH XÁC'}
                   </span>
                   <h3 className="text-2xl font-black text-white mt-2">
@@ -566,7 +581,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                   </h3>
                   <p className="text-xs text-red-300 mt-1">
                     {!myAnswer || myAnswer.selectedIndex < 0
-                      ? 'Hết 15 giây đếm ngược bạn không chọn đáp án nên được tính là trả lời sai. Chuỗi đúng đã về 0!'
+                      ? `Hết ${activeTimeLimitSec} giây đếm ngược bạn không chọn đáp án nên được tính là trả lời sai. Chuỗi đúng đã về 0!`
                       : 'Chuỗi đúng đã được thiết lập lại về 0. Hãy bứt phá ở câu sau!'}
                   </p>
                 </div>
@@ -603,7 +618,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 <div className="pt-3 border-t border-slate-800 flex justify-around text-xs text-slate-400">
                   <div>
                     <span className="block font-bold text-white text-sm">
-                      {myPlayer.correctCount}/15
+                      {myPlayer.correctCount}/{totalQuestions}
                     </span>
                     <span>Số câu đúng</span>
                   </div>
@@ -656,7 +671,7 @@ export const PlayerView: React.FC<PlayerViewProps> = ({
                 <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
                   <span className="text-slate-400 block">Số câu đúng</span>
                   <span className="text-lg font-black text-emerald-400 font-mono">
-                    {myPlayer?.correctCount} / 15
+                    {myPlayer?.correctCount} / {totalQuestions}
                   </span>
                 </div>
               </div>

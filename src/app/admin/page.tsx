@@ -320,6 +320,7 @@ export default async function AdminDashboard() {
           <h2 className="mb-4 text-base font-bold text-ink-900">Thao tác nhanh</h2>
           <div className="grid gap-2">
             {[
+              { href: "/admin/training-quiz", label: "Quản trị Game Tập huấn & Excel", Icon: IconSparkle },
               { href: "/admin/posts/new", label: "Viết bài mới", Icon: IconFile },
               { href: "/admin/categories", label: "Thêm chuyên mục", Icon: IconChart },
               { href: "/admin/projects/new", label: "Thêm dự án", Icon: IconRocket },

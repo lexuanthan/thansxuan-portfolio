@@ -43,6 +43,11 @@ export interface QuizRoomOptions {
   questions?: QuizQuestion[];
   previewDurationMs?: number;
   questionTimeLimitMs?: number;
+  fastShortCircuit?: boolean;
+  baseMaxPoints?: number;
+  allowPerQuestionTimeLimit?: boolean;
+  programTitle?: string;
+  programSubtitle?: string;
 }
 
 export type RoomEventListener = (state: RoomState, event?: QuizRoomEvent) => void;
@@ -61,6 +66,11 @@ export class QuizRoom {
   public readonly questions: QuizQuestion[];
   public readonly previewDurationMs: number;
   public readonly questionTimeLimitMs: number;
+  public readonly fastShortCircuit: boolean;
+  public readonly baseMaxPoints: number;
+  public readonly allowPerQuestionTimeLimit: boolean;
+  public readonly programTitle?: string;
+  public readonly programSubtitle?: string;
 
   public createdAt: number;
   public lastActivityAt: number;
@@ -77,8 +87,29 @@ export class QuizRoom {
         : TRAINING_QUIZ_QUESTIONS;
     this.previewDurationMs = options.previewDurationMs ?? DEFAULT_PREVIEW_DURATION_MS;
     this.questionTimeLimitMs = options.questionTimeLimitMs ?? DEFAULT_QUESTION_TIME_LIMIT_MS;
+    this.fastShortCircuit = options.fastShortCircuit ?? true;
+    this.baseMaxPoints = options.baseMaxPoints ?? 1000;
+    this.allowPerQuestionTimeLimit = options.allowPerQuestionTimeLimit ?? false;
+    this.programTitle = options.programTitle;
+    this.programSubtitle = options.programSubtitle;
     this.createdAt = Date.now();
     this.lastActivityAt = Date.now();
+  }
+
+  public get questionTimeLimitSeconds(): number {
+    return Math.round(this.getCurrentQuestionTimeLimitMs() / 1000);
+  }
+
+  public get previewDurationSeconds(): number {
+    return Math.round(this.previewDurationMs / 1000);
+  }
+
+  public getCurrentQuestionTimeLimitMs(): number {
+    const q = this.getCurrentQuestion();
+    if (this.allowPerQuestionTimeLimit && q && q.timeLimit && q.timeLimit > 0) {
+      return q.timeLimit * 1000;
+    }
+    return this.questionTimeLimitMs;
   }
 
   private generateToken(): string {
@@ -220,25 +251,26 @@ export class QuizRoom {
   }
 
   /**
-   * Transition to QUESTION_ACTIVE: 15-second countdown timer starts now.
+   * Transition to QUESTION_ACTIVE: countdown timer starts now.
    */
   public transitionToQuestionActive(): void {
     this.clearTimer();
+    const limitMs = this.getCurrentQuestionTimeLimitMs();
     this.status = 'QUESTION_ACTIVE';
     this.questionStartTime = Date.now();
-    this.questionDeadline = this.questionStartTime + this.questionTimeLimitMs;
+    this.questionDeadline = this.questionStartTime + limitMs;
 
     this.emit('QUESTION_ACTIVE', {
       questionIndex: this.currentQuestionIndex,
       questionStartTime: this.questionStartTime,
       questionDeadline: this.questionDeadline,
-      timeLimitMs: this.questionTimeLimitMs,
+      timeLimitMs: limitMs,
     });
 
-    // Set 15-second countdown timer for timeout
+    // Set countdown timer for timeout
     this.activeTimer = setTimeout(() => {
       this.handleQuestionTimeout();
-    }, this.questionTimeLimitMs);
+    }, limitMs);
   }
 
   /**
@@ -402,7 +434,13 @@ export class QuizRoom {
       payload.selectedIndex === currentQuestion?.correctIndex;
 
     // 8. Calculate score
-    const result = calculateScore(isCorrect, responseTimeMs, player.streak);
+    const result = calculateScore(
+      isCorrect,
+      responseTimeMs,
+      player.streak,
+      this.getCurrentQuestionTimeLimitMs(),
+      this.baseMaxPoints
+    );
 
     // 9. Update player state
     player.score += result.points;
@@ -447,9 +485,9 @@ export class QuizRoom {
     });
 
     // 12. INSTANT FAST SHORT-CIRCUIT CHECK
-    // If all connected players have answered before the 15-second deadline,
-    // immediately advance to QUESTION_REVEAL!
-    this.checkFastShortCircuit();
+    if (this.fastShortCircuit) {
+      this.checkFastShortCircuit();
+    }
 
     return result;
   }
@@ -490,6 +528,7 @@ export class QuizRoom {
    * Returns standard internal state.
    */
   public getState(): RoomState {
+    const activeTimeLimitSec = Math.round(this.getCurrentQuestionTimeLimitMs() / 1000);
     return {
       roomCode: this.roomCode,
       hostToken: this.hostToken,
@@ -500,6 +539,12 @@ export class QuizRoom {
       players: this.players,
       fastestPlayerInCurrentQuestion: this.fastestPlayerInCurrentQuestion,
       statsPerQuestion: this.statsPerQuestion,
+      questions: this.questions,
+      totalQuestions: this.questions.length,
+      questionTimeLimitSeconds: activeTimeLimitSec,
+      previewDurationSeconds: Math.round(this.previewDurationMs / 1000),
+      programTitle: this.programTitle,
+      programSubtitle: this.programSubtitle,
     };
   }
 
@@ -574,6 +619,23 @@ export class QuizRoom {
       }
     }
 
+    const sanitizedQuestions: QuizQuestion[] = this.questions.map((q, idx) => {
+      const canRevealQuestion =
+        this.status === 'FINAL_RESULTS' ||
+        idx < this.currentQuestionIndex ||
+        (idx === this.currentQuestionIndex &&
+          (this.status === 'QUESTION_REVEAL' || this.status === 'LEADERBOARD'));
+
+      if (canRevealQuestion) {
+        return { ...q };
+      }
+      return {
+        ...q,
+        correctIndex: -1,
+        explanation: '',
+      };
+    });
+
     return {
       roomCode: this.roomCode,
       hostToken: '', // stripped for non-host
@@ -586,6 +648,12 @@ export class QuizRoom {
         ? undefined
         : this.fastestPlayerInCurrentQuestion,
       statsPerQuestion: hideActiveAnswerDetails ? undefined : this.statsPerQuestion,
+      questions: sanitizedQuestions,
+      totalQuestions: this.questions.length,
+      questionTimeLimitSeconds: Math.round(this.getCurrentQuestionTimeLimitMs() / 1000),
+      previewDurationSeconds: Math.round(this.previewDurationMs / 1000),
+      programTitle: this.programTitle,
+      programSubtitle: this.programSubtitle,
     };
   }
 
