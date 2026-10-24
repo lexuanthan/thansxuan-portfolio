@@ -1,0 +1,31 @@
+name: Supabase & Vercel Anti-Hibernation (Keep-Alive 24/7)
+
+on:
+  schedule:
+    # Cháº¡y tá»± Ä‘á»™ng 2 láº§n/ngÃ y (08:00 sÃ¡ng vÃ  20:00 tá»‘i giá» Viá»‡t Nam)
+    - cron: '0 1,13 * * *'
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Project 1 - ÄoÃ n TrÆ°á»ng HCMUTE (bejwlwyminqdhvriukfm)
+        run: |
+          ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJlandsd3ltaW5xZGh2cml1a2ZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5OTQ3OTYsImV4cCI6MjEwNTU3MDc5Nn0.nMaDNwL-HsYuHtXQTWWIbDAAJkGNAcTsRrSAeLPqGbc"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://bejwlwyminqdhvriukfm.supabase.co/rest/v1/members?select=id&limit=1" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")
+          echo "ÄoÃ n TrÆ°á»ng Supabase HTTP Status: $STATUS"
+          curl -s -o /dev/null -w "doantruong.vercel.app HTTP Status: %{http_code}\n" "https://doantruong.vercel.app/"
+
+      - name: Ping Project 2 - UTE-Hub (msfskzmxafxbulpohrlc)
+        run: |
+          ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zZnNrem14YWZ4YnVscG9ocmxjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTE0OTYsImV4cCI6MjEwNTIyNzQ5Nn0.Gpjq3EQscmYvTJI71v7E3EnCx6C1gXuw45jwPnycFc4"
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://msfskzmxafxbulpohrlc.supabase.co/rest/v1/profiles?select=id&limit=1" -H "apikey: $ANON_KEY" -H "Authorization: Bearer $ANON_KEY")
+          echo "UTE-Hub Supabase HTTP Status: $STATUS"
+          curl -s -o /dev/null -w "utehub-lovat.vercel.app HTTP Status: %{http_code}\n" "https://utehub-lovat.vercel.app/"
+
+      - name: Ping Project 3 - Portfolio & Tiá»‡n Ã­ch (lkvpeviezgzzfnaxuqpr)
+        run: |
+          curl -s -o /dev/null -w "thanlx.vercel.app Quiz API HTTP Status: %{http_code}\n" "https://thanlx.vercel.app/api/quiz/config"
+          curl -s -o /dev/null -w "thanlx.vercel.app Career Config HTTP Status: %{http_code}\n" "https://thanlx.vercel.app/api/career-guidance/config"
+          curl -s -o /dev/null -w "lkvpeviezgzzfnaxuqpr Storage HTTP Status: %{http_code}\n" -I "https://lkvpeviezgzzfnaxuqpr.supabase.co/storage/v1/object/public/media/uploads/download-mugnsc7uv8ht6.png"
